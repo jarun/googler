@@ -1,0 +1,147 @@
+#!/usr/bin/python
+#
+# Copyright (C) 2008 Henri Hakkinen
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import sys
+from urllib import quote_plus
+from httplib import HTTPConnection
+from HTMLParser import HTMLParser
+from getopt import getopt, GetoptError
+
+def print_entry(title, url, text):
+    print "* %s (%s)\n%s\n" % (title, url, text)
+
+class GoogleParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.handle_starttag = self.main_start
+        self.handle_data = self.main_data
+        self.handle_endtag = self.main_end
+    def main_start(self, tag, attrs):
+        if tag == "li" and len(attrs) > 0 and attrs[0] == ("class", "g"):
+            self.url = ""
+            self.title = ""
+            self.text = ""
+            self.handle_starttag = self.li_start
+            self.handle_data = self.li_data
+            self.handle_endtag = self.li_end
+    def main_data(self, data):
+        pass
+    def main_end(self, tag):
+        pass
+    def li_start(self, tag, attrs):
+        if tag == "h3":
+            self.handle_starttag = self.h3_start
+            self.handle_data = self.h3_data
+            self.handle_endtag = self.h3_end
+        elif tag == "div":
+            self.handle_starttag = self.div_start
+            self.handle_data = self.div_data
+            self.handle_endtag = self.div_end
+    def li_data(self, data):
+        pass
+    def li_end(self, tag):
+        if tag == "div":
+            print_entry(self.title, self.url, self.text)
+            self.handle_starttag = self.main_start
+            self.handle_data = self.main_data
+            self.handle_endtag = self.main_end
+    def h3_start(self, tag, attrs):
+        if tag == "a":
+            self.url = attrs[0][1]
+    def h3_data(self, data):
+        self.title += data
+    def h3_end(self, tag):
+        if tag == "h3": 
+            self.handle_starttag = self.li_start
+            self.handle_data = self.li_data
+            self.handle_endtag = self.li_end
+    def div_start(self, tag, start):
+        if tag == "br":
+            self.handle_starttag = self.li_start
+            self.handle_data = self.li_data
+            self.handle_endtag = self.li_end
+    def div_data(self, data):
+        self.text += data
+    def div_end(self, tag):
+        pass
+
+def usage():
+    print "Usage: google [OPTIONS] KEYWORDS..."
+    print "Performs a Google search and prints the results to stdout."
+    print
+    print "Options"
+    print "  -s N   start at result N"
+    print "  -n N   shows the first N results"
+    print
+    print "Copyright (C) 2008 Henri Hakkinen"
+    print "Report bugs to <henux@users.sourceforge.net>."
+    sys.exit(1)
+
+if len(sys.argv) < 2:
+    usage()
+
+# Process arguments.
+start    = None
+num      = None
+optlist  = None
+keywords = None
+
+try:
+    optlist, keywords = getopt(sys.argv[1:], "s:n:")
+except GetoptError, e:
+    print "google:", e
+    sys.exit(1)
+
+if len(keywords) < 1:
+    usage()
+
+for opt in optlist:
+    if opt[0] == "-s":
+        if not opt[1].isdigit():
+            print "google: option -s needs an integer"
+            sys.exit(1)
+        start = opt[1]
+    elif opt[0] == "-n":
+        if not opt[1].isdigit():
+            print "google: option -n needs an integer"
+            sys.exit(1)
+        num = opt[1]
+
+# Construct the query URL.
+url = "/search?"
+
+if start != None:
+    url += "start=" + start + "&"
+if num != None:
+    url += "num=" + num + "&"
+
+url += "q=" + quote_plus(keywords[0])
+for kw in keywords[1:]:
+    url += "+" + quote_plus(kw)
+
+# Connect to Google and request the result page.
+conn = HTTPConnection("www.google.com")
+conn.request("GET", url)
+resp = conn.getresponse()
+if resp.status != 200:
+    print str(resp.status)
+    sys.exit(1)
+
+# Parse the HTML document.
+parser = GoogleParser()
+parser.feed(resp.read())
+conn.close()
