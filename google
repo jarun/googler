@@ -16,12 +16,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import webbrowser
 from urllib import quote_plus
 from httplib import HTTPConnection
 from HTMLParser import HTMLParser
 from getopt import getopt, GetoptError
 
 def print_entry(title, url, text):
+    if openUrl == True:
+        webbrowser.open(url)
+        sys.exit(0)
     print "* %s (%s)\n%s\n" % (title, url, text)
 
 class GoogleParser(HTMLParser):
@@ -86,6 +90,7 @@ def usage():
     print "Options"
     print "  -s N   start at result N"
     print "  -n N   shows the first N results"
+    print "  -o     open the first result in web browser"
     print
     print "Copyright (C) 2008 Henri Hakkinen"
     print "Report bugs to <henux@users.sourceforge.net>."
@@ -97,11 +102,12 @@ if len(sys.argv) < 2:
 # Process arguments.
 start    = None
 num      = None
+openUrl  = False
 optlist  = None
 keywords = None
 
 try:
-    optlist, keywords = getopt(sys.argv[1:], "s:n:")
+    optlist, keywords = getopt(sys.argv[1:], "s:n:o")
 except GetoptError, e:
     print "google:", e
     sys.exit(1)
@@ -120,6 +126,8 @@ for opt in optlist:
             print "google: option -n needs an integer"
             sys.exit(1)
         num = opt[1]
+    elif opt[0] == "-o":
+        openUrl = True
 
 # Construct the query URL.
 url = "/search?"

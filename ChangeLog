@@ -1,3 +1,7 @@
+2008-10-14  Henri Häkkinen  <henux@users.sourceforge.net>
+
+	* google: Added -o option.
+
 2008-10-13  Henri Häkkinen  <henux@users.sourceforge.net>
 
 	Initial version.
