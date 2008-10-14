@@ -1,6 +1,7 @@
 2008-10-14  Henri Häkkinen  <henux@users.sourceforge.net>
 
 	* google: Added -o option.
+	* google.1: Created the manpage.
 
 2008-10-13  Henri Häkkinen  <henux@users.sourceforge.net>
 
