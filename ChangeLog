@@ -2,7 +2,7 @@
 
 	* google: Added -l option.
 	* google.1: Fixed typos and added option -o.
-	* Makefile: Added install script.
+	* Makefile: Added install and uninstall scripts.
 
 2008-10-14  Henri Häkkinen  <henux@users.sourceforge.net>
 
