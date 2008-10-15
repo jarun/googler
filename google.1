@@ -1,4 +1,4 @@
-.TH "GOOGLE" "1" "October 2008" "Version 20081014" "User Commands"
+.TH "GOOGLE" "1" "October 2008" "Version 20081015" "User Commands"
 .SH NAME
 google \- Google from command line
 .SH SYNOPSIS
@@ -10,9 +10,6 @@ google \- Google from command line
 is a small tool which allows Google searches to be done from the command line.
 .SH OPTIONS
 .TP
-.B \-o
-Open the first result in a web browser.
-.TP
 .BI \-s " N"
 Start at
 .I N'th
@@ -22,6 +19,14 @@ result.
 Show
 .I N
 results.
+.TP
+.BI \-l " LANG"
+Search for the language LANG, such as
+.I fi
+for Finnish.
+.TP
+.B \-o
+Open the first result in a web browser.
 .SH ENVIRONMENT
 .TP
 .BI BROWSER

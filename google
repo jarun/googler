@@ -88,9 +88,10 @@ def usage():
     print "Performs a Google search and prints the results to stdout."
     print
     print "Options"
-    print "  -s N   start at result N"
-    print "  -n N   shows the first N results"
-    print "  -o     open the first result in web browser"
+    print "  -s N     start at result N"
+    print "  -n N     shows the first N results"
+    print "  -l LANG  search for language LANG"
+    print "  -o       open the first result in web browser"
     print
     print "Copyright (C) 2008 Henri Hakkinen"
     print "Report bugs to <henux@users.sourceforge.net>."
@@ -102,12 +103,13 @@ if len(sys.argv) < 2:
 # Process arguments.
 start    = None
 num      = None
+lang     = None
 openUrl  = False
 optlist  = None
 keywords = None
 
 try:
-    optlist, keywords = getopt(sys.argv[1:], "s:n:o")
+    optlist, keywords = getopt(sys.argv[1:], "s:n:l:o")
 except GetoptError, e:
     print "google:", e
     sys.exit(1)
@@ -126,6 +128,8 @@ for opt in optlist:
             print "google: option -n needs an integer"
             sys.exit(1)
         num = opt[1]
+    elif opt[0] == "-l":
+        lang = opt[1]
     elif opt[0] == "-o":
         openUrl = True
 
@@ -136,6 +140,8 @@ if start != None:
     url += "start=" + start + "&"
 if num != None:
     url += "num=" + num + "&"
+if lang != None:
+    url += "hl=" + lang + "&"
 
 url += "q=" + quote_plus(keywords[0])
 for kw in keywords[1:]:
