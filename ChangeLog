@@ -1,6 +1,7 @@
 2008-10-15  Henri Häkkinen  <henux@users.sourceforge.net>
 
-	* google: Added options -l and -C.
+	* google: Added options -l and -C.  Now prints the full query URL
+	before showing the results.
 	* google.1: Fixed typos and added info for options -l and -C.
 	* Makefile: Added install and uninstall scripts.
 

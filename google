@@ -167,6 +167,11 @@ url += "q=" + quote_plus(keywords[0])
 for kw in keywords[1:]:
     url += "+" + quote_plus(kw)
 
+if colorize:
+    print "\x1B[96m"
+print "http://www.google.com%s" % url
+print
+
 # Connect to Google and request the result page.
 conn = HTTPConnection("www.google.com")
 conn.request("GET", url)
