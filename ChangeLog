@@ -1,7 +1,7 @@
 2008-10-15  Henri Häkkinen  <henux@users.sourceforge.net>
 
-	* google: Added -l option.
-	* google.1: Fixed typos and added option -o.
+	* google: Added options -l and -C.
+	* google.1: Fixed typos and added info for options -l and -C.
 	* Makefile: Added install and uninstall scripts.
 
 2008-10-14  Henri Häkkinen  <henux@users.sourceforge.net>

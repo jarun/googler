@@ -17,20 +17,24 @@
 
 import sys
 import webbrowser
+import termios
+import HTMLParser
+
 from urllib import quote_plus
 from httplib import HTTPConnection
-from HTMLParser import HTMLParser
 from getopt import getopt, GetoptError
 
-def print_entry(title, url, text):
-    if openUrl == True:
-        webbrowser.open(url)
-        sys.exit(0)
-    print "* %s (%s)\n%s\n" % (title, url, text)
+# Global variables
+start    = None    # The first result to display (option -s)
+num      = None    # Number of results to display (option -n)
+lang     = None    # Language to search for (option -l)
+openUrl  = False   # If True, opens the first URL in browser (option -o)
+colorize = False   # If True, colorizes the output (option -C)
 
-class GoogleParser(HTMLParser):
+# Classes
+class GoogleParser(HTMLParser.HTMLParser):
     def __init__(self):
-        HTMLParser.__init__(self)
+        HTMLParser.HTMLParser.__init__(self)
         self.handle_starttag = self.main_start
         self.handle_data = self.main_data
         self.handle_endtag = self.main_end
@@ -83,6 +87,16 @@ class GoogleParser(HTMLParser):
     def div_end(self, tag):
         pass
 
+# Functions
+def print_entry(title, url, text):
+    if openUrl == True:
+        webbrowser.open(url)
+        sys.exit(0)
+    if colorize:
+        print "\x1B[96m* \x1B[92m%s \x1B[93m(%s)\n\x1B[39m%s\n" % (title, url, text)
+    else:
+        print "* %s (%s)\n%s\n" % (title, url, text)
+
 def usage():
     print "Usage: google [OPTIONS] KEYWORDS..."
     print "Performs a Google search and prints the results to stdout."
@@ -91,47 +105,53 @@ def usage():
     print "  -s N     start at result N"
     print "  -n N     shows the first N results"
     print "  -l LANG  search for language LANG, such as fi for Finnish"
+    print "  -C       colorize the output"
     print "  -o       open the first result in web browser"
     print
     print "Copyright (C) 2008 Henri Hakkinen"
     print "Report bugs to <henux@users.sourceforge.net>."
     sys.exit(1)
 
+########### Program Main
+
+# Process command line options.
+optlist = None
+keywords = None
+
 if len(sys.argv) < 2:
     usage()
 
-# Process arguments.
-start    = None
-num      = None
-lang     = None
-openUrl  = False
-optlist  = None
-keywords = None
-
 try:
-    optlist, keywords = getopt(sys.argv[1:], "s:n:l:o")
+    optlist, keywords = getopt(sys.argv[1:], "s:n:l:Co")
 except GetoptError, e:
     print "google:", e
     sys.exit(1)
 
-if len(keywords) < 1:
-    usage()
-
 for opt in optlist:
     if opt[0] == "-s":
+        # Option -s N
         if not opt[1].isdigit():
             print "google: option -s needs an integer"
             sys.exit(1)
         start = opt[1]
     elif opt[0] == "-n":
+        # Option -n N
         if not opt[1].isdigit():
             print "google: option -n needs an integer"
             sys.exit(1)
         num = opt[1]
     elif opt[0] == "-l":
+        # Option -l LANG
         lang = opt[1]
+    elif opt[0] == "-C":
+        # Option -C
+        colorize = True
     elif opt[0] == "-o":
+        # Option -o
         openUrl = True
+
+if len(keywords) < 1:
+    usage()
 
 # Construct the query URL.
 url = "/search?"
@@ -152,10 +172,11 @@ conn = HTTPConnection("www.google.com")
 conn.request("GET", url)
 resp = conn.getresponse()
 if resp.status != 200:
-    print str(resp.status)
+    # The server responded with an error.
+    print "The server responded with an error:", str(resp.status)
     sys.exit(1)
 
-# Parse the HTML document.
+# Parse the HTML document and print the results.
 parser = GoogleParser()
 parser.feed(resp.read())
 conn.close()
