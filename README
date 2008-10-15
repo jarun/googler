@@ -11,7 +11,8 @@ Usage: google [OPTIONS] KEYWORDS...
 Options
   -s N     start at result N
   -n N     shows the first N results
-  -l LANG  search for language LANG, such fi for Finnish
+  -l LANG  search for language LANG, such as fi for Finnish
+  -C       colorize the output
   -o       open the first result in web browser
 
 Report bugs to <henux@users.sourceforge.net>.
