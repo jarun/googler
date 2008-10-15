@@ -90,7 +90,7 @@ def usage():
     print "Options"
     print "  -s N     start at result N"
     print "  -n N     shows the first N results"
-    print "  -l LANG  search for language LANG"
+    print "  -l LANG  search for language LANG, such as fi for Finnish"
     print "  -o       open the first result in web browser"
     print
     print "Copyright (C) 2008 Henri Hakkinen"
