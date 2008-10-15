@@ -15,6 +15,6 @@ install:
 
 uninstall:
 	rm -rf $(BINDIR)/google
-	rm -rf $(MANDIR)/google.1
+	rm -rf $(MANDIR)/google.1 $(MANDIR)/google.1.gz
 	rm -rf $(DOCDIR)/ChangeLog
 	rm -rf $(DOCDIR)/README
