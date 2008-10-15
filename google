@@ -17,7 +17,6 @@
 
 import sys
 import webbrowser
-import termios
 import HTMLParser
 
 from urllib import quote_plus
@@ -123,35 +122,33 @@ if len(sys.argv) < 2:
 
 try:
     optlist, keywords = getopt(sys.argv[1:], "s:n:l:Co")
+    for opt in optlist:
+        if opt[0] == "-s":
+            # Option -s N
+            if not opt[1].isdigit():
+                print "google: option -s needs an integer"
+                sys.exit(1)
+            start = opt[1]
+        elif opt[0] == "-n":
+            # Option -n N
+            if not opt[1].isdigit():
+                print "google: option -n needs an integer"
+                sys.exit(1)
+            num = opt[1]
+        elif opt[0] == "-l":
+            # Option -l LANG
+            lang = opt[1]
+        elif opt[0] == "-C":
+            # Option -C
+            colorize = True
+        elif opt[0] == "-o":
+            # Option -o
+            openUrl = True
+    if len(keywords) < 1:
+        usage()
 except GetoptError, e:
     print "google:", e
     sys.exit(1)
-
-for opt in optlist:
-    if opt[0] == "-s":
-        # Option -s N
-        if not opt[1].isdigit():
-            print "google: option -s needs an integer"
-            sys.exit(1)
-        start = opt[1]
-    elif opt[0] == "-n":
-        # Option -n N
-        if not opt[1].isdigit():
-            print "google: option -n needs an integer"
-            sys.exit(1)
-        num = opt[1]
-    elif opt[0] == "-l":
-        # Option -l LANG
-        lang = opt[1]
-    elif opt[0] == "-C":
-        # Option -C
-        colorize = True
-    elif opt[0] == "-o":
-        # Option -o
-        openUrl = True
-
-if len(keywords) < 1:
-    usage()
 
 # Construct the query URL.
 url = "/search?"
@@ -167,10 +164,12 @@ url += "q=" + quote_plus(keywords[0])
 for kw in keywords[1:]:
     url += "+" + quote_plus(kw)
 
-if colorize:
-    print "\x1B[96m"
-print "http://www.google.com%s" % url
-print
+if not openUrl:
+    if colorize:
+        print "\x1B[96mhttp://www.google.com%s" % url
+    else:
+        print "http://www.google.com%s" % url
+    print
 
 # Connect to Google and request the result page.
 conn = HTTPConnection("www.google.com")
