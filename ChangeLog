@@ -1,3 +1,8 @@
+2008-10-16  Henri Häkkinen  <henux@users.sourceforge.net>
+
+	* google: Changed option -o to -j because -o generally means
+	"output".  Long line truncating.
+
 2008-10-15  Henri Häkkinen  <henux@users.sourceforge.net>
 
 	* google: Added options -l and -C.  Now prints the full query URL

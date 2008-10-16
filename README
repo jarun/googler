@@ -2,17 +2,21 @@ cli-google README
 
 Copyright (C) 2008 Henri Hakkinen
 
+http://henux.nor.fi/coding/projects/6-cli/13-cli-google
+
 `google` is a command line tool for doing Google searches from the
-terminal.  It comes with a manual page.  To install the package to your
-system, run `make install` as root.
+terminal.  To install the package to your system, run `make install` as
+root.
 
 Usage: google [OPTIONS] KEYWORDS...
 
 Options
-  -s N     start at result N
-  -n N     shows the first N results
-  -l LANG  search for language LANG, such as fi for Finnish
-  -C       colorize the output
-  -o       open the first result in web browser
+  -s N     start at the Nth result
+  -n N     shows N results
+  -l LANG  display in language LANG, such as fi for Finnish
+  -C       enable color output
+  -j       open the first result in a web browser
 
 Report bugs to <henux@users.sourceforge.net>.
+
+See the manual page for full details.  Have fun!
