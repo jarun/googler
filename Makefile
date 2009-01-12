@@ -8,13 +8,16 @@ DOCDIR=$(DESTDIR)/share/doc/cli-google
 .PHONY: install uninstall
 
 install:
-	install -D -m755 google $(BINDIR)/google
-	install -D -m644 google.1 $(MANDIR)/google.1
-	install -D -m644 ChangeLog $(DOCDIR)/ChangeLog
-	install -D -m644 README $(DOCDIR)/README
+	install -m755 -d $(BINDIR)
+	install -m755 -d $(MANDIR)
+	install -m755 -d $(DOCDIR)
+	gzip -c google.1 > google.1.gz
+	install -m755 -t $(BINDIR) google
+	install -m644 -t $(MANDIR) google.1.gz
+	install -m644 -t $(DOCDIR) README
+	rm -f google.1.gz
 
 uninstall:
-	rm -rf $(BINDIR)/google
-	rm -rf $(MANDIR)/google.1 $(MANDIR)/google.1.gz
-	rm -rf $(DOCDIR)/ChangeLog
-	rm -rf $(DOCDIR)/README
+	rm -f $(BINDIR)/google
+	rm -f $(MANDIR)/google.1.gz
+	rm -rf $(DOCDIR)
