@@ -1,9 +1,9 @@
 # cli-google Makefile
 
-DESTDIR=/usr/local
-BINDIR=$(DESTDIR)/bin
-MANDIR=$(DESTDIR)/share/man/man1
-DOCDIR=$(DESTDIR)/share/doc/cli-google
+PREFIX=/usr/local
+BINDIR=$(PREFIX)/bin
+MANDIR=$(PREFIX)/share/man/man1
+DOCDIR=$(PREFIX)/share/doc/cli-google
 
 .PHONY: install uninstall
 
