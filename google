@@ -199,3 +199,5 @@ if resp.status != 200:
 parser = GoogleParser()
 parser.feed(resp.read())
 conn.close()
+
+# vim:set sts=4 sw=4 et:
