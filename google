@@ -20,8 +20,8 @@ import termios, fcntl, struct
 import webbrowser
 import HTMLParser
 
-from urllib.parse import quote_plus
-from http.client import HTTPConnection
+from urllib import quote_plus
+from httplib import HTTPConnection
 from getopt import getopt, GetoptError
 
 # Global variables
@@ -99,31 +99,31 @@ def print_entry(title, url, text):
         sys.exit(0)
     # Print the title and the URL.
     if colorize:
-        print("\x1B[96m* \x1B[92m%s\n\x1B[93m%s\x1B[39m" % (title, url))
+        print "\x1B[96m* \x1B[92m%s\n\x1B[93m%s\x1B[39m" % (title, url)
     else:
-        print("* %s\n%s" % (title, url))
+        print "* %s\n%s" % (title, url)
     # Print the text with truncating.
     col = 0
     for w in text.split():
         if (col + len(w) + 1) > columns:
             col = 0
-            print()
-        print(w, end=' ')
+            print
+        print w,
         col += len(w) + 1
-    print()
-    print()
+    print
+    print
 
 def usage():
-    print("Usage: google [OPTIONS] KEYWORDS...")
-    print("Performs a Google search and prints the results to stdout.\n")
-    print("Options")
-    print("  -s N     start at the Nth result")
-    print("  -n N     show N results")
-    print("  -l LANG  display in language LANG, such as fi for Finnish")
-    print("  -C       enable color output")
-    print("  -j       open the first result in a web browser\n")
-    print("Copyright (C) 2008 Henri Hakkinen.")
-    print("Report bugs to <henux@users.sourceforge.net>.")
+    print "Usage: google [OPTIONS] KEYWORDS..."
+    print "Performs a Google search and prints the results to stdout.\n"
+    print "Options"
+    print "  -s N     start at the Nth result"
+    print "  -n N     show N results"
+    print "  -l LANG  display in language LANG, such as fi for Finnish"
+    print "  -C       enable color output"
+    print "  -j       open the first result in a web browser\n"
+    print "Copyright (C) 2008 Henri Hakkinen."
+    print "Report bugs to <henux@users.sourceforge.net>."
     sys.exit(1)
 
 ########### Program Main
@@ -141,13 +141,13 @@ try:
         if opt[0] == "-s":
             # Option -s N
             if not opt[1].isdigit():
-                print("google: option -s needs an integer")
+                print "google: option -s needs an integer"
                 sys.exit(1)
             start = opt[1]
         elif opt[0] == "-n":
             # Option -n N
             if not opt[1].isdigit():
-                print("google: option -n needs an integer")
+                print "google: option -n needs an integer"
                 sys.exit(1)
             num = opt[1]
         elif opt[0] == "-l":
@@ -161,8 +161,8 @@ try:
             openUrl = True
     if len(keywords) < 1:
         usage()
-except GetoptError as e:
-    print("google:", e)
+except GetoptError, e:
+    print "google:", e
     sys.exit(1)
 
 # Construct the query URL.
@@ -180,7 +180,7 @@ for kw in keywords[1:]:
     url += "+" + quote_plus(kw)
 
 if not openUrl:
-    print("\nhttp://www.google.com%s\n" % url)
+    print "\nhttp://www.google.com%s\n" % url
 
 # Get the terminal window size.
 winsz = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, "1234")
@@ -192,7 +192,7 @@ conn.request("GET", url)
 resp = conn.getresponse()
 if resp.status != 200:
     # The server responded with an error.
-    print("Server responded with an error:", str(resp.status))
+    print "Server responded with an error:", str(resp.status)
     sys.exit(1)
 
 # Parse the HTML document and print the results.
