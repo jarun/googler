@@ -101,7 +101,7 @@ def print_entry(title, url, text):
         sys.exit(0)
     # Print the title and the URL.
     if colorize:
-        print "\x1B[96m* \x1B[92m%s\n\x1B[93m%s\x1B[39m" % (title, url)
+        print "\x1B[96m* \x1B[92m%s\n\x1B[93m%s\x1B[39m" % (title, url[7:])
     else:
         print "* %s\n%s" % (title, url)
     # Print the text with truncating.
