@@ -14,7 +14,7 @@ Options
   -s N     start at the Nth result
   -n N     shows N results
   -l LANG  display in language LANG, such as fi for Finnish
-  -C       enable color output
+  -C       disable color output
   -j       open the first result in a web browser
 
 Report bugs to <henux@users.sourceforge.net>.

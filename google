@@ -32,7 +32,7 @@ start    = None    # The first result to display (option -s)
 num      = None    # Number of results to display (option -n)
 lang     = None    # Language to search for (option -l)
 openUrl  = False   # If True, opens the first URL in browser (option -j)
-colorize = False   # If True, colorizes the output (option -C)
+colorize = True    # If True, colorizes the output (option -C)
 
 # Classes
 class GoogleParser(HTMLParser.HTMLParser):
@@ -122,7 +122,7 @@ def usage():
     print "  -s N     start at the Nth result"
     print "  -n N     show N results"
     print "  -l LANG  display in language LANG, such as fi for Finnish"
-    print "  -C       enable color output"
+    print "  -C       disable color output"
     print "  -j       open the first result in a web browser\n"
     print "Copyright (C) 2008 Henri Hakkinen."
     print "Report bugs to <henux@users.sourceforge.net>."
@@ -157,7 +157,7 @@ try:
             lang = opt[1]
         elif opt[0] == "-C":
             # Option -C
-            colorize = True
+            colorize = False
         elif opt[0] == "-j":
             # Option -j
             openUrl = True
