@@ -97,7 +97,7 @@ class GoogleParser(HTMLParser.HTMLParser):
 def print_entry(title, url, text):
     # Open the URL in a web browser if option -j was specified.
     if openUrl:
-        webbrowser.open(url)
+        webbrowser.open(url[7:])
         sys.exit(0)
     # Print the title and the URL.
     if colorize:
