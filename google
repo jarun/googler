@@ -2,6 +2,8 @@
 #
 # Copyright (C) 2008 Henri Hakkinen
 #
+# Modified by Arun Prakash Jana <engineerarun@gmail.com>
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -187,7 +189,7 @@ winsz = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, "1234")
 columns = struct.unpack("HH", winsz)[1]
 
 # Connect to Google and request the result page.
-conn = HTTPConnection("www.google.com")
+conn = HTTPConnection("www.google.co.in")
 conn.request("GET", url)
 resp = conn.getresponse()
 if resp.status != 200:
