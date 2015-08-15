@@ -66,7 +66,7 @@ class GoogleParser(HTMLParser.HTMLParser):
     def li_data(self, data):
         pass
     def li_end(self, tag):
-        if tag == "div":
+        if tag == "span":
             print_entry(self.title, self.url, self.text)
             self.handle_starttag = self.main_start
             self.handle_data = self.main_data
@@ -83,15 +83,25 @@ class GoogleParser(HTMLParser.HTMLParser):
             self.handle_data = self.li_data
             self.handle_endtag = self.li_end
     # <div> ... </div>
-    def div_start(self, tag, start):
+    def div_start(self, tag, attrs):
+        if tag == "span" and len(attrs) > 0 and attrs[0] == ("class", "st"):
+            self.handle_starttag = self.span_start
+            self.handle_data = self.span_data
+            self.handle_endtag = self.span_end
+    def div_data(self, data):
+        pass
+    def div_end(self, tag):
+        pass
+    def span_start(self, tag, start):
         if tag == "br":
             self.handle_starttag = self.li_start
             self.handle_data = self.li_data
             self.handle_endtag = self.li_end
-    def div_data(self, data):
+    def span_data(self, data):
         self.text += data
-    def div_end(self, tag):
+    def span_end(self, tag):
         pass
+
 
 # Functions
 def print_entry(title, url, text):
