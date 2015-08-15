@@ -67,6 +67,13 @@ class GoogleParser(HTMLParser.HTMLParser):
         pass
     def li_end(self, tag):
         if tag == "span":
+            marker = self.url.find("?q=")
+            if marker >= 0:
+                self.url = self.url[marker + 3:]
+            marker = self.url.find('&sa')
+            if marker >= 0:
+                self.url = self.url[:marker]
+
             print_entry(self.title, self.url, self.text)
             self.handle_starttag = self.main_start
             self.handle_data = self.main_data
@@ -107,13 +114,13 @@ class GoogleParser(HTMLParser.HTMLParser):
 def print_entry(title, url, text):
     # Open the URL in a web browser if option -j was specified.
     if openUrl:
-        webbrowser.open(url[7:])
+        webbrowser.open(url)
         sys.exit(0)
     # Print the title and the URL.
     if colorize:
-        print "\x1B[96m* \x1B[92m%s\n\x1B[93m%s\x1B[39m" % (title, url[7:])
+        print "\x1B[96m* \x1B[92m", title, "\n\x1B[93mURL:", url, "\x1B[39m"
     else:
-        print "* %s\n%s" % (title, url)
+        print "* ", title, "\nURL:", url
     # Print the text with truncating.
     col = 0
     for w in text.split():
