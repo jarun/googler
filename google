@@ -2,7 +2,7 @@
 #
 # Copyright (C) 2008 Henri Hakkinen
 #
-# Modified by Arun Prakash Jana <engineerarun@gmail.com>
+# Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ num      = None    # Number of results to display (option -n)
 lang     = None    # Language to search for (option -l)
 openUrl  = False   # If True, opens the first URL in browser (option -j)
 colorize = True    # If True, colorizes the output (option -C)
+duration = None    # Time limit search (option -t) [e.g. d5, w5, m5, y5]
 
 # Classes
 class GoogleParser(HTMLParser.HTMLParser):
@@ -148,9 +149,10 @@ def usage():
     print "  -n N     show N results"
     print "  -l LANG  display in language LANG, such as fi for Finnish"
     print "  -C       disable color output"
-    print "  -j       open the first result in a web browser\n"
+    print "  -j       open the first result in a web browser"
+    print "  -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]\n"
     print "Copyright (C) 2008 Henri Hakkinen."
-    print "Modified by Arun Prakash Jana <engineerarun@gmail.com>"
+    print "Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>"
     print "Report bugs to https://github.com/jarun/google-cli/issues"
     sys.exit(1)
 
@@ -164,7 +166,7 @@ if len(sys.argv) < 2:
     usage()
 
 try:
-    optlist, keywords = getopt(sys.argv[1:], "s:n:l:Cj")
+    optlist, keywords = getopt(sys.argv[1:], "s:n:l:t:Cj")
     for opt in optlist:
         if opt[0] == "-s":
             # Option -s N
@@ -189,6 +191,14 @@ try:
             openUrl = True
             if num == None:
                 num = "1"
+        elif opt[0] == "-t":
+            duration = opt[1]
+            if not opt[1][0] in ('d','w','m','y',):
+                usage()
+                sys.exit(1)
+            if not opt[1][1].isdigit():
+                usage()
+                sys.exit(1)
     if len(keywords) < 1:
         usage()
 except GetoptError, e:
@@ -204,6 +214,8 @@ if num != None:
     url += "num=" + num + "&"
 if lang != None:
     url += "hl=" + lang + "&"
+if duration != None:
+    url += "as_qdr=" + duration + "&"
 
 url += "q=" + quote_plus(keywords[0])
 for kw in keywords[1:]:
@@ -224,7 +236,10 @@ if resp.status != 200:
     if resp.status in (301,302,):
         url = urlparse.urljoin(url, resp.getheader('location', ''))
         #print "Redirected to URL:", url, "\n"
-	conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search?")])
+        if url.find("sorry/IndexRedirect?") >= 0:
+            print "ERROR: Connection blocked due to unusual activity."
+            sys.exit(1)
+        conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search")])
         conn.request("GET", url)
         resp = conn.getresponse()
         if resp.status != 200:

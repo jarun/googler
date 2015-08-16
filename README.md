@@ -16,7 +16,8 @@ Options
     -n N     shows N results  
     -l LANG  display in language LANG, such as fi for Finnish  
     -C       disable color output  
-    -j       open the first result in a web browser</pre>  
+    -j       open the first result in a web browser  
+    -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]</pre>  
 
 Report bugs to https://github.com/jarun/google-cli/issues
 
@@ -33,6 +34,10 @@ To remove, run:
 <pre>$ sudo make uninstall</pre>
 
 # News
+
+>** 17 Aug, 2015**
+> - Support for time limited search  
+> - Throw error in case of google error due to unusual activity from IP
 
 >**16 Aug, 2015**
 > - Use https  
