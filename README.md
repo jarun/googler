@@ -34,11 +34,11 @@ To remove, run:
 <pre>$ sudo make uninstall</pre>
 
 # News
-
->** 17 Aug, 2015**
+  
+>**17 Aug, 2015**
 > - Support for time limited search  
 > - Throw error in case of google error due to unusual activity from IP
-
+  
 >**16 Aug, 2015**
 > - Use https  
 > - Handle google redirections (error 302)
