@@ -19,7 +19,7 @@ Options
   -C       disable color output
   -j       open the first result in a web browser
 
-Report bugs to <henux@users.sourceforge.net>.
+Report bugs to https://github.com/jarun/google-cli/issues
 
 See the manual page for full details.  Have fun!
 
