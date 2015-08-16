@@ -179,6 +179,8 @@ try:
         elif opt[0] == "-j":
             # Option -j
             openUrl = True
+            if num == None:
+                num = "1"
     if len(keywords) < 1:
         usage()
 except GetoptError, e:
