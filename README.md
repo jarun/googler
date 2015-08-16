@@ -10,19 +10,32 @@ Modified by Arun Prakash Jana <engineerarun@gmail.com>
 terminal.  To install the package to your system, run `make install` as
 root.
 
-Usage: google [OPTIONS] KEYWORDS...
-
-Options
-  -s N     start at the Nth result
-  -n N     shows N results
-  -l LANG  display in language LANG, such as fi for Finnish
-  -C       disable color output
-  -j       open the first result in a web browser
+<pre>Usage: google [OPTIONS] KEYWORDS...  
+Options  
+    -s N     start at the Nth result  
+    -n N     shows N results  
+    -l LANG  display in language LANG, such as fi for Finnish  
+    -C       disable color output  
+    -j       open the first result in a web browser</pre>  
 
 Report bugs to https://github.com/jarun/google-cli/issues
 
 See the manual page for full details.  Have fun!
 
+# News
+
+>**16 Aug, 2015**
+> - Use https  
+> - Handle google redirections (error 302)
+> - Showing the first line of the description correctly
+> - Unicode in URL works
+> - Colour output by default, -C now disables it (toggled)
+> - The first URL now correctly opens in browser with -j switch
+> - Honour -j even if -n is not used and open the result in browser
+> - Fixed character encoding problem in URL e.g. double quotes (%22) changed to %2522
+> - Skip browser to show result in console for empty URL, e.g., first result of ‘define hello’
+
+
 # Note
 
-Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the author in past year. I have created this independent repo for the project with the name google-cli. Would love to push the changes back to original repo if the author contacts. I retained the original copyright information.
+Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author (Henri Hakkinen: https://github.com/henux ) in past year. I have created this independent repo for the project with the name google-cli. Would love to push the changes back to original repo if the author contacts. I retained the original copyright information.
