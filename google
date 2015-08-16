@@ -142,6 +142,7 @@ def usage():
     print "  -C       disable color output"
     print "  -j       open the first result in a web browser\n"
     print "Copyright (C) 2008 Henri Hakkinen."
+    print "Modified by Arun Prakash Jana <engineerarun@gmail.com>"
     print "Report bugs to <henux@users.sourceforge.net>."
     sys.exit(1)
 
