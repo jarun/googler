@@ -60,14 +60,14 @@ class GoogleParser(HTMLParser.HTMLParser):
             self.handle_starttag = self.h3_start
             self.handle_data = self.h3_data
             self.handle_endtag = self.h3_end
-        elif tag == "div":
+        elif tag == "div" and len(attrs) > 0 and attrs[0] == ("class", "s"):
             self.handle_starttag = self.div_start
             self.handle_data = self.div_data
             self.handle_endtag = self.div_end
     def li_data(self, data):
         pass
     def li_end(self, tag):
-        if tag == "span" or tag == "div":
+        if tag == "div":
             marker = self.url.find("?q=")
             if marker >= 0:
                 self.url = self.url[marker + 3:]
@@ -101,14 +101,14 @@ class GoogleParser(HTMLParser.HTMLParser):
     def div_end(self, tag):
         pass
     def span_start(self, tag, start):
-        if tag == "br":
-            self.handle_starttag = self.li_start
-            self.handle_data = self.li_data
-            self.handle_endtag = self.li_end
+        pass
     def span_data(self, data):
         self.text += data
     def span_end(self, tag):
-        pass
+        if tag == "span":
+            self.handle_starttag = self.li_start
+            self.handle_data = self.li_data
+            self.handle_endtag = self.li_end
 
 
 # Functions
