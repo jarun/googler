@@ -1,8 +1,8 @@
-cli-google README
+# google-cli
 
 Copyright (C) 2008 Henri Hakkinen
 
-Modified by Arun Prakash Jana [2015]
+Modified by Arun Prakash Jana <engineerarun@gmail.com>
 
 `google` is a command line tool for doing Google searches from the
 terminal.  To install the package to your system, run `make install` as
@@ -20,3 +20,7 @@ Options
 Report bugs to <henux@users.sourceforge.net>.
 
 See the manual page for full details.  Have fun!
+
+# Note
+
+Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the author in past year. I have created this independent repo for the project with the name google-cli. Would love to push the changes back to original repo if the author contacts. I retained the original copyright information.
