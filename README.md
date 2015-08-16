@@ -22,6 +22,16 @@ Report bugs to https://github.com/jarun/google-cli/issues
 
 See the manual page for full details.  Have fun!
 
+# Installation
+
+The following steps are tested on Ubuntu 14.04.3 x64_64:  
+<pre>$ git clone https://github.com/jarun/google-cli/  
+$ cd google-cli  
+$ sudo make install</pre>  
+  
+To remove, run:  
+<pre>$ sudo make uninstall</pre>
+
 # News
 
 >**16 Aug, 2015**
