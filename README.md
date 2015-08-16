@@ -4,7 +4,7 @@
   
 Copyright (C) 2008 Henri Hakkinen
 
-Modified by (2015) Arun Prakash Jana <engineerarun@gmail.com>
+Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>
 
 `google` is a command line tool for doing Google searches from the
 terminal.  To install the package to your system, run `make install` as
