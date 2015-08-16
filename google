@@ -23,7 +23,7 @@ import webbrowser
 import HTMLParser
 
 from urllib import quote_plus, unquote
-from httplib import HTTPConnection
+from httplib import HTTPSConnection
 from getopt import getopt, GetoptError
 
 # Global variables
@@ -209,14 +209,14 @@ for kw in keywords[1:]:
     url += "+" + quote_plus(kw)
 
 if not openUrl:
-    print "\nSearch URL: http://www.google.com%s\n" % url
+    print "\nSearch URL: https://www.google.com%s\n" % url
 
 # Get the terminal window size.
 winsz = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, "1234")
 columns = struct.unpack("HH", winsz)[1]
 
 # Connect to Google and request the result page.
-conn = HTTPConnection("www.google.co.in")
+conn = HTTPSConnection("www.google.co.in")
 conn.request("GET", url)
 resp = conn.getresponse()
 if resp.status != 200:
