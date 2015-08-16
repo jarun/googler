@@ -66,7 +66,7 @@ class GoogleParser(HTMLParser.HTMLParser):
     def li_data(self, data):
         pass
     def li_end(self, tag):
-        if tag == "span":
+        if tag == "div":
             marker = self.url.find("?q=")
             if marker >= 0:
                 self.url = self.url[marker + 3:]
