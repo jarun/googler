@@ -117,8 +117,12 @@ def print_entry(title, url, text):
 
     # Open the URL in a web browser if option -j was specified.
     if openUrl:
-        webbrowser.open(url)
-        sys.exit(0)
+        # If empty URL, like first result of 'define hello', just print the result
+        if url == "":
+            print "Showing in console as URL is empty\n"
+        else:
+            webbrowser.open(url)
+            sys.exit(0)
     # Print the title and the URL.
     if colorize:
         print "\x1B[96m* \x1B[92m", title, "\n\x1B[93mURL:", url, "\x1B[39m"
@@ -205,7 +209,7 @@ for kw in keywords[1:]:
     url += "+" + quote_plus(kw)
 
 if not openUrl:
-    print "\nhttp://www.google.com%s\n" % url
+    print "\nSearch URL: http://www.google.com%s\n" % url
 
 # Get the terminal window size.
 winsz = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, "1234")
