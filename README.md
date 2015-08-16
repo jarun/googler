@@ -37,7 +37,7 @@ To remove, run:
 >**16 Aug, 2015**
 > - Use https  
 > - Handle google redirections (error 302)
-> - Showing search result full text snippet
+> - Showing first line of search result text snippet
 > - Unicode in URL works
 > - Colour output by default, -C now disables it (toggled)
 > - The first URL now correctly opens in browser with -j switch

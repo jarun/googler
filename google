@@ -101,14 +101,14 @@ class GoogleParser(HTMLParser.HTMLParser):
     def div_end(self, tag):
         pass
     def span_start(self, tag, start):
-	pass
-    def span_data(self, data):
-        self.text += data
-    def span_end(self, tag):
-        if tag == "span":
+        if tag == "br":
             self.handle_starttag = self.li_start
             self.handle_data = self.li_data
             self.handle_endtag = self.li_end
+    def span_data(self, data):
+        self.text += data
+    def span_end(self, tag):
+        pass
 
 
 # Functions
