@@ -34,6 +34,7 @@ num      = None    # Number of results to display (option -n)
 lang     = None    # Language to search for (option -l)
 openUrl  = False   # If True, opens the first URL in browser (option -j)
 colorize = True    # If True, colorizes the output (option -C)
+filetype = None    # Filetype specific search
 duration = None    # Time limit search (option -t) [e.g. d5, w5, m5, y5]
 
 # Classes
@@ -150,6 +151,7 @@ def usage():
     print "  -l LANG  display in language LANG, such as fi for Finnish"
     print "  -C       disable color output"
     print "  -j       open the first result in a web browser"
+    print "  -f MIME  search for specific file type"
     print "  -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]\n"
     print "Copyright (C) 2008 Henri Hakkinen."
     print "Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>"
@@ -166,7 +168,7 @@ if len(sys.argv) < 2:
     usage()
 
 try:
-    optlist, keywords = getopt(sys.argv[1:], "s:n:l:t:Cj")
+    optlist, keywords = getopt(sys.argv[1:], "s:n:l:f:t:Cj")
     for opt in optlist:
         if opt[0] == "-s":
             # Option -s N
@@ -191,7 +193,11 @@ try:
             openUrl = True
             if num == None:
                 num = "1"
+        elif opt[0] == "-f":
+            # Option -f MIME
+            filetype = opt[1]
         elif opt[0] == "-t":
+            # Option -t dN
             duration = opt[1]
             if not opt[1][0] in ('d','w','m','y',):
                 usage()
@@ -220,6 +226,9 @@ if duration != None:
 url += "q=" + quote_plus(keywords[0])
 for kw in keywords[1:]:
     url += "+" + quote_plus(kw)
+
+if filetype != None:
+    url += "+filetype:" + filetype
 
 #if not openUrl:
 #    print "\nSearch URL: https://www.google.com%s\n" % url

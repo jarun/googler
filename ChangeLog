@@ -1,6 +1,7 @@
 2015-08-17  Arun Prakash Jana <engineerarun@gmail.com>
 	* google: Support time limited search
 	          Throw error in case of google error due to unusual activity from IP
+	          Support file type specific search
 	* google.1: Updated manpage for new option -t
 
 2015-08-16  Arun Prakash Jana <engineerarun@gmail.com>
