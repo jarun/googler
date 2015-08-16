@@ -21,6 +21,7 @@ import sys
 import termios, fcntl, struct
 import webbrowser
 import HTMLParser
+import urlparse
 
 from urllib import quote_plus, unquote
 from httplib import HTTPSConnection
@@ -216,13 +217,24 @@ winsz = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, "1234")
 columns = struct.unpack("HH", winsz)[1]
 
 # Connect to Google and request the result page.
-conn = HTTPSConnection("www.google.co.in")
+conn = HTTPSConnection("www.google.com")
 conn.request("GET", url)
 resp = conn.getresponse()
 if resp.status != 200:
-    # The server responded with an error.
-    print "Server responded with an error:", str(resp.status)
-    sys.exit(1)
+    if resp.status in (301,302,):
+        url = urlparse.urljoin(url, resp.getheader('location', ''))
+        print "Redirected to URL:", url, "\n"
+	conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search?")])
+        conn.request("GET", url)
+        resp = conn.getresponse()
+        if resp.status != 200:
+            # Failed connecting to redirected server too!
+            print "ERROR after 1st redirection:", str(resp.status), ": ", resp.reason
+	    sys.exit(1)
+    else:
+        # The server responded with an error.
+        print "ERROR:", str(resp.status), ": ", resp.reason
+        sys.exit(1)
 
 # Parse the HTML document and print the results.
 parser = GoogleParser()
