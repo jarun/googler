@@ -209,8 +209,8 @@ url += "q=" + quote_plus(keywords[0])
 for kw in keywords[1:]:
     url += "+" + quote_plus(kw)
 
-if not openUrl:
-    print "\nSearch URL: https://www.google.com%s\n" % url
+#if not openUrl:
+#    print "\nSearch URL: https://www.google.com%s\n" % url
 
 # Get the terminal window size.
 winsz = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, "1234")
@@ -223,7 +223,7 @@ resp = conn.getresponse()
 if resp.status != 200:
     if resp.status in (301,302,):
         url = urlparse.urljoin(url, resp.getheader('location', ''))
-        print "Redirected to URL:", url, "\n"
+        #print "Redirected to URL:", url, "\n"
 	conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search?")])
         conn.request("GET", url)
         resp = conn.getresponse()
