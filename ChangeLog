@@ -1,3 +1,15 @@
+2015-08-16  Arun Prakash Jana <engineerarun@gmail.com>
+	* google: Use https
+	          Handle google redirections (error 302)
+	          Showing the first line of the description correctly
+	          Unicode in URL works
+	          Colour output by default, -C now disables it (toggled)
+	          The first URL now correctly opens in browser with -j switch
+	          Honour -j even if -n is not used and open the result in browser
+	          Fixed character encoding problem in URL e.g. double quotes (%22) changed to %2522
+	          Skip browser to show result in console for empty URL, e.g., first result of ‘define hello’
+	* google.1: Modified manpage author section
+
 2008-10-16  Henri Häkkinen  <henux@users.sourceforge.net>
 
 	* google: Changed option -o to -j because -o generally means
