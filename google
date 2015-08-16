@@ -22,7 +22,7 @@ import termios, fcntl, struct
 import webbrowser
 import HTMLParser
 
-from urllib import quote_plus
+from urllib import quote_plus, unquote
 from httplib import HTTPConnection
 from getopt import getopt, GetoptError
 
@@ -112,6 +112,9 @@ class GoogleParser(HTMLParser.HTMLParser):
 
 # Functions
 def print_entry(title, url, text):
+    # Clean up URL for cases like %22 changed to %2522
+    url = unquote(url)
+
     # Open the URL in a web browser if option -j was specified.
     if openUrl:
         webbrowser.open(url)
