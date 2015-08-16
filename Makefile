@@ -14,7 +14,7 @@ install:
 	gzip -c google.1 > google.1.gz
 	install -m755 -t $(BINDIR) google
 	install -m644 -t $(MANDIR) google.1.gz
-	install -m644 -t $(DOCDIR) README
+	install -m644 -t $(DOCDIR) README.md
 	rm -f google.1.gz
 
 uninstall:
