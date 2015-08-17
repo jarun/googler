@@ -20,6 +20,10 @@ Options
     -f MIME  search for specific file type  
     -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]</pre>  
 
+Example:  
+To fetch 15 results starting from the 10th result for the string <i>cmdline utility</i> in site tuxdiary.com, run:
+<pre>$ google -n 15 -s 10 cmdline utility site:tuxdiary.com</pre>
+
 Report bugs to https://github.com/jarun/google-cli/issues
 
 See the manual page for full details.  Have fun!
