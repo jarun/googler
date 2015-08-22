@@ -275,7 +275,7 @@ while nav == "n" or nav == "p":
     parser.feed(resp.read())
 
     oldstart = start
-    nav = raw_input("Press 'n' or 'p' and Enter to continue...")
+    nav = raw_input("Press 'n' or 'p' and Enter to continue... ")
     if nav == "n":
         if num != None:
             start = str(int(start) + int(num))
