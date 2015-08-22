@@ -150,7 +150,7 @@ def usage():
     print "Performs a Google search and prints the results to stdout.\n"
     print "Options"
     print "  -s N     start at the Nth result"
-    print "  -n N     show N results"
+    print "  -n N     show N results (default 10)"
     print "  -l LANG  display in language LANG, such as fi for Finnish"
     print "  -C       disable color output"
     print "  -j       open the first result in a web browser"
