@@ -196,7 +196,7 @@ try:
         elif opt[0] == "-j":
             # Option -j
             openUrl = True
-            if num == None:
+            if num is None:
                 num = "1"
         elif opt[0] == "-f":
             # Option -f MIME
@@ -219,20 +219,20 @@ except GetoptError, e:
 # Construct the query URL.
 url = "/search?"
 
-if start != None:
+if start is not None:
     url += "start=" + start + "&"
-if num != None:
+if num is not None:
     url += "num=" + num + "&"
-if lang != None:
+if lang is not None:
     url += "hl=" + lang + "&"
-if duration != None:
+if duration is not None:
     url += "as_qdr=" + duration + "&"
 
 url += "q=" + quote_plus(keywords[0])
 for kw in keywords[1:]:
     url += "+" + quote_plus(kw)
 
-if filetype != None:
+if filetype is not None:
     url += "+filetype:" + filetype
 
 #if not openUrl:
@@ -277,13 +277,13 @@ while nav == "n" or nav == "p":
     oldstart = start
     nav = raw_input("Press 'n' or 'p' and Enter to continue... ")
     if nav == "n":
-        if num != None:
+        if num is not None:
             start = str(int(start) + int(num))
         else:
             start = str(int(start) + 10)
         print "\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n"
     elif nav == "p":
-        if num != None:
+        if num is not None:
             start = str(int(start) - int(num))
         else:
             start = str(int(start) - 10)
