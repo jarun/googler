@@ -12,13 +12,17 @@ root.
 
 <pre>Usage: google [OPTIONS] KEYWORDS...  
 Options  
-    -s N     start at the Nth result  
+    -s N     start at the N<sup>th</sup> result  
     -n N     shows N results  
     -l LANG  display in language LANG, such as fi for Finnish  
     -C       disable color output  
     -j       open the first result in a web browser  
     -f MIME  search for specific file type  
     -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]</pre>  
+
+Example:  
+To fetch 15 results starting from the 10<sup>th</sup> result for the string <i>cmdline utility</i> in site tuxdiary.com, run:
+<pre>$ google -n 15 -s 10 cmdline utility site:tuxdiary.com</pre>
 
 Report bugs to https://github.com/jarun/google-cli/issues
 
