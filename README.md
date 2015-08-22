@@ -33,6 +33,8 @@ See the manual page for full details.  Have fun!
 
 # Installation
 
+google-cli requires Python 2.7.x to work. Python 3.x is not supported yet.
+
 The following steps are tested on Ubuntu 14.04.3 x64_64:  
 <pre>$ git clone https://github.com/jarun/google-cli/  
 $ cd google-cli  
