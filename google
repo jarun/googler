@@ -281,17 +281,18 @@ while nav == "n" or nav == "p":
             start = str(int(start) + int(num))
         else:
             start = str(int(start) + 10)
+        print "\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n"
     elif nav == "p":
         if num != None:
             start = str(int(start) - int(num))
         else:
             start = str(int(start) - 10)
+	print "\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n"
 
     if int(start) < 0:
         start = "0"
 
     url = url.replace("start=" + oldstart + "&", "start=" + start + "&", 1)
     #print "new url: ", url
-    print "\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n"
     
 conn.close()
