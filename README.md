@@ -21,8 +21,11 @@ Options
 Keys
     n, p     press 'n' or 'p' and Enter to navigate forward and backward</pre>  
 
-Example:  
-To fetch 15 results updated within last 2 months, starting from the 3<sup>rd</sup> result for the string <b>cmdline utility</b> in site tuxdiary.com, run:
+Examples:
+  
+1. Google <b>hello world</b>:
+<pre>$ google hello world</pre>
+2. To fetch 15 results updated within last 2 months, starting from the 3<sup>rd</sup> result for the string <b>cmdline utility</b> in site tuxdiary.com, run:
 <pre>$ google -n 15 -s 3 -t m2 cmdline utility site:tuxdiary.com</pre>
 
 Report bugs to https://github.com/jarun/google-cli/issues
