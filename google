@@ -29,13 +29,15 @@ from getopt import getopt, GetoptError
 
 # Global variables
 columns  = None    # Terminal window size.
-start    = None    # The first result to display (option -s)
+start    = "0"     # The first result to display (option -s)
 num      = None    # Number of results to display (option -n)
 lang     = None    # Language to search for (option -l)
 openUrl  = False   # If True, opens the first URL in browser (option -j)
 colorize = True    # If True, colorizes the output (option -C)
 filetype = None    # Filetype specific search
 duration = None    # Time limit search (option -t) [e.g. d5, w5, m5, y5]
+conn     = None    # Use a single global connection during navigation
+nav      = "n"     # For user navigation
 
 # Classes
 class GoogleParser(HTMLParser.HTMLParser):
@@ -125,6 +127,7 @@ def print_entry(title, url, text):
             print "Showing in console as URL is empty\n"
         else:
             webbrowser.open(url)
+            conn.close()
             sys.exit(0)
     # Print the title and the URL.
     if colorize:
@@ -199,7 +202,7 @@ try:
         elif opt[0] == "-t":
             # Option -t dN
             duration = opt[1]
-            if not opt[1][0] in ('d','w','m','y',):
+            if not opt[1][0] in ("d","w","m","y",):
                 usage()
                 sys.exit(1)
             if not opt[1][1].isdigit():
@@ -239,30 +242,54 @@ columns = struct.unpack("HH", winsz)[1]
 
 # Connect to Google and request the result page.
 conn = HTTPSConnection("www.google.com")
-conn.request("GET", url)
-resp = conn.getresponse()
-if resp.status != 200:
-    if resp.status in (301,302,):
-        url = urlparse.urljoin(url, resp.getheader('location', ''))
-        #print "Redirected to URL:", url, "\n"
-        if url.find("sorry/IndexRedirect?") >= 0:
-            print "ERROR: Connection blocked due to unusual activity."
+
+while nav == "n" or nav == "p":
+    conn.request("GET", url)
+    resp = conn.getresponse()
+    if resp.status != 200:
+        if resp.status in (301,302,):
+            url = urlparse.urljoin(url, resp.getheader('location', ''))
+            #print "Redirected to URL:", url, "\n"
+            if url.find("sorry/IndexRedirect?") >= 0:
+                print "ERROR: Connection blocked due to unusual activity."
+                sys.exit(1)
+            conn.close()
+            conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search")])
+            conn.request("GET", url)
+            resp = conn.getresponse()
+            if resp.status != 200:
+                # Failed connecting to redirected server too!
+                print "ERROR after 1st redirection:", str(resp.status), ": ", resp.reason
+                conn.close()
+	        sys.exit(1)
+        else:
+            # The server responded with an error.
+            print "ERROR:", str(resp.status), ": ", resp.reason
+            conn.close()
             sys.exit(1)
-        conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search")])
-        conn.request("GET", url)
-        resp = conn.getresponse()
-        if resp.status != 200:
-            # Failed connecting to redirected server too!
-            print "ERROR after 1st redirection:", str(resp.status), ": ", resp.reason
-	    sys.exit(1)
-    else:
-        # The server responded with an error.
-        print "ERROR:", str(resp.status), ": ", resp.reason
-        sys.exit(1)
 
-# Parse the HTML document and print the results.
-parser = GoogleParser()
-parser.feed(resp.read())
+    # Parse the HTML document and print the results.
+    parser = GoogleParser()
+    parser.feed(resp.read())
+
+    oldstart = start
+    nav = raw_input("Press 'n' or 'p' and Enter to continue...")
+    if nav == "n":
+        if num != None:
+            start = str(int(start) + int(num))
+        else:
+            start = str(int(start) + 10)
+    elif nav == "p":
+        if num != None:
+            start = str(int(start) - int(num))
+        else:
+            start = str(int(start) - 10)
+
+    if int(start) < 0:
+        start = "0"
+
+    url = url.replace("start=" + oldstart + "&", "start=" + start + "&", 1)
+    #print "new url: ", url
+    print "\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n"
+    
 conn.close()
-
-# vim:set sts=4 sw=4 et:
