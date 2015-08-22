@@ -18,7 +18,10 @@ Options
     -C       disable color output  
     -j       open the first result in a web browser  
     -f MIME  search for specific file type  
-    -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]</pre>  
+    -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]
+
+Keys
+    n, p     press 'n' or 'p' and Enter to navigate forward and backward</pre>  
 
 Example:  
 To fetch 15 results starting from the 10<sup>th</sup> result for the string <i>cmdline utility</i> in site tuxdiary.com, run:
@@ -40,6 +43,9 @@ To remove, run:
 
 # News
   
+>**22 Aug, 2015**
+> - Add navigation support
+
 >**17 Aug, 2015**
 > - Support for time limited search  
 > - Throw error in case of google error due to unusual activity from IP  
