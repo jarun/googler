@@ -6,9 +6,7 @@ Copyright (C) 2008 Henri Hakkinen
 
 Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>
 
-`google` is a command line tool for doing Google searches from the
-terminal.  To install the package to your system, run `make install` as
-root.
+`google` is a command line tool for doing Google searches from the terminal. For each result it shows the header, URL and text context. You can also navigate back and forth to fetch the next or previous results.
 
 <pre>Usage: google [OPTIONS] KEYWORDS...  
 Options  
