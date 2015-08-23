@@ -1,7 +1,7 @@
 # google-cli
-  
+
 ![Screenshot](google-cli.png)
-  
+
 Copyright (C) 2008 Henri Hakkinen
 
 Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>
@@ -22,7 +22,7 @@ Keys
     n, p     press 'n' or 'p' and Enter to navigate forward and backward</pre>  
 
 Examples:
-  
+
 1. Google <b>hello world</b>:
 <pre>$ google hello world</pre>
 2. To fetch 15 results updated within last 2 months, starting from the 3<sup>rd</sup> result for the string <b>cmdline utility</b> in site tuxdiary.com, run:
@@ -34,25 +34,25 @@ See the manual page for full details.  Have fun!
 
 # Installation
 
-google-cli requires Python 2.7.x to work. Python 3.x is not supported yet.
+google-cli requires Python 2.7.x or Python 3.x to work.
 
 The following steps are tested on Ubuntu 14.04.3 x64_64:  
 <pre>$ git clone https://github.com/jarun/google-cli/  
 $ cd google-cli  
 $ sudo make install</pre>  
-  
+
 To remove, run:  
 <pre>$ sudo make uninstall</pre>
 
 # News
-  
+
 >**22 Aug, 2015**
 > - Add navigation support
 
 >**17 Aug, 2015**
 > - Support for time limited search  
 > - Throw error in case of google error due to unusual activity from IP  
-> - Support file type in search   
+> - Support file type in search
 
 >**16 Aug, 2015**
 > - Use https  
