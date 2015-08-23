@@ -90,7 +90,7 @@ class GoogleParser(HTMLParser.HTMLParser):
     def h3_data(self, data):
         self.title += data
     def h3_end(self, tag):
-        if tag == "h3": 
+        if tag == "h3":
             self.handle_starttag = self.li_start
             self.handle_data = self.li_data
             self.handle_endtag = self.li_end
@@ -263,7 +263,7 @@ while nav == "n" or nav == "p":
                 # Failed connecting to redirected server too!
                 print "ERROR after 1st redirection:", str(resp.status), ": ", resp.reason
                 conn.close()
-	        sys.exit(1)
+                sys.exit(1)
         else:
             # The server responded with an error.
             print "ERROR:", str(resp.status), ": ", resp.reason
@@ -287,12 +287,12 @@ while nav == "n" or nav == "p":
             start = str(int(start) - int(num))
         else:
             start = str(int(start) - 10)
-	print "\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n"
+        print "\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n"
 
     if int(start) < 0:
         start = "0"
 
     url = url.replace("start=" + oldstart + "&", "start=" + start + "&", 1)
     #print "new url: ", url
-    
+
 conn.close()
