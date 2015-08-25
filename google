@@ -222,7 +222,7 @@ except GetoptError as e:
     sys.exit(1)
 
 # Construct the query URL.
-url = "/search?"
+url = "/search?&ie=UTF-8&oe=UTF-8&"
 
 if start is not None:
     url += "start=" + start + "&"
@@ -278,7 +278,7 @@ while nav == "n" or nav == "p":
     # Parse the HTML document and print the results.
     parser = GoogleParser()
     if sys.version_info > (3,):
-        parser.feed(resp.read().decode('latin1'))
+        parser.feed(resp.read().decode('utf-8'))
     else:
         parser.feed(resp.read())
 
