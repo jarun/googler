@@ -46,6 +46,9 @@ To remove, run:
 
 # News
 
+>**25 Aug, 2015**
+> - Add Python 3.x support (thanks Narrat)
+
 >**22 Aug, 2015**
 > - Add navigation support
 
