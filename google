@@ -241,7 +241,7 @@ if filetype is not None:
     url += "+filetype:" + filetype
 
 #if not openUrl:
-#    print "\nSearch URL: https://www.google.com%s\n" % url
+#    print("\n[DEBUG] Search URL: https://www.google.com%s\n" % url)
 
 # Get the terminal window size.
 winsz = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, "1234")
@@ -256,7 +256,7 @@ while nav == "n" or nav == "p":
     if resp.status != 200:
         if resp.status in (301,302,):
             url = urljoin(url, resp.getheader('location', ''))
-            #print "Redirected to URL:", url, "\n"
+            #print("[DEBUG] Redirected to URL:", url, "\n")
             if url.find("sorry/IndexRedirect?") >= 0:
                 print("ERROR: Connection blocked due to unusual activity.")
                 sys.exit(1)
@@ -304,6 +304,6 @@ while nav == "n" or nav == "p":
         start = "0"
 
     url = url.replace("start=" + oldstart + "&", "start=" + start + "&", 1)
-    #print "new url: ", url
+    #print("[DEBUG] new url: ", url)
 
 conn.close()
