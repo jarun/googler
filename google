@@ -52,6 +52,7 @@ class GoogleParser(HTMLParser.HTMLParser):
         self.handle_starttag = self.main_start
         self.handle_data = self.main_data
         self.handle_endtag = self.main_end
+        self.results = []
     def main_start(self, tag, attrs):
         if tag == "li" and len(attrs) > 0 and attrs[0] == ("class", "g"):
             self.title = ""
@@ -85,7 +86,8 @@ class GoogleParser(HTMLParser.HTMLParser):
             if marker >= 0:
                 self.url = self.url[:marker]
 
-            print_entry(self.title, self.url, self.text)
+            index = len(self.results) + 1
+            self.results.append(Result(index, self.title, self.url, self.text))
             self.handle_starttag = self.main_start
             self.handle_data = self.main_data
             self.handle_endtag = self.main_end
@@ -121,34 +123,55 @@ class GoogleParser(HTMLParser.HTMLParser):
             self.handle_endtag = self.li_end
 
 
-# Functions
-def print_entry(title, url, text):
-    # Clean up URL for cases like %22 changed to %2522
-    url = unquote(url)
+class Result:
+    def __init__(self, index, title, url, text):
+        self.index = index
+        self.title = title
+        self.url = url
+        self.text = text
+    def print_entry(self):
+        index = self.index
+        title = self.title
+        url = self.url
+        text = self.text
 
-    # Open the URL in a web browser if option -j was specified.
-    if openUrl:
-        # If empty URL, like first result of 'define hello', just print the result
-        if url == "":
-            print("Showing in console as URL is empty\n")
+        # Clean up URL for cases like %22 changed to %2522
+        url = unquote(url)
+
+        # Open the URL in a web browser if option -j was specified.
+        if openUrl:
+            # If empty URL, like first result of 'define hello', just print the result
+            if url == "":
+                print("Showing in console as URL is empty\n")
+            else:
+                webbrowser.open(url)
+                conn.close()
+                sys.exit(0)
+        # Print the title and the URL.
+        if colorize:
+            print("\x1B[1m\x1B[36m", index, "\x1B[92m", title,
+                  "\x1B[0m\n\x1B[93mURL:", url, "\x1B[39m")
         else:
-            webbrowser.open(url)
-            conn.close()
-            sys.exit(0)
-    # Print the title and the URL.
-    if colorize:
-        print("\x1B[1m\x1B[36m* \x1B[92m", title, "\x1B[0m\n\x1B[93mURL:", url, "\x1B[39m")
-    else:
-        print("* ", title, "\nURL:", url)
-    # Print the text with truncating.
-    col = 0
-    for w in text.split():
-        if (col + len(w) + 1) > columns:
-            col = 0
-            print()
-        print(w, end=' ')
-        col += len(w) + 1
-    print("\n")
+            print(index, title, "\nURL:", url)
+        # Print the text with truncating.
+        col = 0
+        for w in text.split():
+            if (col + len(w) + 1) > columns:
+                col = 0
+                print()
+            print(w, end=' ')
+            col += len(w) + 1
+        print("\n")
+    def open(self):
+        webbrowser.open(self.url)
+
+# Functions
+def is_int(string):
+    try:
+        int(string)
+        return True
+    except:
+        return False
 
 def usage():
     print("Usage: google [OPTIONS] KEYWORDS...")
@@ -162,7 +185,8 @@ def usage():
     print("  -f MIME  search for specific file type")
     print("  -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]\n")
     print("Keys")
-    print("  n, p     press 'n' or 'p' and Enter to navigate forward and backward\n")
+    print("  n, p     press 'n' or 'p' and Enter to navigate forward and backward")
+    print("  1-N      press a number and Enter to open that result in browser\n")
     print("Copyright (C) 2008 Henri Hakkinen.")
     print("Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>")
     print("Report bugs to https://github.com/jarun/google-cli/issues")
@@ -250,7 +274,10 @@ columns = struct.unpack("HH", winsz)[1]
 # Connect to Google and request the result page.
 conn = HTTPSConnection("www.google.com")
 
-while nav == "n" or nav == "p":
+def fetch_results():
+    global conn
+    global url
+
     conn.request("GET", url)
     resp = conn.getresponse()
     if resp.status != 200:
@@ -282,11 +309,23 @@ while nav == "n" or nav == "p":
     else:
         parser.feed(resp.read())
 
+    results = parser.results
+    for r in results:
+        r.print_entry()
+    return results
+
+
+results = []
+while True:
+    if nav == "n" or nav == "p":
+        results = fetch_results()
+
     oldstart = start
     if sys.version_info > (3,):
-        nav = input("Press 'n' or 'p' and Enter to continue... ")
+        nav = input("Press 'n', 'p', or number and Enter to continue... ")
     else:
-        nav = raw_input("Press 'n' or 'p' and Enter to continue... ")
+        nav = raw_input("Press 'n', 'p', or number and Enter to continue... ")
+
     if nav == "n":
         if num is not None:
             start = str(int(start) + int(num))
@@ -299,6 +338,16 @@ while nav == "n" or nav == "p":
         else:
             start = str(int(start) - 10)
         print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n")
+    elif is_int(nav):
+        index = int(nav) - 1
+        try:
+            results[index].open()
+        except IndexError:
+            print("Index out of bound.")
+    elif nav == "":
+        break
+    else:
+        print("Invalid command", nav)
 
     if int(start) < 0:
         start = "0"
