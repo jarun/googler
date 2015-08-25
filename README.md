@@ -48,6 +48,7 @@ To remove, run:
 
 >**25 Aug, 2015**
 > - Add Python 3.x support (thanks Narrat)
+> - Add UTF-8 request and response (thanks Narrat)
 
 >**22 Aug, 2015**
 > - Add navigation support
