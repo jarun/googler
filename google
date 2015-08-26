@@ -345,10 +345,8 @@ while True:
             results[index].open()
         except IndexError:
             print("Index out of bound.")
-    elif nav == "":
-        break
     else:
-        print("Invalid command", nav)
+        break
 
     if int(start) < 0:
         start = "0"

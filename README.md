@@ -46,6 +46,11 @@ To remove, run:
 
 # News
 
+>**26 Aug, 2015**
+> - Open result in browser using index number (thanks jeremija) 
+> - Convert %22 to " (double quote) in URLs
+> - Inputs other than n, p or number (+ Enter) exit
+
 >**25 Aug, 2015**
 > - Add Python 3.x support (thanks Narrat)
 > - Add UTF-8 request and response (thanks Narrat)
