@@ -137,7 +137,7 @@ class Result:
 
         # Clean up URL for cases like %22 changed to %2522
         url = unquote(url)
-	url = url.replace("%22", "\"")
+        url = url.replace("%22", "\"")
 
         # Open the URL in a web browser if option -j was specified.
         if openUrl:
