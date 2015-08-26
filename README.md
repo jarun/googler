@@ -19,7 +19,8 @@ Options
     -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]
 
 Keys
-    n, p     press 'n' or 'p' and Enter to navigate forward and backward</pre>  
+    n, p     press 'n' or 'p' and Enter to navigate forward and backward
+    1-N      press a number and Enter to open that result in browser</pre>  
 
 Examples:
 
@@ -45,6 +46,9 @@ To remove, run:
 <pre>$ sudo make uninstall</pre>
 
 # News
+
+>**27 Aug, 2015**
+> - Time limit search by hours
 
 >**26 Aug, 2015**
 > - Open result in browser using index number (thanks jeremija) 

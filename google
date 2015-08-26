@@ -41,7 +41,7 @@ lang     = None    # Language to search for (option -l)
 openUrl  = False   # If True, opens the first URL in browser (option -j)
 colorize = True    # If True, colorizes the output (option -C)
 filetype = None    # Filetype specific search
-duration = None    # Time limit search (option -t) [e.g. d5, w5, m5, y5]
+duration = None    # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
 conn     = None    # Use a single global connection during navigation
 nav      = "n"     # For user navigation
 
@@ -184,7 +184,7 @@ def usage():
     print("  -C       disable color output")
     print("  -j       open the first result in a web browser")
     print("  -f MIME  search for specific file type")
-    print("  -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]\n")
+    print("  -t dN    time limit search [h5: 5 hrs, d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]\n")
     print("Keys")
     print("  n, p     press 'n' or 'p' and Enter to navigate forward and backward")
     print("  1-N      press a number and Enter to open that result in browser\n")
@@ -234,7 +234,7 @@ try:
         elif opt[0] == "-t":
             # Option -t dN
             duration = opt[1]
-            if not opt[1][0] in ("d","w","m","y",):
+            if not opt[1][0] in ("h", "d","w","m","y",):
                 usage()
                 sys.exit(1)
             if not opt[1][1].isdigit():
