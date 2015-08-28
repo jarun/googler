@@ -6,7 +6,7 @@ Copyright (C) 2008 Henri Hakkinen
 
 Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>
 
-`google` is a command line tool for doing Google searches from the terminal. For each result it shows the header, URL and text context. You can also navigate back and forth to fetch the next or previous results. On link-recognising terminal emulators like AltYo, use `Ctrl-Left click` to open the URL in your default browser. For supported features, check usage below.
+`google` is a command line tool for doing Google searches from the terminal. For each result it shows the header, URL and text context. You can also navigate back and forth to fetch the next or previous results. On link-recognising terminal emulators like AltYo, use `Ctrl-Left click` to open the URL in your default browser. For features, check usage below.
 
 <pre>Usage: google [OPTIONS] KEYWORDS...  
 Options  
