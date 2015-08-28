@@ -181,7 +181,7 @@ def usage():
     print("Options")
     print("  -s N     start at the Nth result")
     print("  -n N     show N results (default 10)")
-    print("  -c SERV  country-specific search (refer man or project page for more)")
+    print("  -c SERV  country-specific search (refer man or project page for details)")
     print("  -l LANG  display in language LANG, such as fi for Finnish")
     print("  -C       disable color output")
     print("  -j       open the first result in a web browser")
