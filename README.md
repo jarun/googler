@@ -12,7 +12,10 @@ Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>
 Options  
     -s N     start at the N<sup>th</sup> result  
     -n N     shows N results (default 10)  
-    -c SERV  country-specific search [in (India), us (USA), uk (UK), de (Germany), pl (Poland), fr (France), nl (Netherlands), it (Italy), ru (Russia), ca (Canada), jp (Japan), kr (South Korea)]  
+    -c SERV  country-specific search
+             in (India), us (USA), uk (UK), de (Germany), pl (Poland),
+             fr (France), nl (Netherlands), it (Italy), ru (Russia),
+             ca (Canada), jp (Japan), kr (South Korea)]  
     -l LANG  display in language LANG, such as fi for Finnish  
     -C       disable color output  
     -j       open the first result in a web browser  
