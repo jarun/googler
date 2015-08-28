@@ -44,6 +44,7 @@ filetype = None    # Filetype specific search
 duration = None    # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
 conn     = None    # Use a single global connection during navigation
 nav      = "n"     # For user navigation
+server   = "www.google.com"    # For country-specific search
 
 # Classes
 class GoogleParser(HTMLParser.HTMLParser):
@@ -180,11 +181,12 @@ def usage():
     print("Options")
     print("  -s N     start at the Nth result")
     print("  -n N     show N results (default 10)")
+    print("  -c SERV  country-specific search (refer man or project page for more)")
     print("  -l LANG  display in language LANG, such as fi for Finnish")
     print("  -C       disable color output")
     print("  -j       open the first result in a web browser")
     print("  -f MIME  search for specific file type")
-    print("  -t dN    time limit search [h5: 5 hrs, d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]\n")
+    print("  -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]\n")
     print("Keys")
     print("  n, p     press 'n' or 'p' and Enter to navigate forward and backward")
     print("  1-N      press a number and Enter to open that result in browser\n")
@@ -192,6 +194,34 @@ def usage():
     print("Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>")
     print("Report bugs to https://github.com/jarun/google-cli/issues")
     sys.exit(1)
+
+def serverURL(domain):
+    if domain == "in":             # India
+        return "www.google.co.in"
+    elif domain == "us":           # USA
+        return "www.google.com"
+    elif domain == "uk":           # UK
+        return "www.google.co.uk"
+    elif domain == "de":           # Germany
+        return "www.google.de"
+    elif domain == "pl":           # Poland
+        return "www.google.pl"
+    elif domain == "fr":           # France
+        return "www.google.fr"
+    elif domain == "nl":           # Netherlands
+        return "www.google.nl"
+    elif domain == "it":           # Italy
+        return "www.google.it"
+    elif domain == "ru":           # Russia
+        return "www.google.ru"
+    elif domain == "ca":           # Canada
+        return "www.google.ca"
+    elif domain == "jp":           # Japan
+        return "www.google.co.jp"
+    elif domain == "kr":           # South Korea
+        return "www.google.co.kr"
+
+    return "www.google.com"
 
 ########### Program Main
 
@@ -203,7 +233,7 @@ if len(sys.argv) < 2:
     usage()
 
 try:
-    optlist, keywords = getopt(sys.argv[1:], "s:n:l:f:t:Cj")
+    optlist, keywords = getopt(sys.argv[1:], "s:n:c:l:f:t:Cj")
     for opt in optlist:
         if opt[0] == "-s":
             # Option -s N
@@ -217,6 +247,8 @@ try:
                 print("google: option -n needs an integer")
                 sys.exit(1)
             num = opt[1]
+        elif opt[0] == "-c":
+            server = serverURL(opt[1])
         elif opt[0] == "-l":
             # Option -l LANG
             lang = opt[1]
@@ -266,14 +298,14 @@ if filetype is not None:
     url += "+filetype:" + filetype
 
 #if not openUrl:
-#    print("\n[DEBUG] Search URL: https://www.google.com%s\n" % url)
+#    print("\n[DEBUG] Search URL: %s%s\n" % (server, url))
 
 # Get the terminal window size.
 winsz = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, "1234")
 columns = struct.unpack("HH", winsz)[1]
 
 # Connect to Google and request the result page.
-conn = HTTPSConnection("www.google.com")
+conn = HTTPSConnection(server)
 
 def fetch_results():
     global conn
