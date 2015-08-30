@@ -275,7 +275,7 @@ if num is not None:
 if lang is not None:
     url += "hl=" + lang + "&"
 if duration is not None:
-    url += "as_qdr=" + duration + "&"
+    url += "tbs=qdr:" + duration + "&"
 
 url += "q=" + quote_plus(keywords[0])
 for kw in keywords[1:]:
