@@ -262,7 +262,7 @@ except GetoptError as e:
     sys.exit(1)
 
 # Construct the query URL.
-url = "/search?&ie=UTF-8&oe=UTF-8&"
+url = "/search?channel=fs&aq=t&ie=UTF-8&oe=UTF-8&"
 
 if start is not None:
     url += "start=" + start + "&"
