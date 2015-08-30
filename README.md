@@ -68,7 +68,9 @@ Keys
 <pre>$ google -c in -l en IPL cricket</pre> 
 5. Search <b>mp3</b> instrumental music:
 <pre>$ google -f mp3 instrumental</pre>
-6. On the fly <b>help</b> (usage details):
+6. Search quoted text e.g. <b>it's a "beautiful world" in spring</b>:
+<pre>$ google it\'s a \"beautiful world\" in spring</pre>
+7. On the fly <b>help</b> (usage details):
 <pre>$ google</pre>
 
 # Installation
