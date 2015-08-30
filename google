@@ -196,30 +196,13 @@ def usage():
     sys.exit(1)
 
 def serverURL(domain):
-    if domain == "in":             # India
-        return "www.google.co.in"
-    elif domain == "us":           # USA
-        return "www.google.com"
-    elif domain == "uk":           # UK
-        return "www.google.co.uk"
-    elif domain == "de":           # Germany
-        return "www.google.de"
-    elif domain == "pl":           # Poland
-        return "www.google.pl"
-    elif domain == "fr":           # France
-        return "www.google.fr"
-    elif domain == "nl":           # Netherlands
-        return "www.google.nl"
-    elif domain == "it":           # Italy
-        return "www.google.it"
-    elif domain == "ru":           # Russia
-        return "www.google.ru"
-    elif domain == "ca":           # Canada
-        return "www.google.ca"
-    elif domain == "jp":           # Japan
-        return "www.google.co.jp"
-    elif domain == "kr":           # South Korea
-        return "www.google.co.kr"
+    # Google domain ref: https://en.wikipedia.org/wiki/List_of_Google_domains
+    if domain in ["id", "in", "jp", "kr", "uk"]:                                                                # www.google.co.domain
+        return "www.google.co." + domain
+    if domain in ["be", "ca", "ch", "cz", "de", "es", "fi", "fr", "it", "nl", "pl", "pt", "ro", "ru", "se"]:    # www.google.domain
+        return "www.google." + domain
+    if domain in ["ar", "au", "br", "mx", "ph", "tw", "ua"]:                                                    # www.google.com.domain
+        return "www.google.com." + domain
 
     return "www.google.com"
 

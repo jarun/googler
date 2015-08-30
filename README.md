@@ -12,10 +12,10 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 Options  
     -s N     start at the N<sup>th</sup> result  
     -n N     shows N results (default 10)  
-    -c SERV  country-specific search
-             in (India), us (USA), uk (UK), de (Germany), pl (Poland),
-             fr (France), nl (Netherlands), it (Italy), ru (Russia),
-             ca (Canada), jp (Japan), kr (South Korea)]  
+    -c SERV  country-specific search (Ref: https://en.wikipedia.org/wiki/List_of_Google_domains)  
+             Added TLDs: ar, au, be, br, ca, ch, cz, de,  
+             es, fi, fr, id, in, it, jp, kr, mx, nl, ph,  
+             pl, pt, ro, ru, se, tw, ua, uk  
     -l LANG  display in language LANG, such as fi for Finnish  
     -C       disable color output  
     -j       open the first result in a web browser  
