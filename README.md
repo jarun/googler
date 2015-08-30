@@ -18,7 +18,7 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 > - Show full contextual text snippet in search results
 > - Specify search duration (in hours / days / weeks / months / years)
 > - Fetch results from Google News section
-> - Country/domain specific search (28 top-level domains supported, default: www.google.com)
+> - Country/domain specific search (28 top-level domains supported, default: .com)
 > - Filetype specific search 
 > - Open the first result directly in browser (as in <i>I'm Feeling Lucky</i>, default: off)
 > - Display results in specific language (depends on the results returned)
