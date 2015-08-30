@@ -6,7 +6,7 @@ Copyright (C) 2008 Henri Hakkinen
 
 Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
-`google` is a command line tool for doing Google searches from the terminal. For each result it shows the header, URL and text context. You can also navigate back and forth to fetch the next or previous results. On link-recognising terminal emulators like AltYo, use `Ctrl-Left click` to open the URL in your default browser. For features, check usage below.
+`google` is a command line tool for doing Google searches from the terminal. For each result it shows the header, URL and text context. You can also navigate back and forth to fetch the next or previous results. On link-recognising terminal emulators like AltYo, use `Ctrl-Left click` to open the URL in your default browser. In addition, all results are indexed per page and you can use the index number to open the URL directly in a browser. For feature details, check usage below.
 
 <pre>Usage: google [OPTIONS] KEYWORDS...
 Options
@@ -32,8 +32,14 @@ Examples:
 
 1. Google <b>hello world</b>:
 <pre>$ google hello world</pre>
-2. To fetch 15 results updated within last 2 months, starting from the 3<sup>rd</sup> result for the string <b>cmdline utility</b> in site tuxdiary.com, run:
-<pre>$ google -n 15 -s 3 -t m2 cmdline utility site:tuxdiary.com</pre>
+2. To fetch <b>15 results</b> updated within last <b>14 months</b>, starting from the <b>3<sup>rd</sup> result</b> for the string <b>cmdline utility</b> in <b>site</b> tuxdiary.com, run:
+<pre>$ google -n 15 -s 3 -t m14 cmdline utility site:tuxdiary.com</pre>
+3. Read recent <b>news</b> on gadgets:
+<pre>$ google -N gadgets</pre>
+4. Fetch results on IPL cricket from <b>Google India</b> server in <b>English</b>:
+<pre>$ google -c in -l en IPL cricket</pre> 
+5. On the fly <b>help</b> (usage details):
+<pre>$ google</pre>
 
 Report bugs to https://github.com/jarun/google-cli/issues
 
