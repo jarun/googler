@@ -55,6 +55,8 @@ To remove, run:
 
 >**31 Aug, 2015**
 > - Google News support
+> - Fix failure to open URL with " (double quotes) in browser
+> - Fix version information in manpage
 
 >**30 Aug, 2015**
 > - Reformat country/domain specific search code. 28 domains supported now
