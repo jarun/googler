@@ -153,9 +153,9 @@ class Result:
         # Print the title and the URL.
         if colorize:
             print("\x1B[1m\x1B[36m", index, "\x1B[92m", title,
-                  "\x1B[0m\n\x1B[93mURL:", url, "\x1B[39m")
+                  "\x1B[0m\n\x1B[93m%s\x1B[39m" % url)
         else:
-            print(index, title, "\nURL:", url)
+            print("", index, title, "\n%s" % url)
         # Print the text with truncating.
         col = 0
         for w in text.split():
