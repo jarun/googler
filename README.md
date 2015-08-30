@@ -8,23 +8,23 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
 `google` is a command line tool for doing Google searches from the terminal. For each result it shows the header, URL and text context. You can also navigate back and forth to fetch the next or previous results. On link-recognising terminal emulators like AltYo, use `Ctrl-Left click` to open the URL in your default browser. For features, check usage below.
 
-<pre>Usage: google [OPTIONS] KEYWORDS...  
-Options  
-    -s N     start at the N<sup>th</sup> result  
-    -n N     shows N results (default 10)  
-    -c SERV  country-specific search (Ref: https://en.wikipedia.org/wiki/List_of_Google_domains)  
-             Added TLDs: ar, au, be, br, ca, ch, cz, de,  
-             es, fi, fr, id, in, it, jp, kr, mx, nl, ph,  
-             pl, pt, ro, ru, se, tw, ua, uk  
-    -l LANG  display in language LANG, such as fi for Finnish  
-    -C       disable color output  
-    -j       open the first result in a web browser  
-    -f MIME  search for specific file type  
+<pre>Usage: google [OPTIONS] KEYWORDS...
+Options
+    -s N     start at the N<sup>th</sup> result
+    -n N     shows N results (default 10)
+    -c SERV  country-specific search (Ref: https://en.wikipedia.org/wiki/List_of_Google_domains)
+             Added TLDs: ar, au, be, br, ca, ch, cz, de,
+             es, fi, fr, id, in, it, jp, kr, mx, nl, ph,
+             pl, pt, ro, ru, se, tw, ua, uk
+    -l LANG  display in language LANG, such as fi for Finnish
+    -C       disable color output
+    -j       open the first result in a web browser
+    -f MIME  search for specific file type
     -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]
 
 Keys
     n, p     press 'n' or 'p' and Enter to navigate forward and backward
-    1-N      press a number and Enter to open that result in browser</pre>  
+    1-N      press a number and Enter to open that result in browser</pre>
 
 Examples:
 
