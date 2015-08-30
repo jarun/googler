@@ -11,7 +11,8 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 <pre>Usage: google [OPTIONS] KEYWORDS...
 Options
     -s N     start at the N<sup>th</sup> result
-    -n N     shows N results (default 10)
+    -n N     show N results (default 10)
+    -N       show results from news section
     -c SERV  country-specific search (Ref: https://en.wikipedia.org/wiki/List_of_Google_domains)
              Added TLDs: ar, au, be, br, ca, ch, cz, de,
              es, fi, fr, id, in, it, jp, kr, mx, nl, ph,
@@ -51,6 +52,9 @@ To remove, run:
 <pre>$ sudo make uninstall</pre>
 
 # News
+
+>**31 Aug, 2015**
+> - Google News support
 
 >**30 Aug, 2015**
 > - Reformat country/domain specific search code. 28 domains supported now

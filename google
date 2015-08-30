@@ -46,6 +46,7 @@ conn     = None    # Use a single global connection during navigation
 nav      = "n"     # For user navigation
 server   = "www.google.com"    # For country-specific search
 debug    = False   # Print debug logs
+news     = False   # Read news
 
 # Classes
 class GoogleParser(HTMLParser.HTMLParser):
@@ -182,6 +183,7 @@ def usage():
     print("Options")
     print("  -s N     start at the Nth result")
     print("  -n N     show N results (default 10)")
+    print("  -N       show results from news section")
     print("  -c SERV  country-specific search (refer man or project page for details)")
     print("  -l LANG  display in language LANG, such as fi for Finnish")
     print("  -C       disable color output")
@@ -218,7 +220,7 @@ if len(sys.argv) < 2:
     usage()
 
 try:
-    optlist, keywords = getopt(sys.argv[1:], "s:n:c:l:f:t:dCj")
+    optlist, keywords = getopt(sys.argv[1:], "s:n:c:l:f:t:NCjd")
     for opt in optlist:
         if opt[0] == "-s":
             # Option -s N
@@ -232,6 +234,8 @@ try:
                 print("google: option -n needs an integer")
                 sys.exit(1)
             num = opt[1]
+        elif opt[0] == "-N":
+            news = True
         elif opt[0] == "-c":
             server = serverURL(opt[1])
         elif opt[0] == "-l":
@@ -272,6 +276,8 @@ if start is not None:
     url += "start=" + start + "&"
 if num is not None:
     url += "num=" + num + "&"
+if news:
+    url += "tbm=nws&"
 if lang is not None:
     url += "hl=" + lang + "&"
 if duration is not None:
