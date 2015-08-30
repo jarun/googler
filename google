@@ -90,7 +90,7 @@ class GoogleParser(HTMLParser.HTMLParser):
                 self.url = self.url[:marker]
 
             index = len(self.results) + 1
-            self.results.append(Result(index, self.title, self.url, self.text))
+            self.results.append(Result(index, self.title, unquote(self.url), self.text))
             self.handle_starttag = self.main_start
             self.handle_data = self.main_data
             self.handle_endtag = self.main_end
