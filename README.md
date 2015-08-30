@@ -6,7 +6,9 @@ Copyright (C) 2008 Henri Hakkinen
 
 Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
-`google` is a command line tool for doing Google searches from the terminal. For each result it shows the header, URL and text context. You can also navigate back and forth to fetch the next or previous results. On link-recognising terminal emulators like AltYo, use `Ctrl-Left click` to open the URL in your default browser. In addition, all results are indexed per page and you can use the index number to open the URL directly in a browser.
+`google-cli` is a command line tool for doing Google searches from the terminal. For each result it shows the header, URL and text context. You can also navigate back and forth to fetch the next or previous results. On link-recognising terminal emulators like AltYo, use `Ctrl-Left click` to open the URL in your default browser. In addition, all results are indexed per page and you can use the index number to open the URL directly in a browser.
+
+`google-cli` is GPLv3 licensed.
 
 # Features
 
@@ -30,6 +32,7 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 > - Enable/disable debug logs (default: disabled)
 > - Manpage for quick reference
 > - Minimal dependencies
+> - Open source and free
 
 # Usage
 
