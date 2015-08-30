@@ -83,7 +83,7 @@ class GoogleParser(HTMLParser.HTMLParser):
             marker = self.url.find("?q=")
             if marker >= 0:
                 self.url = self.url[marker + 3:]
-            marker = self.url.find('&sa')
+            marker = self.url.find("&sa")
             if marker >= 0:
                 self.url = self.url[:marker]
 
