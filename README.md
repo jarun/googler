@@ -20,7 +20,8 @@ Options
     -C       disable color output
     -j       open the first result in a web browser
     -f MIME  search for specific file type
-    -t dN    time limit search [e.g. d5: 5 days, w5: 5 weeks, m5: 5 months, y5: 5 years]
+    -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]
+    -d       enable debugging
 
 Keys
     n, p     press 'n' or 'p' and Enter to navigate forward and backward
@@ -50,6 +51,10 @@ To remove, run:
 <pre>$ sudo make uninstall</pre>
 
 # News
+
+>**30 Aug, 2015**
+> - Reformat country/domain specific search code. 28 domains supported now
+> - Add switch for debug logs
 
 >**28 Aug, 2015**
 > - Support country-specific search (Open to additions on request)

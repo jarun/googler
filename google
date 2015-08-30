@@ -45,6 +45,7 @@ duration = None    # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
 conn     = None    # Use a single global connection during navigation
 nav      = "n"     # For user navigation
 server   = "www.google.com"    # For country-specific search
+debug    = False   # Print debug logs
 
 # Classes
 class GoogleParser(HTMLParser.HTMLParser):
@@ -186,13 +187,14 @@ def usage():
     print("  -C       disable color output")
     print("  -j       open the first result in a web browser")
     print("  -f MIME  search for specific file type")
-    print("  -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]\n")
+    print("  -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]")
+    print("  -d       enable debugging\n")
     print("Keys")
     print("  n, p     press 'n' or 'p' and Enter to navigate forward and backward")
     print("  1-N      press a number and Enter to open that result in browser\n")
     print("Copyright (C) 2008 Henri Hakkinen.")
     print("Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>")
-    print("Report bugs to https://github.com/jarun/google-cli/issues")
+    print("Webpage: https://github.com/jarun/google-cli")
     sys.exit(1)
 
 def serverURL(domain):
@@ -216,7 +218,7 @@ if len(sys.argv) < 2:
     usage()
 
 try:
-    optlist, keywords = getopt(sys.argv[1:], "s:n:c:l:f:t:Cj")
+    optlist, keywords = getopt(sys.argv[1:], "s:n:c:l:f:t:dCj")
     for opt in optlist:
         if opt[0] == "-s":
             # Option -s N
@@ -255,6 +257,8 @@ try:
             if not opt[1][1].isdigit():
                 usage()
                 sys.exit(1)
+        elif opt[0] == "-d":
+            debug = True
     if len(keywords) < 1:
         usage()
 except GetoptError as e:
@@ -280,8 +284,8 @@ for kw in keywords[1:]:
 if filetype is not None:
     url += "+filetype:" + filetype
 
-#if not openUrl:
-#    print("\n[DEBUG] Search URL: %s%s\n" % (server, url))
+if debug:
+    print("[DEBUG] Search URL [%s : %s]" % (server, url))
 
 # Get the terminal window size.
 winsz = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, "1234")
@@ -299,12 +303,19 @@ def fetch_results():
     if resp.status != 200:
         if resp.status in (301,302,):
             url = urljoin(url, resp.getheader('location', ''))
-            #print("[DEBUG] Redirected to URL:", url, "\n")
+            if debug:
+                print("[DEBUG] Redirected URL [%s]" % url)
             if url.find("sorry/IndexRedirect?") >= 0:
                 print("ERROR: Connection blocked due to unusual activity.")
+                conn.close()
                 sys.exit(1)
             conn.close()
+            if debug:
+                print("[DEBUG] Next Server [%s]" % url[url.find("//") + 2:url.find("/search")])
             conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search")])
+            url = url[url.find("/search"):]
+            if debug:
+                print("[DEBUG] Next GET [%s]\n" % url)
             conn.request("GET", url)
             resp = conn.getresponse()
             if resp.status != 200:
@@ -367,6 +378,7 @@ while True:
         start = "0"
 
     url = url.replace("start=" + oldstart + "&", "start=" + start + "&", 1)
-    #print("[DEBUG] new url: ", url)
+    if debug:
+        print("[DEBUG] Next URL [%s]\n" % url)
 
 conn.close()
