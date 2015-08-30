@@ -22,7 +22,7 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 > - Fetch results from Google News section
 > - Country/domain specific search (28 top-level domains supported, default: .com)
 > - Filetype specific search 
-> - Open the first result directly in browser (as in <i>I'm Feeling Lucky</i>, default: off)
+> - Optionally open the first result directly in browser (as in <i>I'm Feeling Lucky</i>)
 > - Display results in specific language (depends on the results returned)
 > - Handle first level of Google redirections (reports IP blocking by Google)
 > - Unicode in URL works
