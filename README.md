@@ -6,7 +6,31 @@ Copyright (C) 2008 Henri Hakkinen
 
 Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
-`google` is a command line tool for doing Google searches from the terminal. For each result it shows the header, URL and text context. You can also navigate back and forth to fetch the next or previous results. On link-recognising terminal emulators like AltYo, use `Ctrl-Left click` to open the URL in your default browser. In addition, all results are indexed per page and you can use the index number to open the URL directly in a browser. For feature details, check usage below.
+`google` is a command line tool for doing Google searches from the terminal. For each result it shows the header, URL and text context. You can also navigate back and forth to fetch the next or previous results. On link-recognising terminal emulators like AltYo, use `Ctrl-Left click` to open the URL in your default browser. In addition, all results are indexed per page and you can use the index number to open the URL directly in a browser.
+
+# Features
+
+> - Uses HTTPS connection
+> - Fetch n results in a go
+> - Start at n<sup>th</sup> result
+> - Fetch and navigate next or previous set of results
+> - Easily open result URLs in browser from cmdline using index number
+> - Show full contextual text snippet in search results
+> - Specify search duration (in hours / days / weeks / months / years)
+> - Fetch results from Google News section
+> - Country/domain specific search (28 top-level domains supported, default: www.google.com)
+> - Filetype specific search 
+> - Open the first result directly in browser (as in <i>I'm Feeling Lucky</i>, default: off)
+> - Display results in specific language (depends on the results returned)
+> - Handle first level of Google redirections (reports IP blocking by Google)
+> - Unicode in URL works
+> - UTF-8 request and response
+> - Works with Python 2.7.x and 3.x
+> - Enable/disable color output (default: colorful)
+> - Enable/disable debug logs (default: disabled)
+> - Manpage for quick reference
+
+# Usage
 
 <pre>Usage: google [OPTIONS] KEYWORDS...
 Options
@@ -28,7 +52,7 @@ Keys
     n, p     press 'n' or 'p' and Enter to navigate forward and backward
     1-N      press a number and Enter to open that result in browser</pre>
 
-Examples:
+# Examples
 
 1. Google <b>hello world</b>:
 <pre>$ google hello world</pre>
@@ -38,12 +62,10 @@ Examples:
 <pre>$ google -N gadgets</pre>
 4. Fetch results on IPL cricket from <b>Google India</b> server in <b>English</b>:
 <pre>$ google -c in -l en IPL cricket</pre> 
-5. On the fly <b>help</b> (usage details):
+5. Search <b>mp3</b> instrumental music:
+<pre>$ google -f mp3 instrumental</pre>
+6. On the fly <b>help</b> (usage details):
 <pre>$ google</pre>
-
-Report bugs to https://github.com/jarun/google-cli/issues
-
-See the manual page for full details.  Have fun!
 
 # Installation
 
