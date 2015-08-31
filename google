@@ -19,6 +19,7 @@
 
 from __future__ import print_function
 import sys
+import os
 import termios, fcntl, struct
 import webbrowser
 from getopt import getopt, GetoptError
@@ -167,7 +168,17 @@ class Result:
             col += len(w) + 1
         print("\n")
     def open(self):
-        webbrowser.open(self.url)
+        _stderr = os.dup(2)
+        os.close(2)
+        _stdout = os.dup(1)
+        os.close(1)
+        fd = os.open(os.devnull, os.O_RDWR)
+        try:
+            webbrowser.open(self.url)
+        finally:
+            os.close(fd)
+            os.dup2(_stderr, 2)
+            os.dup2(_stdout, 1)
 
 # Functions
 def is_int(string):

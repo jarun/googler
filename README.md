@@ -92,6 +92,7 @@ To remove, run:
 > - Google News support
 > - Fix failure to open URL with " (double quotes) in browser
 > - Fix version information in manpage
+> - Get rid of Google Chrome debug/error messages in console when opening URL
 
 >**30 Aug, 2015**
 > - Reformat country/domain specific search code. 28 domains supported now
