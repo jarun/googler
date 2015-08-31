@@ -31,6 +31,7 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 > - Enable/disable color output (default: colorful)
 > - Enable/disable debug logs (default: disabled)
 > - Manpage for quick reference
+> - Fast and clean (no ads or clutter)
 > - Minimal dependencies
 > - Open source and free
 
