@@ -59,7 +59,7 @@ Keys
 
 <b>Configuration file</b>  
   
-google-cli doesn't have any! This is to retain the speed of the utlity and avoid OS-specific differences. Users can enjoy the advantage of config files using aliases.  
+google-cli doesn't have any! This is to retain the speed of the utlity and avoid OS-specific differences. Users can enjoy the advantage of config files using aliases. There's no need to memorize options.  
   
 For example, the following alias set in `~/.bashrc`:
 <pre>alias g='google -n 7 -c ru -l ru'</pre>
