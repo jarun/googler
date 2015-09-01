@@ -23,7 +23,7 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 > - Country/domain specific search (28 top-level domains supported, default: .com)
 > - Filetype specific search 
 > - Optionally open the first result directly in browser (as in <i>I'm Feeling Lucky</i>)
-> - Display results in specific language (depends on the results returned)
+> - Specify language preference for results
 > - Handle first level of Google redirections (reports IP blocking by Google)
 > - Unicode in URL works
 > - UTF-8 request and response
@@ -56,6 +56,23 @@ Options
 Keys
     n, p     press 'n' or 'p' and Enter to navigate forward and backward
     1-N      press a number and Enter to open that result in browser</pre>
+
+<b>Configuration file</b>  
+  
+google-cli doesn't have any! This is to retain the speed of the utlity and avoid OS-specific differences. Users can enjoy the advantage of config files using aliases.  
+  
+For example, the following alias set in `~/.bashrc`:
+<pre>alias g='google -n 7 -c ru -l ru'</pre>
+fetches 7 results from the Google Russia server, with preference towards results in Russian.  
+  
+The alias serves both the purposes of using config files:
+- persistent settings: when users invokes `g`, it expands to the alias everytime.
+- override settings: thanks to the way Python getopt() works, google-cli is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs:  
+<code>$ g -l de -c de -n 12 hello world</code>  
+12 results are returned from the Google Germany server, with preference towards results in German.
+  
+Windows users can refer the following discussion on how to use aliases on Windows:
+http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 
 # Examples
 
