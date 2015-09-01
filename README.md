@@ -66,7 +66,7 @@ For example, the following alias set in `~/.bashrc`:
 fetches 7 results from the Google Russia server, with preference towards results in Russian.  
   
 The alias serves both the purposes of using config files:
-- persistent settings: when users invokes `g`, it expands to the preferred settings everytime.
+- persistent settings: when the user invokes `g`, it expands to the preferred settings everytime.
 - override settings: thanks to the way Python getopt() works, google-cli is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs:  
 <code>$ g -l de -c de -n 12 hello world</code>  
 12 results are returned from the Google Germany server, with preference towards results in German.
