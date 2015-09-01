@@ -6,7 +6,7 @@ Copyright (C) 2008 Henri Hakkinen
 
 Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
-`google-cli` is a command line tool to search Google from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number.
+`google-cli` is a command line tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number.
   
 `google-cli` is GPLv3 licensed.
 
