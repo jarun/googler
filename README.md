@@ -83,11 +83,17 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 <pre>$ google -N gadgets</pre>
 4. Fetch results on IPL cricket from <b>Google India</b> server in <b>English</b>:
 <pre>$ google -c in -l en IPL cricket</pre> 
-5. Search <b>mp3</b> instrumental music:
-<pre>$ google -f mp3 instrumental</pre>
-6. Search quoted text e.g. <b>it's a "beautiful world" in spring</b>:
+5. Search quoted text e.g. <b>it's a "beautiful world" in spring</b>:
 <pre>$ google it\'s a \"beautiful world\" in spring</pre>
-7. On the fly <b>help</b> (usage details):
+6. Search for a specific file type:
+<pre>$ google instrumental filetype:mp3</pre>
+7. I'm feeling lucky search:
+<pre>$ google -j leather jackets</pre>
+8. Website specific search alias:
+<pre>alias t='google -n 7 site:tuxdiary.com'</pre>
+9. Alias to find meanings of words (note: the first result in Google is not a link):
+<pre>alias define='google -n 2 define'</pre>
+10. On the fly <b>help</b> (usage details):
 <pre>$ google</pre>
 
 # Installation
