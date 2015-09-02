@@ -21,7 +21,7 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 > - Specify search duration (in hours / days / weeks / months / years)
 > - Fetch results from Google News section
 > - Country/domain specific search (28 top-level domains supported, default: .com)
-> - Filetype specific search 
+> - Google search keywords like `filetype:mime`, `site:somesite.com` etc. work.
 > - Optionally open the first result directly in browser (as in <i>I'm Feeling Lucky</i>)
 > - Specify language preference for results
 > - Handle first level of Google redirections (reports IP blocking by Google)
@@ -49,7 +49,6 @@ Options
     -l LANG  display in language LANG, such as fi for Finnish
     -C       disable color output
     -j       open the first result in a web browser
-    -f MIME  search for specific file type
     -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]
     -d       enable debugging
 
@@ -104,6 +103,9 @@ To remove, run:
 <pre>$ sudo make uninstall</pre>
 
 # News
+
+>**03 Sep, 2015**
+> - Removed file type specific search as it can be done easily with `filetype:mime` option 
 
 >**31 Aug, 2015**
 > - Google News support
