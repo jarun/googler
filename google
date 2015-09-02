@@ -148,7 +148,7 @@ class Result:
             if url == "":
                 print("Showing in console as URL is empty\n")
             else:
-                webbrowser.open(url)
+                self.open()
                 conn.close()
                 sys.exit(0)
         # Print the title and the URL.
