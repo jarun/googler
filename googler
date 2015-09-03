@@ -188,7 +188,7 @@ def is_int(string):
         return False
 
 def usage():
-    print("Usage: google [OPTIONS] KEYWORDS...")
+    print("Usage: googler [OPTIONS] KEYWORDS...")
     print("Performs a Google search and prints the results to stdout.\n")
     print("Options")
     print("  -s N     start at the Nth result")
@@ -203,6 +203,7 @@ def usage():
     print("Keys")
     print("  n, p     press 'n' or 'p' and Enter to navigate forward and backward")
     print("  1-N      press a number and Enter to open that result in browser\n")
+    print("Version 1.2")
     print("Copyright (C) 2008 Henri Hakkinen.")
     print("Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>")
     print("Webpage: https://github.com/jarun/google-cli")
@@ -234,13 +235,13 @@ try:
         if opt[0] == "-s":
             # Option -s N
             if not opt[1].isdigit():
-                print("google: option -s needs an integer")
+                print("googler: option -s needs an integer")
                 sys.exit(1)
             start = opt[1]
         elif opt[0] == "-n":
             # Option -n N
             if not opt[1].isdigit():
-                print("google: option -n needs an integer")
+                print("googler: option -n needs an integer")
                 sys.exit(1)
             num = opt[1]
         elif opt[0] == "-N":
@@ -272,7 +273,7 @@ try:
     if len(keywords) < 1:
         usage()
 except GetoptError as e:
-    print("google:", e)
+    print("googler:", e)
     sys.exit(1)
 
 # Construct the query URL.

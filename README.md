@@ -8,7 +8,7 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
 `google-cli` is a command line tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number.
   
-`google-cli` is GPLv3 licensed.
+`google-cli` is GPLv3 licensed. It doesn't have any affiliation to Google in any way.
 
 # Features
 
@@ -37,7 +37,7 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
 # Usage
 
-<pre>Usage: google [OPTIONS] KEYWORDS...
+<pre>Usage: googler [OPTIONS] KEYWORDS...
 Options
     -s N     start at the N<sup>th</sup> result
     -n N     show N results (default 10)
@@ -61,7 +61,7 @@ Keys
 google-cli doesn't have any! This is to retain the speed of the utlity and avoid OS-specific differences. Users can enjoy the advantage of config files using aliases. There's no need to memorize options.  
   
 For example, the following alias set in `~/.bashrc`:
-<pre>alias g='google -n 7 -c ru -l ru'</pre>
+<pre>alias g='googler -n 7 -c ru -l ru'</pre>
 fetches 7 results from the Google Russia server, with preference towards results in Russian.  
   
 The alias serves both the purposes of using config files:
@@ -76,25 +76,25 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 # Examples
 
 1. Google <b>hello world</b>:
-<pre>$ google hello world</pre>
+<pre>$ googler hello world</pre>
 2. To fetch <b>15 results</b> updated within last <b>14 months</b>, starting from the <b>3<sup>rd</sup> result</b> for the string <b>cmdline utility</b> in <b>site</b> tuxdiary.com, run:
-<pre>$ google -n 15 -s 3 -t m14 cmdline utility site:tuxdiary.com</pre>
+<pre>$ googler -n 15 -s 3 -t m14 cmdline utility site:tuxdiary.com</pre>
 3. Read recent <b>news</b> on gadgets:
-<pre>$ google -N gadgets</pre>
+<pre>$ googler -N gadgets</pre>
 4. Fetch results on IPL cricket from <b>Google India</b> server in <b>English</b>:
-<pre>$ google -c in -l en IPL cricket</pre> 
+<pre>$ googler -c in -l en IPL cricket</pre> 
 5. Search quoted text e.g. <b>it's a "beautiful world" in spring</b>:
-<pre>$ google it\'s a \"beautiful world\" in spring</pre>
+<pre>$ googler it\'s a \"beautiful world\" in spring</pre>
 6. Search for a specific file type:
-<pre>$ google instrumental filetype:mp3</pre>
+<pre>$ googler instrumental filetype:mp3</pre>
 7. I'm feeling lucky search:
-<pre>$ google -j leather jackets</pre>
+<pre>$ googler -j leather jackets</pre>
 8. Website specific search alias:
-<pre>alias t='google -n 7 site:tuxdiary.com'</pre>
+<pre>alias t='googler -n 7 site:tuxdiary.com'</pre>
 9. Alias to find meanings of words (note: the first result in Google is not a link):
-<pre>alias define='google -n 2 define'</pre>
+<pre>alias define='googler -n 2 define'</pre>
 10. On the fly <b>help</b> (usage details):
-<pre>$ google</pre>
+<pre>$ googler</pre>
 
 # Installation
 
@@ -112,6 +112,8 @@ To remove, run:
 
 >**03 Sep, 2015**
 > - Removed file type specific search as it can be done easily with `filetype:mime` option 
+> - The utilily name is changed to googler (from google) to avoid any copyright infringements
+> - All necessary changes for renaming done
 
 >**31 Aug, 2015**
 > - Google News support
