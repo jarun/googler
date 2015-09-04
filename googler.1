@@ -1,4 +1,4 @@
-.TH "GOOGLER" "1" "August 2015" "Version 1.2" "User Commands"
+.TH "GOOGLER" "1" "September 2015" "Version 1.5" "User Commands"
 .SH NAME
 googler \- Google from command line
 .SH SYNOPSIS
@@ -7,7 +7,7 @@ googler \- Google from command line
 .I KEYWORDS...
 .SH DESCRIPTION
 .B googler
-is a command line tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. There is no configuration file as aliases serve the same purpose for this utility.
+is a command line tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. There is no configuration file as aliases serve the same purpose for this utility. Supports sequential searches in a single instance.
 .SH OPTIONS
 .TP
 .BI \-s " N"
@@ -45,10 +45,16 @@ Enable debugging.
 .SH KEYS
 .TP
 .BI "n, p"
-Press 'n' or 'p' and Enter to navigate forward and backward
+Enter 'n' or 'p' to navigate forward or backward.
+.TP
+.BI s " terms"
+Enter 's' followed by keywords to initiate a new search (with original options).
 .TP
 .BI "1-N"
-Press a number and Enter to open that result in browser
+Enter a number to open that result in browser.
+.TP
+.BI ""
+Any other input exits googler.
 .SH ENVIRONMENT
 .TP
 .BI BROWSER

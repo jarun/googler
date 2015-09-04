@@ -6,7 +6,7 @@ Copyright (C) 2008 Henri Hakkinen
 
 Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
-`google-cli` is a command line tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number.
+`google-cli` is a command line tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. Supports sequential searches in a single instance.
   
 `google-cli` is GPLv3 licensed. It doesn't have any affiliation to Google in any way.
 
@@ -16,6 +16,7 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 > - Fetch n results in a go
 > - Start at n<sup>th</sup> result
 > - Fetch and navigate next or previous set of results
+> - Initiate a new search with original options (in a single instance)
 > - Easily open result URLs in browser from cmdline using index number
 > - Show full contextual text snippet in search results
 > - Specify search duration (in hours / days / weeks / months / years)
@@ -53,8 +54,10 @@ Options
     -d       enable debugging
 
 Keys
-    n, p     press 'n' or 'p' and Enter to navigate forward and backward
-    1-N      press a number and Enter to open that result in browser</pre>
+    n, p     enter 'n' or 'p' to navigate forward or backward
+    s terms  enter 's' followed by keywords to initiate a new search (with original options)
+    1-N      enter a number to open that result in browser
+             any other input exits googler</pre>
 
 <b>Configuration file</b>  
   
@@ -109,6 +112,9 @@ To remove, run:
 <pre>$ sudo make uninstall</pre>
 
 # News
+
+>**04 Sep, 2015**
+> - Add incremental search
 
 >**03 Sep, 2015**
 > - Removed file type specific search as it can be done easily with `filetype:mime` option 
