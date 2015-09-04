@@ -36,6 +36,21 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 > - Minimal dependencies
 > - Open source and free
 
+# Installation
+
+google-cli requires Python 2.7.x or Python 3.x to work.
+
+The following steps are tested on Ubuntu 14.04.3 x64_64:  
+<pre>$ git clone https://github.com/jarun/google-cli/  
+$ cd google-cli  
+$ sudo make install</pre>  
+
+To remove, run:  
+<pre>$ sudo make uninstall</pre>
+
+google-cli is also available on AUR:  
+https://aur.archlinux.org/packages/google-cli/
+
 # Usage
 
 <pre>Usage: googler [OPTIONS] KEYWORDS...
@@ -98,18 +113,6 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 <pre>alias define='googler -n 2 define'</pre>
 10. On the fly <b>help</b> (usage details):
 <pre>$ googler</pre>
-
-# Installation
-
-google-cli requires Python 2.7.x or Python 3.x to work.
-
-The following steps are tested on Ubuntu 14.04.3 x64_64:  
-<pre>$ git clone https://github.com/jarun/google-cli/  
-$ cd google-cli  
-$ sudo make install</pre>  
-
-To remove, run:  
-<pre>$ sudo make uninstall</pre>
 
 # News
 
