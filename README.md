@@ -116,6 +116,9 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 
 # News
 
+>**06 Sep, 2015**
+> - Reconnect and retry on httplib.BadStatusLine exception. Connection is closed due to inactivity.
+
 >**04 Sep, 2015**
 > - Add incremental search
 
