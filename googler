@@ -316,8 +316,17 @@ def fetch_results():
     global conn
     global url
 
-    conn.request("GET", url)
-    resp = conn.getresponse()
+    try:
+        conn.request("GET", url)
+        resp = conn.getresponse()
+    except:
+        if debug:
+            print("[DEBUG] Got Exception with old conn, retrying...")
+        conn.close()
+        conn = HTTPSConnection(server)
+        conn.request("GET", url)
+        resp = conn.getresponse()
+
     if resp.status != 200:
         if resp.status in (301,302,):
             url = urljoin(url, resp.getheader('location', ''))
