@@ -376,9 +376,9 @@ while True:
 
     oldstart = start
     if sys.version_info > (3,):
-        nav = input("Enter 'n', 'p', 'g keywords', or number to continue... ")
+        nav = input("Enter 'n', 'p', 'g keywords', or number to continue: ")
     else:
-        nav = raw_input("Enter 'n', 'p', 'g keywords' or number to continue... ")
+        nav = raw_input("Enter 'n', 'p', 'g keywords' or number to continue: ")
 
     if nav == "n":
         if num is not None:
@@ -395,7 +395,7 @@ while True:
     elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
         trimsearch = nav[2:].strip().replace(" ", "+")
         if trimsearch == "":
-            print("Empty string. Exiting...")
+            print("Empty search. Exiting.")
             break
         url = baseurl + "q=" + trimsearch
         if debug:
