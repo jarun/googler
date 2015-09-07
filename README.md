@@ -12,29 +12,30 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
 # Features
 
-> - Uses HTTPS connection
-> - Fetch n results in a go
-> - Start at n<sup>th</sup> result
-> - Fetch and navigate next or previous set of results
-> - Initiate a new search with original options (in a single instance)
-> - Easily open result URLs in browser from cmdline using index number
-> - Show full contextual text snippet in search results
-> - Specify search duration (in hours / days / weeks / months / years)
-> - Fetch results from Google News section
-> - Country/domain specific search (28 top-level domains supported, default: .com)
-> - Google search keywords like `filetype:mime`, `site:somesite.com` etc. work.
-> - Optionally open the first result directly in browser (as in <i>I'm Feeling Lucky</i>)
-> - Specify language preference for results
-> - Handle first level of Google redirections (reports IP blocking by Google)
-> - Unicode in URL works
-> - UTF-8 request and response
-> - Works with Python 2.7.x and 3.x
-> - Enable/disable color output (default: colorful)
-> - Enable/disable debug logs (default: disabled)
-> - Manpage for quick reference
-> - Fast and clean (no ads or clutter)
-> - Minimal dependencies
-> - Open source and free
+- Uses HTTPS connection
+- Fetch n results in a go
+- Start at n<sup>th</sup> result
+- Fetch and navigate next or previous set of results
+- Initiate a new search with original options (in a single instance)
+- Reconnect on new search even if connection is closed due to inactivity
+- Easily open result URLs in browser from cmdline using index number
+- Show full contextual text snippet in search results
+- Specify search duration (in hours / days / weeks / months / years)
+- Fetch results from Google News section
+- Country/domain specific search (28 top-level domains supported, default: .com)
+- Google search keywords like `filetype:mime`, `site:somesite.com` etc. work.
+- Optionally open the first result directly in browser (as in <i>I'm Feeling Lucky</i>)
+- Specify language preference for results
+- Handle first level of Google redirections (reports IP blocking by Google)
+- Unicode in URL works
+- UTF-8 request and response
+- Works with Python 2.7.x and 3.x
+- Enable/disable color output (default: colorful)
+- Enable/disable debug logs (default: disabled)
+- Manpage for quick reference
+- Fast and clean (no ads or clutter)
+- Minimal dependencies
+- Open source and free
 
 # Installation
 
