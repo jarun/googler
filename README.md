@@ -69,8 +69,8 @@ Options
     -d       enable debugging
 
 Keys
-    n, p     enter 'n' or 'p' to navigate forward or backward
     g terms  enter 'g' followed by keywords to initiate a new search (with original options)
+    n, p     enter 'n' or 'p' to navigate forward or backward
     1-N      enter a number to open that result in browser
              any other input exits googler</pre>
 
