@@ -70,7 +70,7 @@ Options
 
 Keys
     n, p     enter 'n' or 'p' to navigate forward or backward
-    s terms  enter 's' followed by keywords to initiate a new search (with original options)
+    g terms  enter 'g' followed by keywords to initiate a new search (with original options)
     1-N      enter a number to open that result in browser
              any other input exits googler</pre>
 
@@ -115,6 +115,9 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 <pre>$ googler</pre>
 
 # News
+
+>**07 Sep, 2015**
+> - Change incremental search shortcut from `s` to `g`.
 
 >**06 Sep, 2015**
 > - Reconnect and retry on httplib.BadStatusLine exception. Connection is closed due to inactivity.

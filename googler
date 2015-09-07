@@ -202,7 +202,7 @@ def usage():
     print("  -d       enable debugging\n")
     print("Keys")
     print("  n, p     enter 'n' or 'p' to navigate forward or backward")
-    print("  s terms  enter 's' followed by keywords to initiate a new search (with original options)")
+    print("  g terms  enter 'g' followed by keywords to initiate a new search (with original options)")
     print("  1-N      enter a number to open that result in browser")
     print("           any other input exits googler\n")
     print("Version 1.5")
@@ -371,14 +371,14 @@ def fetch_results():
 
 results = []
 while True:
-    if nav == "n" or nav == "p" or nav =="s":
+    if nav == "n" or nav == "p" or nav =="g":
         results = fetch_results()
 
     oldstart = start
     if sys.version_info > (3,):
-        nav = input("Enter 'n', 'p', 's keywords', or number to continue... ")
+        nav = input("Enter 'n', 'p', 'g keywords', or number to continue... ")
     else:
-        nav = raw_input("Enter 'n', 'p', 's keywords' or number to continue... ")
+        nav = raw_input("Enter 'n', 'p', 'g keywords' or number to continue... ")
 
     if nav == "n":
         if num is not None:
@@ -392,7 +392,7 @@ while True:
         else:
             start = str(int(start) - 10)
         print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n")
-    elif len(nav) > 2 and nav[0] == "s" and nav[1] == " ":
+    elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
         trimsearch = nav[2:].strip().replace(" ", "+")
         if trimsearch == "":
             print("Empty string. Exiting...")
@@ -400,7 +400,7 @@ while True:
         url = baseurl + "q=" + trimsearch
         if debug:
             print("New search URL [%s]" % url)
-        nav = "s"
+        nav = "g"
         start = basestart
         print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n")
         continue
