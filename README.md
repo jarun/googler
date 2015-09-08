@@ -104,13 +104,13 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 <pre>$ googler -c in -l en IPL cricket</pre> 
 5. Search quoted text e.g. <b>it's a "beautiful world" in spring</b>:
 <pre>$ googler it\'s a \"beautiful world\" in spring</pre>
-6. Search for a specific file type:
+6. Search for a <b>specific file type</b>:
 <pre>$ googler instrumental filetype:mp3</pre>
-7. I'm feeling lucky search:
+7. <b>I'm feeling lucky</b> search:
 <pre>$ googler -j leather jackets</pre>
-8. Website specific search alias:
+8. <b>Website specific</b> search alias:
 <pre>alias t='googler -n 7 site:tuxdiary.com'</pre>
-9. Alias to find meanings of words (note: the first result in Google is not a link):
+9. Alias to find <b>meanings of words</b> (note: the first result in Google is not a link):
 <pre>alias define='googler -n 2 define'</pre>
 10. On the fly <b>help</b> (usage details):
 <pre>$ googler</pre>
