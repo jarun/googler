@@ -45,7 +45,6 @@ google-cli requires Python 2.7.x or Python 3.x to work.
 <pre>$ git clone https://github.com/jarun/google-cli/  
 $ cd google-cli  
 $ sudo make install</pre>  
-
 To remove, run:  
 <pre>$ sudo make uninstall</pre>
 
