@@ -306,7 +306,7 @@ if debug:
     print("[DEBUG] Search URL [%s : %s]" % (server, url))
 
 # Get the terminal window size.
-winsz = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, "1234")
+winsz = fcntl.ioctl(sys.stdin, termios.TIOCGWINSZ, "1234")
 columns = struct.unpack("HH", winsz)[1]
 
 # Connect to Google and request the result page.

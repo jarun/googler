@@ -116,11 +116,14 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 
 # News
 
+>**14 Sep, 2015**
+> - Fix issues with redirection and piping 
+
 >**07 Sep, 2015**
-> - Change incremental search shortcut from `s` to `g`.
+> - Change incremental search shortcut from `s` to `g`
 
 >**06 Sep, 2015**
-> - Reconnect and retry on httplib.BadStatusLine exception. Connection is closed due to inactivity.
+> - Reconnect and retry on httplib.BadStatusLine exception. Connection is closed due to inactivity
 
 >**04 Sep, 2015**
 > - Add incremental search
