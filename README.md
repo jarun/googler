@@ -113,11 +113,19 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 <pre>alias define='googler -n 2 define'</pre>
 10. On the fly <b>help</b> (usage details):
 <pre>$ googler</pre>
+11. Input and output <b>redirection</b>:
+<pre>$ googler -C hello world < input > output</pre>
+Note that `-C` is required to avoid printing control characters. `2>&1` would error as the console geometry is calculated from `stderr`.
+12. <b>Piping</b>:
+<pre>$ googler -C hello world | tee output</pre>
 
 # News
 
+>**16 Sep, 2015**
+> - Use stderr to get terminal geomtry (to support input redirection)
+
 >**14 Sep, 2015**
-> - Fix issues with redirection and piping 
+> - Fix issues with redirection and piping
 
 >**07 Sep, 2015**
 > - Change incremental search shortcut from `s` to `g`
