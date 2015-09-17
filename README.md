@@ -116,7 +116,7 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 11. Input and output <b>redirection</b>:
 <pre>$ googler -C hello world < input > output</pre>
 Note that `-C` is required to avoid printing control characters. `2>&1` would error as the console geometry is calculated from `stderr`.
-12. <b>Piping</b>:
+12. <b>Piping</b> google-cli output:
 <pre>$ googler -C hello world | tee output</pre>
 
 # News
