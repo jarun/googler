@@ -10,7 +10,7 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
   
 `google-cli` is GPLv3 licensed. It doesn't have any affiliation to Google in any way.
 
-If you like the utility, please consider donating via PayPal.  
+If you find `google-cli` useful, please consider donating via PayPal.  
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=RMLTQ76JSXJ4Q"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate Button with Credit Cards" /></a>
 
 # Features
