@@ -27,6 +27,7 @@ If you find `google-cli` useful, please consider donating via PayPal.
 - Fetch results from Google News section
 - Country/domain specific search (28 top-level domains supported, default: .com)
 - Google search keywords like `filetype:mime`, `site:somesite.com` etc. work.
+- Open filetype specific links in browser, the links are handled by browser for the type
 - Optionally open the first result directly in browser (as in <i>I'm Feeling Lucky</i>)
 - Specify language preference for results
 - Handle first level of Google redirections (reports IP blocking by Google)
