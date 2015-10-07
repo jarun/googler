@@ -310,7 +310,7 @@ winsz = fcntl.ioctl(sys.stderr, termios.TIOCGWINSZ, "1234")
 columns = struct.unpack("HH", winsz)[1]
 
 # Connect to Google and request the result page.
-conn = HTTPSConnection(server)
+conn = HTTPSConnection(server, timeout=45)
 
 def fetch_results():
     global conn
@@ -323,7 +323,7 @@ def fetch_results():
         if debug:
             print("[DEBUG] Got Exception with old conn, retrying...")
         conn.close()
-        conn = HTTPSConnection(server)
+        conn = HTTPSConnection(server, timeout=45)
         conn.request("GET", url)
         resp = conn.getresponse()
 
@@ -339,7 +339,7 @@ def fetch_results():
             conn.close()
             if debug:
                 print("[DEBUG] Next Server [%s]" % url[url.find("//") + 2:url.find("/search")])
-            conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search")])
+            conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search")], timeout=45)
             url = url[url.find("/search"):]
             if debug:
                 print("[DEBUG] Next GET [%s]\n" % url)
