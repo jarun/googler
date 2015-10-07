@@ -123,6 +123,11 @@ Note that `-C` is required to avoid printing control characters. `2>&1` would er
 12. <b>Piping</b> google-cli output:
 <pre>$ googler -C hello world | tee output</pre>
 
+Browsers (Firefox, Chromium, Google Chrome) throw error or warning messages when a search result is opened in the browser. `google-cli` has message suppression for Chromium based browsers. However, Firfox still throws the following error with Python 2.7:  
+<code>GLib-CRITICAL **: g_slice_set_config: assertion 'sys_page_size == 0' failed</code>  
+However, the message suppression works with Python 3.x. Use the following alias on Linux:
+<pre>alias g='python3 /usr/local/bin/googler ...'</pre>
+
 # News
 
 >**16 Sep, 2015**
