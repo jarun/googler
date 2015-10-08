@@ -22,6 +22,7 @@ If you find `google-cli` useful, please consider donating via PayPal.
 - Initiate a new search with original options (in a single instance)
 - Reconnect on new search even if connection is closed due to inactivity
 - Easily open result URLs in browser from cmdline using index number
+- Browser (Chromium and Firefox based) errors and warnings suppression
 - Show full contextual text snippet in search results
 - Specify search duration (in hours / days / weeks / months / years)
 - Fetch results from Google News section
@@ -122,11 +123,6 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 Note that `-C` is required to avoid printing control characters. `2>&1` would error as the console geometry is calculated from `stderr`.
 12. <b>Piping</b> google-cli output:
 <pre>$ googler -C hello world | tee output</pre>
-
-Browsers (Firefox, Chromium, Google Chrome) throw error or warning messages when a search result is opened in the browser. `google-cli` has message suppression for Chromium based browsers. However, Firefox still throws the following error with Python 2.7:  
-<code>GLib-CRITICAL **: g_slice_set_config: assertion 'sys_page_size == 0' failed</code>  
-The message suppression for Firefox works with Python 3.x. Use the following alias on Linux:
-<pre>alias g='python3 /usr/local/bin/googler ...'</pre>
 
 # News
 
