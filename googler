@@ -172,6 +172,8 @@ class Result:
         _stdout = os.dup(1)
         os.close(1)
         fd = os.open(os.devnull, os.O_RDWR)
+        os.dup2(fd, 2)
+        os.dup2(fd, 1)
         try:
             webbrowser.open(self.url)
         finally:
