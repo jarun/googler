@@ -2,10 +2,6 @@
 
 ![Screenshot](google-cli.png)
 
-Copyright (C) 2008 Henri Hakkinen
-
-Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
-
 `google-cli` is a command line tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. Supports sequential searches in a single instance.
   
 `google-cli` is GPLv3 licensed. It doesn't have any affiliation to Google in any way.
@@ -123,6 +119,12 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 Note that `-C` is required to avoid printing control characters. `2>&1` would error as the console geometry is calculated from `stderr`.
 12. <b>Piping</b> google-cli output:
 <pre>$ googler -C hello world | tee output</pre>
+
+# Developers
+
+Copyright (C) 2008 Henri Hakkinen
+
+Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
 # Note
 
