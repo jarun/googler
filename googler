@@ -23,6 +23,7 @@ import os
 import termios, fcntl, struct
 import webbrowser
 from getopt import getopt, GetoptError
+import readline
 # Try to load Py3 modules, on error fall back to Py2 module names
 try:
     import html.parser as HTMLParser
