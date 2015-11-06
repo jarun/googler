@@ -409,10 +409,16 @@ while True:
         continue
     elif is_int(nav):
         index = int(nav) - 1
+        if index < 0:
+            print("Index out of bound.")
+            continue
+
         try:
             results[index].open()
         except IndexError:
             print("Index out of bound.")
+
+        continue
     else:
         break
 
