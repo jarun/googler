@@ -42,15 +42,21 @@ If you find `google-cli` useful, please consider donating via PayPal.
 
 google-cli requires Python 2.7.x or Python 3.x to work.
 
-1. The following steps are tested on Ubuntu 14.04.3 x64_64:  
+1. If you have git installed (the steps are tested on Ubuntu 14.04.3 x64_64):  
 <pre>$ git clone https://github.com/jarun/google-cli/  
 $ cd google-cli  
 $ sudo make install</pre>  
 To remove, run:  
 <pre>$ sudo make uninstall</pre>
 
-2. google-cli is also available on AUR:  
-https://aur.archlinux.org/packages/google-cli/
+2. If you do not have git installed:  
+Download the latest <a href="https://github.com/jarun/google-cli/releases/latest">stable release</a> or <a href="https://github.com/jarun/google-cli/archive/master.zip">development version</a> source code. Extract, cd into the directory and run:
+<pre>$ sudo make install</pre>
+If you do not want to install, `googler` is standalone:
+<pre>$ chmod +x googler
+$ ./googler ...</pre>
+
+3. google-cli is also available on <a href="https://aur.archlinux.org/packages/google-cli/">AUR</a> and <a href="http://fossies.org/linux/google-cli">Fossies</a>.
 
 # Usage
 
