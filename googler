@@ -346,8 +346,15 @@ def fetch_results():
             url = url[url.find("/search"):]
             if debug:
                 print("[DEBUG] Next GET [%s]\n" % url)
-            conn.request("GET", url)
-            resp = conn.getresponse()
+
+            try:
+                conn.request("GET", url)
+                resp = conn.getresponse()
+            except Exception as e:
+                print("[DEBUG] Exception: %s" % e)
+                conn.close()
+                sys.exit(1)
+
             if resp.status != 200:
                 # Failed connecting to redirected server too!
                 print("ERROR after 1st redirection:", str(resp.status), ": ", resp.reason)
