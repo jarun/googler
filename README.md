@@ -40,7 +40,7 @@ If you find `google-cli` useful, please consider donating via PayPal.
 
 # Installation
 
-google-cli requires Python 2.7.x or Python 3.x to work.
+`google-cli` requires Python 2.7.x or Python 3.x to work.
 
 1. If you have git installed (the steps are tested on Ubuntu 14.04.3 x64_64):  
 <pre>$ git clone https://github.com/jarun/google-cli/  
@@ -56,7 +56,7 @@ If you do not want to install, `googler` is standalone:
 <pre>$ chmod +x googler
 $ ./googler ...</pre>
 
-3. google-cli is also available on <a href="https://aur.archlinux.org/packages/google-cli/">AUR</a> and <a href="http://fossies.org/linux/google-cli">Fossies</a>.
+3. `google-cli` is also available on <a href="https://aur.archlinux.org/packages/google-cli/">AUR</a> and <a href="http://fossies.org/linux/google-cli">Fossies</a>.
 
 # Usage
 
@@ -83,7 +83,7 @@ Keys
 
 <b>Configuration file</b>  
   
-google-cli doesn't have any! This is to retain the speed of the utlity and avoid OS-specific differences. Users can enjoy the advantage of config files using aliases. There's no need to memorize options.  
+`google-cli` doesn't have any! This is to retain the speed of the utlity and avoid OS-specific differences. Users can enjoy the advantage of config files using aliases. There's no need to memorize options.  
   
 For example, the following alias set in `~/.bashrc`:
 <pre>alias g='googler -n 7 -c ru -l ru'</pre>
@@ -91,7 +91,7 @@ fetches 7 results from the Google Russia server, with preference towards results
   
 The alias serves both the purposes of using config files:
 - persistent settings: when the user invokes `g`, it expands to the preferred settings everytime.
-- override settings: thanks to the way Python getopt() works, google-cli is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs:  
+- override settings: thanks to the way Python getopt() works, `google-cli` is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs:  
 <code>$ g -l de -c de -n 12 hello world</code>  
 12 results are returned from the Google Germany server, with preference towards results in German.
   
@@ -123,7 +123,7 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 11. Input and output <b>redirection</b>:
 <pre>$ googler -C hello world < input > output</pre>
 Note that `-C` is required to avoid printing control characters. `2>&1` would error as the console geometry is calculated from `stderr`.
-12. <b>Piping</b> google-cli output:
+12. <b>Piping</b> `google-cli` output:
 <pre>$ googler -C hello world | tee output</pre>
 
 # Developers
@@ -134,4 +134,4 @@ Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
 # Note
 
-Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author (Henri Hakkinen: https://github.com/henux ) in past year. I have created this independent repo for the project with the name google-cli. Would love to push the changes back to original repo if the author contacts. I retained the original copyright information.
+Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author (Henri Hakkinen: https://github.com/henux ) in past year. I have created this independent repo for the project with the name `google-cli`. Would love to push the changes back to original repo if the author contacts. I retained the original copyright information.
