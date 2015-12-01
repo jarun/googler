@@ -160,14 +160,18 @@ class Result:
         else:
             print("", index, title, "\n%s" % url)
         # Print the text with truncating.
-        col = 0
-        for w in text.split():
-            if (col + len(w) + 1) > columns:
-                col = 0
-                print()
-            print(w, end=' ')
-            col += len(w) + 1
-        print("\n")
+        if columns > 0:
+            col = 0
+            for w in text.split():
+                if (col + len(w) + 1) > columns:
+                    col = 0
+                    print()
+                print(w, end=' ')
+                col += len(w) + 1
+            print("\n")
+        else:
+            print("%s\n" % text.replace("\n"," "))
+
     def open(self):
         _stderr = os.dup(2)
         os.close(2)
@@ -312,6 +316,9 @@ if debug:
 # Get the terminal window size.
 winsz = fcntl.ioctl(sys.stderr, termios.TIOCGWINSZ, "1234")
 columns = struct.unpack("HH", winsz)[1]
+
+if columns <= 0:
+    columns = int(os.environ.get('COLUMNS', 0))
 
 # Connect to Google and request the result page.
 conn = HTTPSConnection(server, timeout=45)
