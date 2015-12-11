@@ -20,7 +20,9 @@
 from __future__ import print_function
 import sys
 import os
-import termios, fcntl, struct
+import termios
+import fcntl
+import struct
 import webbrowser
 from getopt import getopt, GetoptError
 import readline
@@ -36,40 +38,47 @@ except ImportError:
     from httplib import HTTPSConnection
 
 # Global variables
-columns  = None    # Terminal window size.
-start    = "0"     # The first result to display (option -s)
-num      = None    # Number of results to display (option -n)
-lang     = None    # Language to search for (option -l)
-openUrl  = False   # If True, opens the first URL in browser (option -j)
+columns = None    # Terminal window size.
+start = "0"     # The first result to display (option -s)
+num = None    # Number of results to display (option -n)
+lang = None    # Language to search for (option -l)
+openUrl = False   # If True, opens the first URL in browser (option -j)
 colorize = True    # If True, colorizes the output (option -C)
 duration = None    # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
-conn     = None    # Use a single global connection during navigation
-nav      = "n"     # For user navigation
-server   = "www.google.com"    # For country-specific search
-debug    = False   # Print debug logs
-news     = False   # Read news
+conn = None    # Use a single global connection during navigation
+nav = "n"     # For user navigation
+server = "www.google.com"    # For country-specific search
+debug = False   # Print debug logs
+news = False   # Read news
 
 # Classes
+
+
 class GoogleParser(HTMLParser.HTMLParser):
+
     def __init__(self):
         HTMLParser.HTMLParser.__init__(self)
         self.handle_starttag = self.main_start
         self.handle_data = self.main_data
         self.handle_endtag = self.main_end
         self.results = []
+
     def main_start(self, tag, attrs):
         if tag == "li" and len(attrs) > 0 and attrs[0] == ("class", "g"):
             self.title = ""
-            self.url   = ""
-            self.text  = ""
+            self.url = ""
+            self.text = ""
             self.handle_starttag = self.li_start
             self.handle_data = self.li_data
             self.handle_endtag = self.li_end
+
     def main_data(self, data):
         pass
+
     def main_end(self, tag):
         pass
     # <li class="g"> ... </li>
+
     def li_start(self, tag, attrs):
         if tag == "h3":
             self.handle_starttag = self.h3_start
@@ -79,8 +88,10 @@ class GoogleParser(HTMLParser.HTMLParser):
             self.handle_starttag = self.div_start
             self.handle_data = self.div_data
             self.handle_endtag = self.div_end
+
     def li_data(self, data):
         pass
+
     def li_end(self, tag):
         if tag == "div":
             marker = self.url.find("?q=")
@@ -92,35 +103,45 @@ class GoogleParser(HTMLParser.HTMLParser):
 
             if self.url != "":
                 index = len(self.results) + 1
-                self.results.append(Result(index, self.title, unquote(self.url), self.text))
+                self.results.append(Result(index, self.title,
+                                    unquote(self.url), self.text))
             self.handle_starttag = self.main_start
             self.handle_data = self.main_data
             self.handle_endtag = self.main_end
     # <h3> ... </h3>
+
     def h3_start(self, tag, attrs):
         if tag == "a":
             self.url = attrs[0][1]
+
     def h3_data(self, data):
         self.title += data
+
     def h3_end(self, tag):
         if tag == "h3":
             self.handle_starttag = self.li_start
             self.handle_data = self.li_data
             self.handle_endtag = self.li_end
     # <div> ... </div>
+
     def div_start(self, tag, attrs):
         if tag == "span" and len(attrs) > 0 and attrs[0] == ("class", "st"):
             self.handle_starttag = self.span_start
             self.handle_data = self.span_data
             self.handle_endtag = self.span_end
+
     def div_data(self, data):
         pass
+
     def div_end(self, tag):
         pass
+
     def span_start(self, tag, start):
         pass
+
     def span_data(self, data):
         self.text += data
+
     def span_end(self, tag):
         if tag == "span":
             self.handle_starttag = self.li_start
@@ -129,11 +150,13 @@ class GoogleParser(HTMLParser.HTMLParser):
 
 
 class Result:
+
     def __init__(self, index, title, url, text):
         self.index = index
         self.title = title
         self.url = url
         self.text = text
+
     def print_entry(self):
         index = self.index
         title = self.title
@@ -170,7 +193,7 @@ class Result:
                 col += len(w) + 1
             print("\n")
         else:
-            print("%s\n" % text.replace("\n"," "))
+            print("%s\n" % text.replace("\n", " "))
 
     def open(self):
         _stderr = os.dup(2)
@@ -188,12 +211,15 @@ class Result:
             os.dup2(_stdout, 1)
 
 # Functions
+
+
 def is_int(string):
     try:
         int(string)
         return True
     except:
         return False
+
 
 def usage():
     print("Usage: googler [OPTIONS] KEYWORDS...")
@@ -202,14 +228,17 @@ def usage():
     print("  -s N     start at the Nth result")
     print("  -n N     show N results (default 10)")
     print("  -N       show results from news section")
-    print("  -c SERV  country-specific search (refer man or project page for details)")
+    print("  -c SERV  country-specific search (refer man or project page for" +
+          " details)")
     print("  -l LANG  display in language LANG, such as fi for Finnish")
     print("  -C       disable color output")
     print("  -j       open the first result in a web browser")
-    print("  -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]")
+    print("  -t dN    time limit search [h5 (5 hrs), d5 (5 days), " +
+          "w5 (5 weeks), m5 (5 months), y5 (5 years)]")
     print("  -d       enable debugging\n")
     print("Keys")
-    print("  g terms  enter 'g' followed by keywords to initiate a new search (with original options)")
+    print("  g terms  enter 'g' followed by keywords to initiate a new " +
+          "search (with original options)")
     print("  n, p     enter 'n' or 'p' to navigate forward or backward")
     print("  1-N      enter a number to open that result in browser")
     print("           any other input exits googler\n")
@@ -219,18 +248,22 @@ def usage():
     print("Webpage: https://github.com/jarun/google-cli")
     sys.exit(1)
 
+
 def serverURL(domain):
     # Google domain ref: https://en.wikipedia.org/wiki/List_of_Google_domains
-    if domain in ["id", "in", "jp", "kr", "uk"]:                                                                # www.google.co.domain
+    # www.google.co.domain
+    if domain in ["id", "in", "jp", "kr", "uk"]:
         return "www.google.co." + domain
-    if domain in ["be", "ca", "ch", "cz", "de", "es", "fi", "fr", "it", "nl", "pl", "pt", "ro", "ru", "se"]:    # www.google.domain
+    if domain in ["be", "ca", "ch", "cz", "de", "es", "fi", "fr", "it", "nl",
+                  "pl", "pt", "ro", "ru", "se"]:    # www.google.domain
         return "www.google." + domain
-    if domain in ["ar", "au", "br", "mx", "ph", "tw", "ua"]:                                                    # www.google.com.domain
+    # www.google.com.domain
+    if domain in ["ar", "au", "br", "mx", "ph", "tw", "ua"]:
         return "www.google.com." + domain
 
     return "www.google.com"
 
-########### Program Main
+# Program Main
 
 # Process command line options.
 optlist = None
@@ -272,7 +305,7 @@ try:
         elif opt[0] == "-t":
             # Option -t dN
             duration = opt[1]
-            if not opt[1][0] in ("h", "d","w","m","y",):
+            if not opt[1][0] in ("h", "d", "w", "m", "y",):
                 usage()
                 sys.exit(1)
             if not opt[1][1].isdigit():
@@ -323,6 +356,7 @@ if columns <= 0:
 # Connect to Google and request the result page.
 conn = HTTPSConnection(server, timeout=45)
 
+
 def fetch_results():
     global conn
     global url
@@ -339,7 +373,7 @@ def fetch_results():
         resp = conn.getresponse()
 
     if resp.status != 200:
-        if resp.status in (301,302,):
+        if resp.status in (301, 302,):
             url = urljoin(url, resp.getheader('location', ''))
             if debug:
                 print("[DEBUG] Redirected URL [%s]" % url)
@@ -349,8 +383,10 @@ def fetch_results():
                 sys.exit(1)
             conn.close()
             if debug:
-                print("[DEBUG] Next Server [%s]" % url[url.find("//") + 2:url.find("/search")])
-            conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search")], timeout=45)
+                print("[DEBUG] Next Server [%s]" % url[url.find("//") +
+                      2:url.find("/search")])
+            conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search")],
+                                   timeout=45)
             url = url[url.find("/search"):]
             if debug:
                 print("[DEBUG] Next GET [%s]\n" % url)
@@ -365,7 +401,8 @@ def fetch_results():
 
             if resp.status != 200:
                 # Failed connecting to redirected server too!
-                print("ERROR after 1st redirection:", str(resp.status), ": ", resp.reason)
+                print("ERROR after 1st redirection:", str(resp.status), ": ",
+                      resp.reason)
                 conn.close()
                 sys.exit(1)
         else:
@@ -389,7 +426,7 @@ def fetch_results():
 
 results = []
 while True:
-    if nav == "n" or nav == "p" or nav =="g":
+    if nav == "n" or nav == "p" or nav == "g":
         results = fetch_results()
 
     oldstart = start
@@ -403,13 +440,15 @@ while True:
             start = str(int(start) + int(num))
         else:
             start = str(int(start) + 10)
-        print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n")
+        print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****\
+                \x1B[0m\n")
     elif nav == "p":
         if num is not None:
             start = str(int(start) - int(num))
         else:
             start = str(int(start) - 10)
-        print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n")
+        print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****\
+                \x1B[0m\n")
     elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
         trimsearch = nav[2:].strip().replace(" ", "+")
         if trimsearch == "":
@@ -420,7 +459,8 @@ while True:
             print("New search URL [%s]" % url)
         nav = "g"
         start = basestart
-        print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****     \x1B[0m\n")
+        print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****\
+                \x1B[0m\n")
         continue
     elif is_int(nav):
         index = int(nav) - 1
