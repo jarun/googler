@@ -242,7 +242,7 @@ def usage():
     print("  n, p     enter 'n' or 'p' to navigate forward or backward")
     print("  1-N      enter a number to open that result in browser")
     print("           any other input exits googler\n")
-    print("Version 1.9")
+    print("Version 2.0")
     print("Copyright (C) 2008 Henri Hakkinen.")
     print("Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>")
     print("Webpage: https://github.com/jarun/google-cli")
