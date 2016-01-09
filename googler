@@ -64,13 +64,13 @@ class GoogleParser(HTMLParser.HTMLParser):
         self.results = []
 
     def main_start(self, tag, attrs):
-        if tag == "li" and len(attrs) > 0 and attrs[0] == ("class", "g"):
+        if tag == "div" and len(attrs) > 0 and attrs[0] == ("class", "g"):
             self.title = ""
             self.url = ""
             self.text = ""
-            self.handle_starttag = self.li_start
-            self.handle_data = self.li_data
-            self.handle_endtag = self.li_end
+            self.handle_starttag = self.div_outer_start
+            self.handle_data = self.div_outer_data
+            self.handle_endtag = self.div_outer_end
 
     def main_data(self, data):
         pass
@@ -79,20 +79,20 @@ class GoogleParser(HTMLParser.HTMLParser):
         pass
     # <li class="g"> ... </li>
 
-    def li_start(self, tag, attrs):
+    def div_outer_start(self, tag, attrs):
         if tag == "h3":
             self.handle_starttag = self.h3_start
             self.handle_data = self.h3_data
             self.handle_endtag = self.h3_end
         elif tag == "div" and len(attrs) > 0 and attrs[0] == ("class", "s"):
-            self.handle_starttag = self.div_start
-            self.handle_data = self.div_data
-            self.handle_endtag = self.div_end
+            self.handle_starttag = self.div_inner_start
+            self.handle_data = self.div_inner_data
+            self.handle_endtag = self.div_inner_end
 
-    def li_data(self, data):
+    def div_outer_data(self, data):
         pass
 
-    def li_end(self, tag):
+    def div_outer_end(self, tag):
         if tag == "div":
             marker = self.url.find("?q=")
             if marker >= 0:
@@ -119,21 +119,21 @@ class GoogleParser(HTMLParser.HTMLParser):
 
     def h3_end(self, tag):
         if tag == "h3":
-            self.handle_starttag = self.li_start
-            self.handle_data = self.li_data
-            self.handle_endtag = self.li_end
+            self.handle_starttag = self.div_outer_start
+            self.handle_data = self.div_outer_data
+            self.handle_endtag = self.div_outer_end
     # <div> ... </div>
 
-    def div_start(self, tag, attrs):
+    def div_inner_start(self, tag, attrs):
         if tag == "span" and len(attrs) > 0 and attrs[0] == ("class", "st"):
             self.handle_starttag = self.span_start
             self.handle_data = self.span_data
             self.handle_endtag = self.span_end
 
-    def div_data(self, data):
+    def div_inner_data(self, data):
         pass
 
-    def div_end(self, tag):
+    def div_inner_end(self, tag):
         pass
 
     def span_start(self, tag, start):
@@ -144,9 +144,9 @@ class GoogleParser(HTMLParser.HTMLParser):
 
     def span_end(self, tag):
         if tag == "span":
-            self.handle_starttag = self.li_start
-            self.handle_data = self.li_data
-            self.handle_endtag = self.li_end
+            self.handle_starttag = self.div_outer_start
+            self.handle_data = self.div_outer_data
+            self.handle_endtag = self.div_outer_end
 
 
 class Result:
