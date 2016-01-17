@@ -4,7 +4,8 @@
 
 `google-cli` is a command-line power tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. Supports sequential searches in a single instance.
   
-`google-cli` is GPLv3 licensed. It doesn't have any affiliation to Google in any way.
+`google-cli` is GPLv3 licensed. It doesn't have any affiliation to Google in any way.  
+Why not use Google provided APIs? Check point 2 in [Notes](#Notes).
 
 If you find `google-cli` useful, please consider donating via PayPal.  
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=RMLTQ76JSXJ4Q"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate Button with Credit Cards" /></a>
@@ -132,6 +133,7 @@ Copyright (C) 2008 Henri Hakkinen
 
 Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
 
-# Note
+<h1 id="Notes">Notes</h1>
 
-Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author (Henri Hakkinen: https://github.com/henux ) in past year. I have created this independent repo for the project with the name `google-cli`. Would love to push the changes back to original repo if the author contacts. I retained the original copyright information.
+1. Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author [Henri Hakkinen](https://github.com/henux) in past year. I have created this independent repo for the project with the name `google-cli`. Would love to push the changes back to original repo if the author contacts. I retained the original copyright information.
+2. Google provides a search API which returns the results in JSON format. However, as per my understanding from the [official docs](https://developers.google.com/custom-search/json-api/v1/overview), the API issues the queries against an existing instance of a custom search engine and is limited by 100 search queries per day for free. In addition, I don't want to end up paying if they ever change their plan or restrict the API in other ways. So I refrained from coupling with Google plans and policies and retained the browser-way of doing it by fetching html, which is a open and free specification.
