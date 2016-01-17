@@ -37,7 +37,9 @@ except ImportError:
     from urllib import quote_plus, unquote
     from httplib import HTTPSConnection
 
+
 # Global variables
+
 columns = None    # Terminal window size.
 start = "0"     # The first result to display (option -s)
 num = None    # Number of results to display (option -n)
@@ -51,8 +53,8 @@ server = "www.google.com"    # For country-specific search
 debug = False   # Print debug logs
 news = False   # Read news
 
-# Classes
 
+# Classes
 
 class GoogleParser(HTMLParser.HTMLParser):
 
@@ -77,8 +79,8 @@ class GoogleParser(HTMLParser.HTMLParser):
 
     def main_end(self, tag):
         pass
-    # <li class="g"> ... </li>
 
+    # outer <div class="g"> ... </div>
     def div_outer_start(self, tag, attrs):
         if tag == "h3":
             self.handle_starttag = self.h3_start
@@ -108,8 +110,8 @@ class GoogleParser(HTMLParser.HTMLParser):
             self.handle_starttag = self.main_start
             self.handle_data = self.main_data
             self.handle_endtag = self.main_end
-    # <h3> ... </h3>
 
+    # <h3> ... </h3>
     def h3_start(self, tag, attrs):
         if tag == "a":
             self.url = attrs[0][1]
@@ -122,8 +124,8 @@ class GoogleParser(HTMLParser.HTMLParser):
             self.handle_starttag = self.div_outer_start
             self.handle_data = self.div_outer_data
             self.handle_endtag = self.div_outer_end
-    # <div> ... </div>
 
+    # inner <div> ... </div>
     def div_inner_start(self, tag, attrs):
         if tag == "span" and len(attrs) > 0 and attrs[0] == ("class", "st"):
             self.handle_starttag = self.span_start
@@ -210,8 +212,8 @@ class Result:
             os.dup2(_stderr, 2)
             os.dup2(_stdout, 1)
 
-# Functions
 
+# Functions
 
 def is_int(string):
     try:
@@ -262,6 +264,7 @@ def serverURL(domain):
         return "www.google.com." + domain
 
     return "www.google.com"
+
 
 # Program Main
 
