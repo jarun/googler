@@ -116,7 +116,7 @@ class GoogleParser(HTMLParser.HTMLParser):
                                     unquote(self.url), self.text))
                 else:
                     skipped += 1
-            else:
+            elif self.title != "":
                 skipped += 1
             self.handle_starttag = self.main_start
             self.handle_data = self.main_data
@@ -439,7 +439,11 @@ def fetch_results():
         r.print_entry()
 
     if skipped:
-        print("%d ads skipped." % skipped)
+        if skipped == 1:
+            print("%d ad skipped." % skipped)
+        else:
+            print("%d ads skipped." % skipped)
+
         skipped = 0
 
     return results
