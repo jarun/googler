@@ -248,12 +248,13 @@ def usage():
     print("  -t dN    time limit search [h5 (5 hrs), d5 (5 days), " +
           "w5 (5 weeks), m5 (5 months), y5 (5 years)]")
     print("  -d       enable debugging\n")
-    print("Keys")
-    print("  g terms  enter 'g' followed by keywords to initiate a new " +
-          "search (with original options)")
-    print("  n, p     enter 'n' or 'p' to navigate forward or backward")
-    print("  1-N      enter a number to open that result in browser")
-    print("           any other input exits googler\n")
+    print("Prompt Keys")
+    print("  g terms  initiate a new search for 'terms' with original options")
+    print("  n, p     fetch next or previous set of search results")
+    print("  1-N      open the Nth result index in browser")
+    print("  Enter    exit googler (same behaviour for an empty search)")
+    print("  *        any other string initiates a new search with original" +
+          " options\n")
     print("Version 2.1")
     print("Copyright (C) 2008 Henri Hakkinen.")
     print("Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>")
