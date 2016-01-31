@@ -116,8 +116,7 @@ class GoogleParser(HTMLParser.HTMLParser):
                                     unquote(self.url), self.text))
                 else:
                     skipped += 1
-            elif self.title != "":
-                skipped += 1
+
             self.handle_starttag = self.main_start
             self.handle_data = self.main_data
             self.handle_endtag = self.main_end
