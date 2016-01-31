@@ -24,14 +24,17 @@ import termios
 import fcntl
 import struct
 import webbrowser
+import gzip
 from getopt import getopt, GetoptError
 import readline
 # Try to load Py3 modules, on error fall back to Py2 module names
 try:
+    from io import BytesIO
     import html.parser as HTMLParser
     from urllib.parse import urljoin, quote_plus, unquote
     from http.client import HTTPSConnection
 except ImportError:
+    import StringIO
     import HTMLParser
     from urlparse import urljoin
     from urllib import quote_plus, unquote
@@ -365,14 +368,14 @@ def fetch_results():
     global url
 
     try:
-        conn.request("GET", url)
+        conn.request("GET", url, None, {"Accept-encoding": "gzip"})
         resp = conn.getresponse()
     except Exception as e:
         if debug:
             print("[DEBUG] Exception: %s" % e)
         conn.close()
         conn = HTTPSConnection(server, timeout=45)
-        conn.request("GET", url)
+        conn.request("GET", url, None, {"Accept-encoding": "gzip"})
         resp = conn.getresponse()
 
     if resp.status != 200:
@@ -395,7 +398,7 @@ def fetch_results():
                 print("[DEBUG] Next GET [%s]\n" % url)
 
             try:
-                conn.request("GET", url)
+                conn.request("GET", url, None, {"Accept-encoding": "gzip"})
                 resp = conn.getresponse()
             except Exception as e:
                 print("[DEBUG] Exception: %s" % e)
@@ -416,10 +419,11 @@ def fetch_results():
 
     # Parse the HTML document and print the results.
     parser = GoogleParser()
+ 
     if sys.version_info > (3,):
-        parser.feed(resp.read().decode('utf-8'))
+        parser.feed(gzip.GzipFile(fileobj = BytesIO(resp.read())).read().decode('utf-8'))
     else:
-        parser.feed(resp.read())
+        parser.feed(gzip.GzipFile(fileobj = StringIO.StringIO(resp.read())).read())
 
     results = parser.results
     for r in results:
