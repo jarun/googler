@@ -42,19 +42,22 @@ Time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 y
 .TP
 .BI \-d
 Enable debugging.
-.SH KEYS
+.SH PROMPT KEYS
 .TP
 .BI g " terms"
-Enter 'g' followed by keywords to initiate a new search (with original options).
+Initiate a new search for 'terms' with original options.
 .TP
 .BI "n, p"
-Enter 'n' or 'p' to navigate forward or backward.
+Fetch next or previous set of search results.
 .TP
 .BI "1-N"
-Enter a number to open that result in browser.
+Open the Nth result index in browser.
 .TP
-.BI ""
-Any other input exits googler.
+.BI Enter
+Exit googler (same behaviour for an empty search).
+.TP
+.BI *
+Any other string initiates a new search with original options.
 .SH ENVIRONMENT
 .TP
 .BI BROWSER
