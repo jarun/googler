@@ -107,8 +107,9 @@ class GoogleParser(HTMLParser.HTMLParser):
                 self.url = self.url[:marker]
 
             if self.url != "":
-                index = len(self.results) + 1
-                self.results.append(Result(index, self.title,
+                if (self.url.find("://", 0, 12) >= 0):
+                    index = len(self.results) + 1
+                    self.results.append(Result(index, self.title,
                                     unquote(self.url), self.text))
             self.handle_starttag = self.main_start
             self.handle_data = self.main_data
