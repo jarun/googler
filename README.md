@@ -32,6 +32,7 @@ If you find `google-cli` useful, please consider donating via PayPal.
 - Handle first level of Google redirections (reports IP blocking by Google)
 - Unicode in URL works
 - UTF-8 request and response
+- Fetch gzip compressed results
 - Works with Python 2.7.x and 3.x
 - Enable/disable color output (default: colorful)
 - Enable/disable debug logs (default: disabled)
