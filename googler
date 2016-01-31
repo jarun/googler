@@ -44,17 +44,18 @@ except ImportError:
 # Global variables
 
 columns = None    # Terminal window size.
-start = "0"     # The first result to display (option -s)
-num = None    # Number of results to display (option -n)
-lang = None    # Language to search for (option -l)
+start = "0"       # The first result to display (option -s)
+num = None        # Number of results to display (option -n)
+lang = None       # Language to search for (option -l)
 openUrl = False   # If True, opens the first URL in browser (option -j)
-colorize = True    # If True, colorizes the output (option -C)
-duration = None    # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
-conn = None    # Use a single global connection during navigation
-nav = "n"     # For user navigation
-server = "www.google.com"    # For country-specific search
-debug = False   # Print debug logs
-news = False   # Read news
+colorize = True   # If True, colorizes the output (option -C)
+duration = None   # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
+conn = None       # Use a single global connection during navigation
+nav = "n"         # For user navigation
+skipped = 0       # Count for skipped ads or blank links
+debug = False     # Print debug logs
+news = False      # Read news
+server = "www.google.com"
 
 
 # Classes
@@ -98,6 +99,8 @@ class GoogleParser(HTMLParser.HTMLParser):
         pass
 
     def div_outer_end(self, tag):
+        global skipped
+
         if tag == "div":
             marker = self.url.find("?q=")
             if marker >= 0:
@@ -111,6 +114,10 @@ class GoogleParser(HTMLParser.HTMLParser):
                     index = len(self.results) + 1
                     self.results.append(Result(index, self.title,
                                     unquote(self.url), self.text))
+                else:
+                    skipped += 1
+            else:
+                skipped += 1
             self.handle_starttag = self.main_start
             self.handle_data = self.main_data
             self.handle_endtag = self.main_end
@@ -367,6 +374,7 @@ conn = HTTPSConnection(server, timeout=45)
 def fetch_results():
     global conn
     global url
+    global skipped
 
     try:
         conn.request("GET", url, None, {"Accept-encoding": "gzip"})
@@ -429,6 +437,11 @@ def fetch_results():
     results = parser.results
     for r in results:
         r.print_entry()
+
+    if skipped:
+        print("%d ads skipped." % skipped)
+        skipped = 0
+
     return results
 
 

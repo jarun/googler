@@ -31,6 +31,7 @@ If you find `google-cli` useful, please consider donating via PayPal.
 - Specify language preference for results
 - Handle first level of Google redirections (reports IP blocking by Google)
 - Unicode in URL works
+- Skip links to Google News, Images or blank URLs in web search results
 - UTF-8 request and response
 - Fetch gzip compressed results
 - Works with Python 2.7.x and 3.x
