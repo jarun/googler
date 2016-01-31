@@ -17,7 +17,7 @@ If you find `google-cli` useful, please consider donating via PayPal.
 - Fetch n results in a go
 - Start at n<sup>th</sup> result
 - Fetch and navigate next or previous set of results
-- Initiate a new search with original options (in a single instance)
+- Continuous search: fire new searches without exiting
 - Reconnect on new search even if connection is closed due to inactivity
 - Easily open result URLs in browser from cmdline using index number
 - Browser (Chromium and Firefox based) errors and warnings suppression
@@ -64,7 +64,10 @@ $ ./googler ...</pre>
 
 # Usage
 
-<pre>Usage: googler [OPTIONS] KEYWORDS...
+<pre>$ googler
+Usage: googler [OPTIONS] KEYWORDS...
+Performs a Google search and prints the results to stdout.
+
 Options
     -s N     start at the N<sup>th</sup> result
     -n N     show N results (default 10)
@@ -79,11 +82,12 @@ Options
     -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]
     -d       enable debugging
 
-Keys
-    g terms  enter 'g' followed by keywords to initiate a new search (with original options)
-    n, p     enter 'n' or 'p' to navigate forward or backward
-    1-N      enter a number to open that result in browser
-             any other input exits googler</pre>
+Prompt Keys
+    g terms  initiate a new search for 'terms' with original options
+    n, p     fetch next or previous set of search results
+    1-N      open the Nth result index in browser
+    Enter    exit googler (same behaviour for an empty search)
+    *        any other string initiates a new search with original options</pre>
 
 <b>Configuration file</b>  
   
@@ -122,8 +126,12 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 <pre>alias t='googler -n 7 site:tuxdiary.com'</pre>
 9. Alias to find <b>meanings of words</b> (note: the first result in Google is not a link):
 <pre>alias define='googler -n 2 define'</pre>
-10. On the fly <b>help</b> (usage details):
-<pre>$ googler</pre>
+10. Look up `n`, `p`, `g co` or a number at <b>navigation prompt</b>:  
+As the navigation prompt recognizes `n`, `p`, `g keywords` or numbers as keys, they can't be searched directly without the `g` key. To search them -
+<pre>Enter 'n', 'p', 'g keywords', or result number to continue: <b>g n</b>
+Enter 'n', 'p', 'g keywords', or result number to continue: <b>g g keywords</b>
+Enter 'n', 'p', 'g keywords', or result number to continue: <b>g 1984</b></pre>
+Note that Google ignores searches for negative numbers (e.g. `-1984`).
 11. Input and output <b>redirection</b>:
 <pre>$ googler -C hello world < input > output</pre>
 Note that `-C` is required to avoid printing control characters. `2>&1` would error as the console geometry is calculated from `stderr`.
