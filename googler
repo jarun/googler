@@ -315,7 +315,7 @@ try:
             # Option -j
             openUrl = True
             if num is None:
-                num = "1"
+                num = "3"
         elif opt[0] == "-t":
             # Option -t dN
             duration = opt[1]
