@@ -142,7 +142,7 @@ Note that `-C` is required to avoid printing control characters. `2>&1` would er
 
 Copyright (C) 2008 Henri Hakkinen
 
-Modified (2015) by Arun Prakash Jana &lt;engineerarun@gmail.com&gt;
+Modified (2015) by [Arun Prakash Jana](mailto:engineerarun@gmail.com)
 
 <h1 id="Notes">Notes</h1>
 
