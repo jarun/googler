@@ -1,9 +1,7 @@
-# google-cli Makefile
-
 PREFIX=/usr/local
 BINDIR=$(PREFIX)/bin
 MANDIR=$(PREFIX)/share/man/man1
-DOCDIR=$(PREFIX)/share/doc/google-cli
+DOCDIR=$(PREFIX)/share/doc/googler
 UNAME_S:=$(shell uname -s)
 
 

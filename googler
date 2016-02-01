@@ -258,7 +258,7 @@ def usage():
     print("Version 2.1")
     print("Copyright (C) 2008 Henri Hakkinen.")
     print("Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>")
-    print("Webpage: https://github.com/jarun/google-cli")
+    print("Webpage: https://github.com/jarun/googler")
     sys.exit(1)
 
 
