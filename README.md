@@ -138,6 +138,14 @@ Note that `-C` is required to avoid printing control characters. `2>&1` would er
 12. <b>Piping</b> `googler` output:
 <pre>$ googler -C hello world | tee output</pre>
 
+# Troubleshooting
+
+1. If print() throws the following error complaining about handling Unicode with `ascii` codec:
+<pre>UnicodeEncodeError: 'ascii' codec can't encode character '\u201c' in position 0: ordinal not in range(128)</pre>
+add the following to your `~/.bashrc`:
+<pre>export PYTHONIOENCODING=UTF-8</pre>
+Ref issue [#21](https://github.com/jarun/googler/issues/21).
+
 # Developers
 
 Copyright (C) 2008 Henri Hakkinen
