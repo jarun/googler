@@ -60,7 +60,7 @@ If you do not want to install, `googler` is standalone:
 <pre>$ chmod +x googler
 $ ./googler ...</pre>
 
-3. `googler` is also available on <a href="https://aur.archlinux.org/packages/googler/">AUR</a> and <a href="http://fossies.org/linux/googler">Fossies</a>.
+3. `googler` is also available on <a href="https://aur.archlinux.org/packages/googler/">AUR</a>, <a href="http://fossies.org/linux/googler">Fossies</a> and <a href="http://braumeister.org/formula/googler">Homebrew</a> (`brew install googler`).
 
 # Usage
 
