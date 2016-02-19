@@ -144,6 +144,8 @@ Note that `-C` is required to avoid printing control characters. `2>&1` would er
 <pre>UnicodeEncodeError: 'ascii' codec can't encode character '\u201c' in position 0: ordinal not in range(128)</pre>
 add the following to your `~/.bashrc`:
 <pre>export PYTHONIOENCODING=UTF-8</pre>
+If you use fish shell, add the following in `~/.config/fish/config.fish`:
+<pre>set -x PYTHONIOENCODING UTF-8</pre>
 Ref issue [#21](https://github.com/jarun/googler/issues/21).
 
 # Developers
