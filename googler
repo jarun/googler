@@ -455,10 +455,13 @@ while True:
         results = fetch_results()
 
     oldstart = start
-    if sys.version_info > (3,):
-        nav = input("Enter 'n', 'p', 'g keywords', or result number to continue: ")
-    else:
-        nav = raw_input("Enter 'n', 'p', 'g keywords' or result number to continue: ")
+    try:
+        if sys.version_info > (3,):
+            nav = input("Enter 'n', 'p', 'g keywords', or result number to continue: ")
+        else:
+            nav = raw_input("Enter 'n', 'p', 'g keywords' or result number to continue: ")
+    except EOFError:
+        nav = ""
 
     if nav == "n":
         if num is not None:
