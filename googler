@@ -432,7 +432,7 @@ def fetch_results():
     if sys.version_info > (3,):
         parser.feed(gzip.GzipFile(fileobj = BytesIO(resp.read())).read().decode('utf-8'))
     else:
-        parser.feed(gzip.GzipFile(fileobj = StringIO.StringIO(resp.read())).read())
+        parser.feed(gzip.GzipFile(fileobj = StringIO.StringIO(resp.read())).read().decode('utf-8'))
 
     results = parser.results
     for r in results:
