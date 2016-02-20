@@ -28,6 +28,7 @@ import gzip
 from getopt import getopt, GetoptError
 import readline
 import tempfile
+import logging
 # Try to load Py3 modules, on error fall back to Py2 module names
 try:
     from io import BytesIO
@@ -334,6 +335,15 @@ except GetoptError as e:
     print("googler:", e)
     sys.exit(1)
 
+# Set up logging
+logger = logging.getLogger(__name__)
+shell_formatter = logging.Formatter(fmt='[%(levelname)s] %(message)s')
+shell_handler = logging.StreamHandler()
+shell_handler.setFormatter(shell_formatter)
+logger.addHandler(shell_handler)
+if debug:
+    logger.setLevel(logging.DEBUG)
+
 # Construct the query URL.
 url = "/search?ie=UTF-8&oe=UTF-8&"
 
@@ -351,15 +361,13 @@ if duration is not None:
 baseurl = url
 basestart = start
 
-if debug:
-    print("[DEBUG] Base URL [%s]" % url)
+logger.debug("Base URL [%s]", url)
 
 url += "q=" + quote_plus(keywords[0])
 for kw in keywords[1:]:
     url += "+" + quote_plus(kw)
 
-if debug:
-    print("[DEBUG] Search URL [%s : %s]" % (server, url))
+logger.debug("Search URL [%s : %s]", server, url)
 
 # Get the terminal window size.
 winsz = fcntl.ioctl(sys.stderr, termios.TIOCGWINSZ, "1234")
@@ -381,8 +389,7 @@ def fetch_results():
         conn.request("GET", url, None, {"Accept-encoding": "gzip"})
         resp = conn.getresponse()
     except Exception as e:
-        if debug:
-            print("[DEBUG] Exception: %s" % e)
+        logger.debug("Exception: %s", e)
         conn.close()
         conn = HTTPSConnection(server, timeout=45)
         conn.request("GET", url, None, {"Accept-encoding": "gzip"})
@@ -391,21 +398,18 @@ def fetch_results():
     if resp.status != 200:
         if resp.status in (301, 302,):
             url = urljoin(url, resp.getheader('location', ''))
-            if debug:
-                print("[DEBUG] Redirected URL [%s]" % url)
+            logger.debug("Redirected URL [%s]", url)
             if url.find("sorry/IndexRedirect?") >= 0:
                 print("ERROR: Connection blocked due to unusual activity.")
                 conn.close()
                 sys.exit(1)
             conn.close()
-            if debug:
-                print("[DEBUG] Next Server [%s]" % url[url.find("//") +
-                      2:url.find("/search")])
+            logger.debug("Next Server [%s]", url[url.find("//") + 2:
+                                                 url.find("/search")])
             conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search")],
                                    timeout=45)
             url = url[url.find("/search"):]
-            if debug:
-                print("[DEBUG] Next GET [%s]\n" % url)
+            logger.debug("Next GET [%s]\n", url)
 
             try:
                 conn.request("GET", url, None, {"Accept-encoding": "gzip"})
@@ -440,7 +444,7 @@ def fetch_results():
         os.close(fd)
         with open(tmpfile, 'wb') as fp:
             fp.write(resp_body.encode('utf-8'))
-        print("[DEBUG] Response body written to '%s'." % tmpfile)
+        logger.debug("Response body written to '%s'.", tmpfile)
 
     parser.feed(resp_body)
 
@@ -493,8 +497,7 @@ while True:
             print("Empty search. Exiting.")
             break
         url = baseurl + "q=" + trimsearch
-        if debug:
-            print("New search URL [%s]" % url)
+        logger.debug("New search URL [%s]", url)
         nav = "g"
         start = basestart
         print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****\
@@ -521,8 +524,7 @@ while True:
             print("Empty search. Exiting.")
             break
         url = baseurl + "q=" + trimsearch
-        if debug:
-            print("New search URL [%s]" % url)
+        logger.debug("New search URL [%s]", url)
         nav = "g"
         start = basestart
         print("\n\x1B[91m\x1B[1m     *****     *****     *****     *****\
@@ -535,7 +537,6 @@ while True:
         start = "0"
 
     url = url.replace("start=" + oldstart + "&", "start=" + start + "&", 1)
-    if debug:
-        print("[DEBUG] Next URL [%s]\n" % url)
+    logger.debug("Next URL [%s]\n", url)
 
 conn.close()
