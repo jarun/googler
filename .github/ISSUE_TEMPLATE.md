@@ -1,9 +1,9 @@
 #### Bug reports
-Please follow and fill the checklist:
-- [ ] Output of `googler -d`
-- [ ] Response body, something like `/tmp/googler-response-xxxxxx`
-- [ ] Details of operating system, Python version used, terminal emulator and shell
-- [ ] `locale` output, if relevant
+Please make sure you provide the following:
+- [X] Output of `googler -d`
+- [X] Response body, something like `/tmp/googler-response-xxxxxx`
+- [X] Details of operating system, Python version used, terminal emulator and shell
+- [X] `locale` output, if relevant
   
   
 #### Feature requests
