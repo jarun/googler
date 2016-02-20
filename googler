@@ -27,6 +27,7 @@ import webbrowser
 import gzip
 from getopt import getopt, GetoptError
 import readline
+import tempfile
 # Try to load Py3 modules, on error fall back to Py2 module names
 try:
     from io import BytesIO
@@ -428,11 +429,20 @@ def fetch_results():
 
     # Parse the HTML document and print the results.
     parser = GoogleParser()
- 
+
     if sys.version_info > (3,):
-        parser.feed(gzip.GzipFile(fileobj = BytesIO(resp.read())).read().decode('utf-8'))
+        resp_body = gzip.GzipFile(fileobj = BytesIO(resp.read())).read().decode('utf-8')
     else:
-        parser.feed(gzip.GzipFile(fileobj = StringIO.StringIO(resp.read())).read().decode('utf-8'))
+        resp_body = gzip.GzipFile(fileobj = StringIO.StringIO(resp.read())).read().decode('utf-8')
+
+    if debug:
+        fd, tmpfile = tempfile.mkstemp(prefix='googler-response-')
+        os.close(fd)
+        with open(tmpfile, 'wb') as fp:
+            fp.write(resp_body.encode('utf-8'))
+        print("[DEBUG] Response body written to '%s'." % tmpfile)
+
+    parser.feed(resp_body)
 
     results = parser.results
     for r in results:
