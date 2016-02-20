@@ -112,10 +112,10 @@ class GoogleParser(HTMLParser.HTMLParser):
                 self.url = self.url[:marker]
 
             if self.url != "":
-                if (self.url.find("://", 0, 12) >= 0):
+                if self.url.find("://", 0, 12) >= 0:
                     index = len(self.results) + 1
                     self.results.append(Result(index, self.title,
-                                    unquote(self.url), self.text))
+                                               unquote(self.url), self.text))
                 else:
                     skipped += 1
 
@@ -321,7 +321,7 @@ try:
         elif opt[0] == "-t":
             # Option -t dN
             duration = opt[1]
-            if not opt[1][0] in ("h", "d", "w", "m", "y",):
+            if opt[1][0] not in ("h", "d", "w", "m", "y",):
                 usage()
                 sys.exit(1)
             if not opt[1][1].isdigit():
@@ -435,9 +435,9 @@ def fetch_results():
     parser = GoogleParser()
 
     if sys.version_info > (3,):
-        resp_body = gzip.GzipFile(fileobj = BytesIO(resp.read())).read().decode('utf-8')
+        resp_body = gzip.GzipFile(fileobj=BytesIO(resp.read())).read().decode('utf-8')
     else:
-        resp_body = gzip.GzipFile(fileobj = StringIO.StringIO(resp.read())).read().decode('utf-8')
+        resp_body = gzip.GzipFile(fileobj=StringIO.StringIO(resp.read())).read().decode('utf-8')
 
     if debug:
         fd, tmpfile = tempfile.mkstemp(prefix='googler-response-')
