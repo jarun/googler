@@ -147,10 +147,12 @@ add the following to your `~/.bashrc`:
 If you use fish shell, add the following in `~/.config/fish/config.fish`:
 <pre>set -x PYTHONIOENCODING UTF-8</pre>
 Ref issue [#21](https://github.com/jarun/googler/issues/21).
+2. `googler` may show fewer number of results than you expect, for example if you fetch only a singe result (`-n 1`) it may not show ay results. The reason is Google shows some Google service (like Youtube) results, map locations etc. depending on your geographical data, which `googler` tries to omit. In some cases Google (the web-service) doesn't show exactly 10 results (default) on a search. While these can be fixed, it would need more processing and take more time. We chose to omit these results as far as possible. You can just navigate forward to fetch the next set of results.
 
 # Developers
 
 Copyright (C) 2008 Henri Hakkinen
+Special thanks to @jeremija, @shaggytwodope, @zmwangx and @Narrat for their contributions and efforts in spreading `googler`.
 
 Modified (2015) by [Arun Prakash Jana](mailto:engineerarun@gmail.com)
 
