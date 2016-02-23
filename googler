@@ -195,7 +195,7 @@ class Result:
                   "\x1B[0m\n\x1B[93m%s\x1B[39m" % url)
         else:
             print("", index, title, "\n%s" % url)
-        # Print the text with truncating.
+        # Hard wrap text if the number of columns is available.
         if columns > 0:
             col = 0
             for w in text.split():
@@ -362,11 +362,14 @@ if debug:
     print("[DEBUG] Search URL [%s : %s]" % (server, url))
 
 # Get the terminal window size.
-winsz = fcntl.ioctl(sys.stderr, termios.TIOCGWINSZ, "1234")
-columns = struct.unpack("HH", winsz)[1]
+try:
+    winsz = fcntl.ioctl(sys.stderr, termios.TIOCGWINSZ, "1234")
+    columns = struct.unpack("HH", winsz)[1]
 
-if columns <= 0:
-    columns = int(os.environ.get('COLUMNS', 0))
+    if columns <= 0:
+        columns = int(os.environ.get('COLUMNS', 0))
+except IOError:
+    columns = 0
 
 # Connect to Google and request the result page.
 conn = HTTPSConnection(server, timeout=45)
