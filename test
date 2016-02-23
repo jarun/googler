@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+
+set -e
+
+declare quiet exitcode
+
+quiet=0
+exitcode=0
+while [[ $1 == -* ]]; do
+    case $1 in
+        -h|--help)
+            cat <<'EOF'
+Usage: test [options]
+
+Run automated tests of googler(1). googler(1) is expected on $PATH.
+
+Requires shuf(1) from coreutils and /usr/share/dict/words.
+
+Options:
+    -h, --help
+        Print this help and exit.
+    -q, --quiet
+        Suppress googler's output except when a test fails. Some progress info
+        is still printed to stderr. Note that without this option, this script
+        is rather verbose.
+EOF
+            exit 1
+            ;;
+        -q|--quiet)
+            quiet=1
+            ;;
+        *)
+            printf 'Error: Unrecognized option %q.\n' "$1" >&2
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+[[ $# -gt 0 ]] && {
+    printf 'Error: Unrecognized argument %q.\n' "$1" >&2
+    exit 1
+}
+
+declare num_rand_words
+declare -a predefined_wordlist random_wordlist tld_args lang_args
+
+# A UTF-8 wordlist.
+predefined_wordlist=('汉语' 'español' 'português' 'ру́сский язы́к' '日本語' '한국어' 'le français')
+
+# Requires shuf(1).
+command -v shuf &>/dev/null || {
+    printf 'Error: shuf(1) not found.' >&2
+    exit 1
+}
+
+num_rand_words=10
+random_wordlist=( $(shuf -n $num_rand_words /usr/share/dict/words 2>/dev/null) )
+[[ ${#random_wordlist[@]} == $num_rand_words ]] || {
+    printf 'Error: Problem reading random words from /usr/share/dict/words.' >&2
+    exit 1
+}
+
+# Test googler with the given options, and report error if necessary.
+#
+# Whether googler's output is suppressed depends on whether the global variable
+# quiet is truthy (set by -q, --quiet); when a failure is encountered, the
+# global variable exitcode is set to 1, and if quiet was set, the test is rerun
+# with output turned on.
+test_googler () {
+    report_error () {
+        declare -g exitcode
+
+        local rerun=0
+        [[ $1 == --rerun ]] && {
+            rerun=1
+            shift
+        }
+
+        printf 'Error: googler ' >&2
+        printf '%q ' "$@" >&2
+        printf 'failed.\n' >&2
+        exitcode=1
+
+        (( rerun )) && { googler "$@" </dev/null; echo; } || :
+    }
+
+    declare -g quiet
+    if (( quiet )); then
+        googler "$@" </dev/null &>/dev/null || report_error --rerun "$@"
+    else
+        printf $'\033[34m==> googler ' >&2
+        printf '%q ' "$@" >&2
+        printf $'\033[0m\n'
+        googler "$@" </dev/null || report_error "$@"
+        echo
+    fi
+}
+
+# Write a list of configurations to $config_list, and later randomly pick from
+# that list. (The reason we don't test them all is that Google would block us
+# after thousands of queries.)
+declare config_list
+config_list="$(mktemp)"
+trap 'rm -f "$config_list"' EXIT
+for tld in com be ca ch cz de es fi fr it nl pl pt ro ru se; do
+    [[ $tld != com ]] && tld_args=(-c $tld) || tld_args=()
+
+    for lang in default de en fr hi ja ko zh; do
+        [[ $lang != default ]] && lang_args=(-l $lang) || lang_args=()
+
+        # Test single word queries.
+        for keyword in "${predefined_wordlist[@]}" "${random_wordlist[@]}"; do
+            printf '%s ' "${tld_args[@]}" "${lang_args[@]}" "$keyword"
+            echo
+        done
+
+        # Test double word queries.
+        for (( i = 0; i + 1 < num_rand_words; i += 2 )); do
+            printf '%s ' "${tld_args[@]}" "${lang_args[@]}" \
+                   "${random_wordlist[i]}" "${random_wordlist[i+1]}"
+            echo
+        done
+    done
+done >"$config_list"
+
+declare num_rand_configs
+num_rand_configs=100
+counter=0
+shuf -n $num_rand_configs "$config_list" | while read -r args; do
+    (( counter++ )) || :
+    printf '%d/%d' $counter $num_rand_configs
+    (( quiet )) && printf '\r' || printf ':\n'
+    test_googler $args # explicit word splitting here, yes
+done
+
+exit $exitcode
