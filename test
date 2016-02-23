@@ -82,17 +82,17 @@ test_googler () {
         printf 'failed.\n' >&2
         exitcode=1
 
-        (( rerun )) && { googler "$@" </dev/null; echo; } || :
+        (( rerun )) && { googler -d "$@" </dev/null; echo; } || :
     }
 
     declare -g quiet
     if (( quiet )); then
-        googler "$@" </dev/null &>/dev/null || report_error --rerun "$@"
+        googler -d "$@" </dev/null &>/dev/null || report_error --rerun "$@"
     else
         printf $'\033[34m==> googler ' >&2
         printf '%q ' "$@" >&2
         printf $'\033[0m\n'
-        googler "$@" </dev/null || report_error "$@"
+        googler -d "$@" </dev/null || report_error "$@"
         echo
     fi
 }
