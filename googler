@@ -57,6 +57,8 @@ skipped = 0       # Count for skipped ads or blank links
 debug = False     # Print debug logs
 news = False      # Read news
 server = "www.google.com"
+ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+      '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
 
 
 # Classes
@@ -388,7 +390,7 @@ def fetch_results():
             print("[DEBUG] Exception: %s" % e)
         conn.close()
         conn = HTTPSConnection(server, timeout=45)
-        conn.request("GET", url, None, {"Accept-encoding": "gzip"})
+        conn.request("GET", url, None, {"Accept-encoding": "gzip", "User-Agent": ua})
         resp = conn.getresponse()
 
     if resp.status != 200:
@@ -411,7 +413,7 @@ def fetch_results():
                 print("[DEBUG] Next GET [%s]\n" % url)
 
             try:
-                conn.request("GET", url, None, {"Accept-encoding": "gzip"})
+                conn.request("GET", url, None, {"Accept-encoding": "gzip", "User-Agent": ua})
                 resp = conn.getresponse()
             except Exception as e:
                 print("[DEBUG] Exception: %s" % e)
