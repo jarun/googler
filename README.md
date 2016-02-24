@@ -19,6 +19,7 @@ If you find `googler` useful, please consider donating via PayPal.
 - Fetch and navigate next or previous set of results
 - Continuous search: fire new searches without exiting
 - Reconnect on new search even if connection is closed due to inactivity
+- Disable automatic spelling correction and search exact keywords (default: enabled)
 - Easily open result URLs in browser from cmdline using index number
 - Browser (Chromium and Firefox based) errors and warnings suppression
 - Show full contextual text snippet in search results
@@ -77,6 +78,7 @@ Options
              es, fi, fr, id, in, it, jp, kr, mx, nl, ph,
              pl, pt, ro, ru, se, tw, ua, uk
     -l LANG  display in language LANG, such as fi for Finnish
+    -x       disable automatic spelling correction
     -C       disable color output
     -j       open the first result in a web browser
     -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]
