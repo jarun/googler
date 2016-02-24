@@ -151,9 +151,11 @@ Ref issue [#21](https://github.com/jarun/googler/issues/21).
 
 # Developers
 
-Copyright (C) 2008 Henri Hakkinen  
-Resurrected and maintained (2015 -) by [Arun Prakash Jana](mailto:engineerarun@gmail.com)  
-Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https://github.com/shaggytwodope), [zmwangx](https://github.com/zmwangx) and [Narrat](https://github.com/Narrat) for their contributions and efforts in spreading `googler`.
+1. Copyright (C) 2008 Henri Hakkinen
+2. Resurrected and maintained (2015 -) by [Arun Prakash Jana](mailto:engineerarun@gmail.com)
+3. [Zhiming Wang](https://github.com/zmwangx)
+  
+Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https://github.com/shaggytwodope) and [Narrat](https://github.com/Narrat) for their contributions and efforts in spreading `googler`.
 
 <h1 id="Notes">Notes</h1>
 
