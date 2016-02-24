@@ -1,0 +1,13 @@
+language: python
+python:
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "nightly"
+matrix:
+  allow_failures:
+    - python: "nightly"
+script:
+  - PYTHONIOENCODING=utf-8 PATH=$PWD:$PATH ./test --ci
