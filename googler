@@ -56,6 +56,7 @@ nav = "n"         # For user navigation
 skipped = 0       # Count for skipped ads or blank links
 debug = False     # Print debug logs
 news = False      # Read news
+exact = False     # Disable automatic spelling correction
 server = "www.google.com"
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
@@ -246,6 +247,7 @@ def usage():
     print("  -c SERV  country-specific search (refer man or project page for" +
           " details)")
     print("  -l LANG  display in language LANG, such as fi for Finnish")
+    print("  -x       disable automatic spelling correction")
     print("  -C       disable color output")
     print("  -j       open the first result in a web browser")
     print("  -t dN    time limit search [h5 (5 hrs), d5 (5 days), " +
@@ -290,7 +292,7 @@ if len(sys.argv) < 2:
     usage()
 
 try:
-    optlist, keywords = getopt(sys.argv[1:], "s:n:c:l:t:NCjd")
+    optlist, keywords = getopt(sys.argv[1:], "s:n:c:l:t:NCjdx")
     for opt in optlist:
         if opt[0] == "-s":
             # Option -s N
@@ -328,6 +330,9 @@ try:
             if not opt[1][1].isdigit():
                 usage()
                 sys.exit(1)
+        elif opt[0] == "-x":
+            # Option -x
+            exact = True
         elif opt[0] == "-d":
             debug = True
     if len(keywords) < 1:
@@ -349,6 +354,8 @@ if lang is not None:
     url += "hl=" + lang + "&"
 if duration is not None:
     url += "tbs=qdr:" + duration + "&"
+if exact:
+    url  += "nfpr=1&"
 
 baseurl = url
 basestart = start
