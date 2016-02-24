@@ -122,23 +122,28 @@ http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt
 <pre>$ googler it\'s a \"beautiful world\" in spring</pre>
 6. Search for a <b>specific file type</b>:
 <pre>$ googler instrumental filetype:mp3</pre>
-7. <b>I'm feeling lucky</b> search:
+7. Disable <b>automatic spelling correction</b> and fetch results for `googler` instead of `google`:
+<pre>$ googler -x googler</pre>
+8. <b>I'm feeling lucky</b> search:
 <pre>$ googler -j leather jackets</pre>
-8. <b>Website specific</b> search alias:
+9. <b>Website specific</b> search alias:
 <pre>alias t='googler -n 7 site:tuxdiary.com'</pre>
-9. Alias to find <b>meanings of words</b> (note: the first result in Google is not a link):
+10. Alias to find <b>meanings of words</b> (note: the first result in Google is not a link):
 <pre>alias define='googler -n 2 define'</pre>
-10. Look up `n`, `p`, `g co` or a number at <b>navigation prompt</b>:  
+11. Look up `n`, `p`, `g co` or a number at <b>navigation prompt</b>:  
 As the navigation prompt recognizes `n`, `p`, `g keywords` or numbers as keys, they can't be searched directly without the `g` key. To search them -
 <pre>Enter 'n', 'p', 'g keywords', or result number to continue: <b>g n</b>
 Enter 'n', 'p', 'g keywords', or result number to continue: <b>g g keywords</b>
 Enter 'n', 'p', 'g keywords', or result number to continue: <b>g 1984</b></pre>
 Note that Google ignores searches for negative numbers (e.g. `-1984`).
-11. Input and output <b>redirection</b>:
+12. Input and output <b>redirection</b>:
 <pre>$ googler -C hello world < input > output</pre>
 Note that `-C` is required to avoid printing control characters. `2>&1` would error as the console geometry is calculated from `stderr`.
-12. <b>Piping</b> `googler` output:
+13. <b>Piping</b> `googler` output:
 <pre>$ googler -C hello world | tee output</pre>
+14. More <b>help</b>:
+<pre>$ googler
+$ man googler</pre>
 
 # Troubleshooting
 
