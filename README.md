@@ -1,5 +1,7 @@
 # googler
 
+[![Build Status](https://travis-ci.org/jarun/googler.svg?branch=master)](https://travis-ci.org/jarun/googler)
+
 ![Screenshot](googler.png)
 
 `googler` is a command-line power tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. Supports sequential searches in a single instance.
