@@ -114,7 +114,7 @@ test_googler () {
 declare config_list
 config_list="$(mktemp)"
 trap 'rm -f "$config_list"' EXIT
-for tld in com be ca ch cz de es fi fr it nl pl pt ro ru se; do
+for tld in com ar au be br ca ch cz de es 'fi' fr id 'in' it jp kr mx nl ph pl pt ro ru se tw ua uk; do
     [[ $tld != com ]] && tld_args=(-c $tld) || tld_args=()
 
     for lang in default de en fr hi ja ko zh; do
@@ -145,5 +145,5 @@ while read -r args; do
     test_googler $args # explicit word splitting here, yes
 done < <(shuf -n $num_rand_configs "$config_list")
 
-(( exitcode )) || printf '\033[32mAll passed.\033[0m\n'
+(( exitcode )) || printf '\033[K\033[32mAll passed.\033[0m\n'
 exit $exitcode
