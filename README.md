@@ -6,7 +6,7 @@
 
 `googler` is GPLv3 licensed. It doesn't have any affiliation to Google in any way.
 
-Why not use Google provided APIs? Check point 2 in [Notes](#Notes).
+Why not use Google provided APIs? Check point 2 in [Notes](#notes) section.
 
 If you find `googler` useful, please consider donating via PayPal.
 [![Donate Button with Credit Cards](https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=RMLTQ76JSXJ4Q)
@@ -41,7 +41,7 @@ If you find `googler` useful, please consider donating via PayPal.
 - Specify search duration (in hours / days / weeks / months / years)
 - Fetch results from Google News section
 - Country/domain specific search (28 top-level domains supported, default: .com)
-- Google search keywords like `filetype:mime`, `site:somesite.com` etc. work.
+- Supports Google search keywords like `filetype:mime`, `site:somesite.com` etc.
 - Open filetype specific links in browser, the links are handled by browser for the type
 - Optionally open the first result directly in browser (as in <i>I'm Feeling Lucky</i>)
 - Specify language preference for results
@@ -70,9 +70,7 @@ To download this repository, you may either clone via git:
 
 or download a source code archive: [the latest stable release](https://github.com/jarun/googler/releases/latest) or [the development version](https://github.com/jarun/googler/archive/master.zip).
 
-Next, depending on whether you want to install `googler` to a prefix, you have two options.
-
-### Installing to (or uninstalling from) a prefix
+### Installing to default or custom location (prefix)
 
 Run
 
