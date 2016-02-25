@@ -16,7 +16,7 @@ If you find `googler` useful, please consider donating via PayPal.
 - [Features](#features)
 - [Installation](#installation)
     - [Installing from this repository](#installing-from-this-repository)
-        - [Installing to (or uninstalling from) a prefix](#installing-to-or-uninstalling-from-a-prefix)
+        - [Installing to default or custom location](#installing-to-default-or-custom-location)
         - [Running as a standalone utility](#running-as-a-standalone-utility)
     - [Installing with a package manager](#installing-with-a-package-manager)
 - [Usage](#usage)
@@ -70,7 +70,7 @@ To download this repository, you may either clone via git:
 
 or download a source code archive: [the latest stable release](https://github.com/jarun/googler/releases/latest) or [the development version](https://github.com/jarun/googler/archive/master.zip).
 
-### Installing to default or custom location (prefix)
+### Installing to default or custom location
 
 Run
 
