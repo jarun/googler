@@ -232,6 +232,8 @@ Windows users can refer to [this discussion](http://stackoverflow.com/questions/
 
 Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https://github.com/shaggytwodope) and [Narrat](https://github.com/Narrat) for their contributions and efforts in spreading `googler`.
 
+[![Build Status](https://travis-ci.org/jarun/googler.svg?branch=master)](https://travis-ci.org/jarun/googler)
+
 # Notes
 
 1. Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author [Henri Hakkinen](https://github.com/henux) in past year. I have created this independent repo for the project with the name `googler`. I retained the original copyright information.
