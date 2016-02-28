@@ -9,7 +9,7 @@
 Why not use Google provided APIs? Check point 2 in [Notes](#notes) section.
 
 If you find `googler` useful, please consider donating via PayPal.
-[![Donate Button with Credit Cards](https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q)
+[![Donate Button](https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q)
 
 # Table of contents
 
