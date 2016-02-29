@@ -60,6 +60,7 @@ exact = False     # If True, disable automatic spelling correction
 server = "www.google.com"
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
+                  # Disguise as Microsoft Edge
 
 
 # Classes
@@ -282,6 +283,24 @@ def serverURL(domain):
     return "www.google.com"
 
 
+# Send a GET request to Google with the appropriate headers.
+# url can be relative (to the appropriate Google domain).
+def google_get(conn, url):
+    global ua
+    conn.request("GET", url, None, {
+        "Accept-encoding": "gzip",
+        "User-Agent": ua,
+    })
+
+
+# Returns a new connection to the given domain with appropriate options.
+# When the given domain is absent, the global variable server is used
+# instead.
+def new_connection(domain=None):
+    global server
+    return HTTPSConnection(domain if domain else server, timeout=45)
+
+
 # Program Main
 
 # Process command line options.
@@ -381,7 +400,7 @@ except IOError:
     columns = 0
 
 # Connect to Google and request the result page.
-conn = HTTPSConnection(server, timeout=45)
+conn = new_connection()
 
 
 def fetch_results():
@@ -390,14 +409,14 @@ def fetch_results():
     global skipped
 
     try:
-        conn.request("GET", url, None, {"Accept-encoding": "gzip"})
+        google_get(conn, url)
         resp = conn.getresponse()
     except Exception as e:
         if debug:
             print("[DEBUG] Exception: %s" % e)
         conn.close()
-        conn = HTTPSConnection(server, timeout=45)
-        conn.request("GET", url, None, {"Accept-encoding": "gzip", "User-Agent": ua})
+        conn = new_connection()
+        google_get(conn, url)
         resp = conn.getresponse()
 
     if resp.status != 200:
@@ -413,14 +432,13 @@ def fetch_results():
             if debug:
                 print("[DEBUG] Next Server [%s]" % url[url.find("//") +
                       2:url.find("/search")])
-            conn = HTTPSConnection(url[url.find("//") + 2:url.find("/search")],
-                                   timeout=45)
+            conn = new_connection(url[url.find("//") + 2:url.find("/search")])
             url = url[url.find("/search"):]
             if debug:
                 print("[DEBUG] Next GET [%s]\n" % url)
 
             try:
-                conn.request("GET", url, None, {"Accept-encoding": "gzip", "User-Agent": ua})
+                google_get(conn, url)
                 resp = conn.getresponse()
             except Exception as e:
                 print("[DEBUG] Exception: %s" % e)
