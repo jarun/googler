@@ -291,6 +291,7 @@ def google_get(conn, url):
         "Accept-encoding": "gzip",
         "User-Agent": ua,
     })
+    return conn.getresponse()
 
 
 # Returns a new connection to the given domain with appropriate options.
@@ -409,15 +410,13 @@ def fetch_results():
     global skipped
 
     try:
-        google_get(conn, url)
-        resp = conn.getresponse()
+        resp = google_get(conn, url)
     except Exception as e:
         if debug:
             print("[DEBUG] Exception: %s" % e)
         conn.close()
         conn = new_connection()
-        google_get(conn, url)
-        resp = conn.getresponse()
+        resp = google_get(conn, url)
 
     if resp.status != 200:
         if resp.status in (301, 302,):
@@ -438,8 +437,7 @@ def fetch_results():
                 print("[DEBUG] Next GET [%s]\n" % url)
 
             try:
-                google_get(conn, url)
-                resp = conn.getresponse()
+                resp = google_get(conn, url)
             except Exception as e:
                 print("[DEBUG] Exception: %s" % e)
                 conn.close()
