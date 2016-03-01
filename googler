@@ -186,13 +186,9 @@ class Result:
 
         # Open the URL in a web browser if option -j was specified.
         if openUrl:
-            # If empty URL, like first result of 'define hello', just print the result
-            if url == "":
-                print("Showing in console as URL is empty\n")
-            else:
-                self.open()
-                conn.close()
-                sys.exit(0)
+            self.open()
+            conn.close()
+            sys.exit(0)
         # Print the title and the URL.
         if colorize:
             print("\x1B[1m\x1B[36m", index, "\x1B[92m", title,
