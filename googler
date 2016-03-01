@@ -143,9 +143,9 @@ class GoogleParser(HTMLParser.HTMLParser):
     # inner <div> ... </div>
     def div_inner_start(self, tag, attrs):
         if tag == "span" and len(attrs) > 0 and attrs[0] == ("class", "st"):
-            self.handle_starttag = self.span_start
-            self.handle_data = self.span_data
-            self.handle_endtag = self.span_end
+            self.handle_starttag = self.span_outer_start
+            self.handle_data = self.span_outer_data
+            self.handle_endtag = self.span_outer_end
 
     def div_inner_data(self, data):
         pass
@@ -153,17 +153,32 @@ class GoogleParser(HTMLParser.HTMLParser):
     def div_inner_end(self, tag):
         pass
 
-    def span_start(self, tag, start):
-        pass
+    def span_outer_start(self, tag, attrs):
+        if tag == "span" and len(attrs) > 0 and attrs[0] == ("class", "f"):
+            self.handle_starttag = self.span_inner_start
+            self.handle_data = self.span_inner_data
+            self.handle_endtag = self.span_inner_end
 
-    def span_data(self, data):
+    def span_outer_data(self, data):
         self.text += data
 
-    def span_end(self, tag):
+    def span_outer_end(self, tag):
         if tag == "span":
             self.handle_starttag = self.div_outer_start
             self.handle_data = self.div_outer_data
             self.handle_endtag = self.div_outer_end
+
+    def span_inner_start(self, tag, start):
+        pass
+
+    def span_inner_data(self, data):
+        self.text += data
+
+    def span_inner_end(self, tag):
+        if tag == "span":
+            self.handle_starttag = self.span_outer_start
+            self.handle_data = self.span_outer_data
+            self.handle_endtag = self.span_outer_end
 
 
 class Result:
@@ -432,7 +447,7 @@ def fetch_results():
             conn = new_connection(url[url.find("//") + 2:url.find("/search")])
             url = url[url.find("/search"):]
             if debug:
-                print("[DEBUG] Next GET [%s]\n" % url)
+                print("[DEBUG] Next GET [%s]" % url)
 
             try:
                 resp = google_get(conn, url)
@@ -463,7 +478,7 @@ def fetch_results():
         os.close(fd)
         with open(tmpfile, 'wb') as fp:
             fp.write(resp_body.encode('utf-8'))
-        print("[DEBUG] Response body written to '%s'." % tmpfile)
+        print("[DEBUG] Response body written to '%s'.\n" % tmpfile)
 
     parser.feed(resp_body)
 
