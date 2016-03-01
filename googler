@@ -129,7 +129,9 @@ class GoogleParser(HTMLParser.HTMLParser):
     # <h3> ... </h3>
     def h3_start(self, tag, attrs):
         if tag == "a":
-            self.url = attrs[0][1]
+            for name, value in attrs:
+                if name == "href":
+                    self.url = value
 
     def h3_data(self, data):
         self.title += data
