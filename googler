@@ -31,15 +31,23 @@ import tempfile
 # Try to load Py3 modules, on error fall back to Py2 module names
 try:
     from io import BytesIO
+    from html.entities import name2codepoint
     import html.parser as HTMLParser
     from urllib.parse import urljoin, quote_plus, unquote
     from http.client import HTTPSConnection
 except ImportError:
     import StringIO
+    from htmlentitydefs import name2codepoint
     import HTMLParser
     from urlparse import urljoin
     from urllib import quote_plus, unquote
     from httplib import HTTPSConnection
+# Additional compatibility layer
+try:
+    unichr(0)
+except NameError:
+    # For Py3, use chr in place of unichr
+    unichr = chr
 
 
 # Global variables
@@ -72,6 +80,9 @@ class GoogleParser(HTMLParser.HTMLParser):
         self.handle_starttag = self.main_start
         self.handle_data = self.main_data
         self.handle_endtag = self.main_end
+        # Use stacks to keep track of the hirarchy of entityref/charref handlers
+        self.old_entityref_handlers = [self.handle_entityref]
+        self.old_charref_handlers = [self.handle_charref]
         self.results = []
 
     def main_start(self, tag, attrs):
@@ -94,6 +105,7 @@ class GoogleParser(HTMLParser.HTMLParser):
         if tag == "h3":
             self.handle_starttag = self.h3_start
             self.handle_data = self.h3_data
+            self.register_entityref_and_charref_handlers('title')
             self.handle_endtag = self.h3_end
         elif tag == "div" and len(attrs) > 0 and attrs[0] == ("class", "s"):
             self.handle_starttag = self.div_inner_start
@@ -140,6 +152,7 @@ class GoogleParser(HTMLParser.HTMLParser):
         if tag == "h3":
             self.handle_starttag = self.div_outer_start
             self.handle_data = self.div_outer_data
+            self.restore_entityref_and_charref_handlers()
             self.handle_endtag = self.div_outer_end
 
     # inner <div> ... </div>
@@ -147,6 +160,7 @@ class GoogleParser(HTMLParser.HTMLParser):
         if tag == "span" and len(attrs) > 0 and attrs[0] == ("class", "st"):
             self.handle_starttag = self.span_outer_start
             self.handle_data = self.span_outer_data
+            self.register_entityref_and_charref_handlers('text')
             self.handle_endtag = self.span_outer_end
 
     def div_inner_data(self, data):
@@ -159,6 +173,7 @@ class GoogleParser(HTMLParser.HTMLParser):
         if tag == "span" and len(attrs) > 0 and attrs[0] == ("class", "f"):
             self.handle_starttag = self.span_inner_start
             self.handle_data = self.span_inner_data
+            self.register_entityref_and_charref_handlers('text')
             self.handle_endtag = self.span_inner_end
 
     def span_outer_data(self, data):
@@ -168,6 +183,7 @@ class GoogleParser(HTMLParser.HTMLParser):
         if tag == "span":
             self.handle_starttag = self.div_outer_start
             self.handle_data = self.div_outer_data
+            self.restore_entityref_and_charref_handlers()
             self.handle_endtag = self.div_outer_end
 
     def span_inner_start(self, tag, start):
@@ -180,7 +196,47 @@ class GoogleParser(HTMLParser.HTMLParser):
         if tag == "span":
             self.handle_starttag = self.span_outer_start
             self.handle_data = self.span_outer_data
+            self.restore_entityref_and_charref_handlers()
             self.handle_endtag = self.span_outer_end
+
+    # Register entityref and charref handlers so that decoded refs are
+    # appended to the attribute (of self) named dest (e.g., 'title' or
+    # 'text').
+    def register_entityref_and_charref_handlers(self, dest):
+        self.old_entityref_handlers.append(self.handle_entityref)
+        self.old_charref_handlers.append(self.handle_charref)
+        self.handle_entityref = lambda ref: self.entityref(dest, ref)
+        self.handle_charref = lambda ref: self.charref(dest, ref)
+
+    def restore_entityref_and_charref_handlers(self):
+        self.handle_entityref = self.old_entityref_handlers.pop()
+        self.handle_charref = self.old_charref_handlers.pop()
+
+    def entityref(self, dest, ref):
+        try:
+            char = unichr(name2codepoint[ref])
+            setattr(self, dest, getattr(self, dest) + char)
+        except KeyError:
+            # Entity name not found; most likely rather sloppy HTML
+            # where a literal ampersand is not escaped; For instance,
+            # the HTML response returned by
+            #
+            #     googler -c au -l ko expected
+            #
+            # contains the following tag
+            #
+            #     <p class="_e4b"><a href="...">expected market return s&p 500</a></p>
+            #
+            # where &p is interpreted by HTMLParser as an entity (this
+            # behavior seems to be specific to Python 2.7).
+            setattr(self, dest, getattr(self, dest) + '&' + ref)
+
+    def charref(self, dest, ref):
+        if ref.startswith('x'):
+            char = unichr(int(ref[1:], 16))
+        else:
+            char = unichr(int(ref))
+        setattr(self, dest, getattr(self, dest) + char)
 
 
 class Result:
