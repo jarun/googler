@@ -373,6 +373,24 @@ def quit(conn):
     sys.exit(1)
 
 
+
+# Show the search or navigation omniprompt:
+def show_omniprompt():
+    global colorize
+
+    if sys.version_info > (3,):
+        if colorize:
+            return input("\x1b[107m\x1b[41mEnter 'n', 'p', 'g keywords', or result number to continue\x1B[0m ")
+        else:
+            return input("Enter 'n', 'p', 'g keywords', or result number to continue: ")
+    else:
+        if colorize:
+            return raw_input("\x1b[107m\x1b[41mEnter 'n', 'p', 'g keywords' or result number to continue\x1B[0m ")
+        else:
+            return raw_input("Enter 'n', 'p', 'g keywords' or result number to continue: ")
+
+
+
 # Program Main
 
 # Process command line options.
@@ -562,10 +580,7 @@ while True:
 
     oldstart = start
     try:
-        if sys.version_info > (3,):
-            nav = input("Enter 'n', 'p', 'g keywords', or result number to continue: ")
-        else:
-            nav = raw_input("Enter 'n', 'p', 'g keywords' or result number to continue: ")
+        nav = show_omniprompt()
     except EOFError:
         nav = ""
 
