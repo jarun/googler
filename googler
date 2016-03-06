@@ -380,14 +380,14 @@ def show_omniprompt():
 
     if sys.version_info > (3,):
         if colorize:
-            return input("\x1b[107m\x1b[41mEnter 'n', 'p', 'g keywords', or result number to continue\x1B[0m ")
+            return input("\x1b[107m\x1b[41mEnter 'n', 'p', keywords or result number to continue\x1B[0m ")
         else:
-            return input("Enter 'n', 'p', 'g keywords', or result number to continue: ")
+            return input("Enter 'n', 'p', keywords or result number to continue: ")
     else:
         if colorize:
-            return raw_input("\x1b[107m\x1b[41mEnter 'n', 'p', 'g keywords' or result number to continue\x1B[0m ")
+            return raw_input("\x1b[107m\x1b[41mEnter 'n', 'p', keywords or result number to continue\x1B[0m ")
         else:
-            return raw_input("Enter 'n', 'p', 'g keywords' or result number to continue: ")
+            return raw_input("Enter 'n', 'p', keywords or result number to continue: ")
 
 
 
