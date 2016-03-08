@@ -50,7 +50,7 @@ If you find `googler` useful, please consider donating via PayPal.
 - Skip links to Google News, Images or blank URLs in web search results
 - UTF-8 request and response
 - Fetch gzip compressed results
-- Works with Python 2.7.x and 3.x
+- Works with Python 2.7.x and 3.3.x or later
 - Enable/disable color output (default: colorful)
 - Enable/disable debug logs (default: disabled)
 - Manpage for quick reference
@@ -60,7 +60,7 @@ If you find `googler` useful, please consider donating via PayPal.
 
 # Installation
 
-`googler` requires Python 2.7.x or Python 3.x to work.
+`googler` requires Python to work. Officially supported Python versions are 2.7 and 3.3 or later (only the latest patch release of each minor version is supported).
 
 ## Installing from this repository
 
