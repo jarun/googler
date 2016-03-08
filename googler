@@ -376,7 +376,7 @@ def show_omniprompt():
 
     message = "Enter 'n', 'p', keywords or result number to continue"
     if colorize:
-        return raw_input("\x1b[107m\x1b[41m%s\x1b[0m " % message)
+        return raw_input("\x1b[7m%s\x1b[0m " % message)
     else:
         return raw_input("%s: " % message)
 
