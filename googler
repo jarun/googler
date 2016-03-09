@@ -43,12 +43,9 @@ except ImportError:
     from urllib import quote_plus, unquote
     from httplib import HTTPSConnection
 # Additional compatibility layer
-try:
-    unichr(0)
-except NameError:
-    # For Py3, use chr in place of unichr
+if sys.version_info > (3,):
     unichr = chr
-
+    raw_input = input
 
 # Global variables
 
@@ -373,22 +370,15 @@ def quit(conn):
     sys.exit(1)
 
 
-
 # Show the search or navigation omniprompt:
 def show_omniprompt():
     global colorize
 
-    if sys.version_info > (3,):
-        if colorize:
-            return input("\x1b[107m\x1b[41mEnter 'n', 'p', keywords or result number to continue\x1B[0m ")
-        else:
-            return input("Enter 'n', 'p', keywords or result number to continue: ")
+    message = "Enter 'n', 'p', keywords or result number to continue"
+    if colorize:
+        return raw_input("\x1b[7m%s\x1b[0m " % message)
     else:
-        if colorize:
-            return raw_input("\x1b[107m\x1b[41mEnter 'n', 'p', keywords or result number to continue\x1B[0m ")
-        else:
-            return raw_input("Enter 'n', 'p', keywords or result number to continue: ")
-
+        return raw_input("%s: " % message)
 
 
 # Program Main
