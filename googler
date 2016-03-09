@@ -132,7 +132,7 @@ class GoogleParser(HTMLParser.HTMLParser):
                 self.url = self.url[:marker]
 
             if self.url != "":
-                if (self.url.find("://", 0, 12) >= 0):
+                if self.url.find("://", 0, 12) >= 0:
                     index = len(self.results) + 1
                     self.results.append(Result(index, self.title,
                                                url_unquote(self.url),
@@ -432,7 +432,7 @@ try:
         elif opt[0] == "-t":
             # Option -t dN
             duration = opt[1]
-            if not opt[1][0] in ("h", "d", "w", "m", "y",):
+            if opt[1][0] not in ("h", "d", "w", "m", "y",):
                 usage()
                 sys.exit(1)
             if not opt[1][1].isdigit():
@@ -463,7 +463,7 @@ if lang is not None:
 if duration is not None:
     url += "tbs=qdr:" + duration + "&"
 if exact:
-    url  += "nfpr=1&"
+    url += "nfpr=1&"
 
 baseurl = url
 basestart = start
@@ -518,7 +518,7 @@ def fetch_results():
             conn.close()
             if debug:
                 print("[DEBUG] Next Server [%s]" % url[url.find("//") +
-                      2:url.find("/search")])
+                                                       2:url.find("/search")])
             conn = new_connection(url[url.find("//") + 2:url.find("/search")])
             url = url[url.find("/search"):]
             if debug:
@@ -590,7 +590,7 @@ while True:
             start = str(int(start) - int(num))
         else:
             start = str(int(start) - 10)
-        print("");
+        print("")
     elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
         trimsearch = nav[2:].strip().replace(" ", "+")
         if trimsearch == "":
