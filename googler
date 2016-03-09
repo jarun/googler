@@ -374,7 +374,7 @@ def quit(conn):
 def show_omniprompt():
     global colorize
 
-    message = "Enter 'n', 'p', keywords or result number to continue"
+    message = "Enter n, p, result number or new keywords"
     if colorize:
         return raw_input("\x1b[7m%s\x1b[0m " % message)
     else:
