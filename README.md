@@ -104,31 +104,37 @@ If you installed to a different prefix, you'll need to specify the same `PREFIX`
 
 # Usage
 
-    $ googler
-    Usage: googler [OPTIONS] KEYWORDS...
-    Performs a Google search and prints the results to stdout.
+<pre>usage: googler [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C] [-j] [-t dN]
+               [-d]
+               KEYWORD [KEYWORD ...]
 
-    Options
-        -s N     start at the N<sup>th</sup> result
-        -n N     show N results (default 10)
-        -N       show results from news section
-        -c SERV  country-specific search (Ref: https://en.wikipedia.org/wiki/List_of_Google_domains)
-                 Added TLDs: ar, au, be, br, ca, ch, cz, de,
-                 es, fi, fr, id, in, it, jp, kr, mx, nl, ph,
-                 pl, pt, ro, ru, se, tw, ua, uk
-        -l LANG  display in language LANG, such as fi for Finnish
-        -x       disable automatic spelling correction
-        -C       disable color output
-        -j       open the first result in a web browser
-        -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]
-        -d       enable debugging
+Perform a Google search and print results to stdout.
 
-    Prompt Keys
-        g terms  initiate a new search for 'terms' with original options
-        n, p     fetch next or previous set of search results
-        1-N      open the Nth result index in browser
-        Enter    exit googler (same behaviour for an empty search)
-        *        any other string initiates a new search with original options
+positional arguments:
+  KEYWORD  search keywords
+
+optional arguments:
+  -s N     start at the Nth result
+  -n N     show N results (default 10)
+  -N       show results from news section
+  -c TLD   country-specific search with top-level domain .TLD, e.g., 'in' for
+           India (see <a href="https://en.wikipedia.org/wiki/List_of_Google_domains" target="_blank">https://en.wikipedia.org/wiki/List_of_Google_domains</a> for
+           a full list of TLDs)
+  -l LANG  display in language LANG
+  -x       disable automatic spelling correction
+  -C       disable color output
+  -j       open the first result in a web browser
+  -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5
+           months), y5 (5 years)]
+  -d       enable debugging
+
+prompt keys:
+  g terms  initiate a new search for 'terms' with original options
+  n, p     fetch next or previous set of search results
+  1-N      open the Nth result index in browser
+  Enter    exit googler (same behaviour for an empty search)
+  *        any other string initiates a new search with original options
+</pre>
 
 ## Configuration file
 

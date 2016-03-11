@@ -27,8 +27,8 @@ import readline
 import struct
 import sys
 import tempfile
-import textwrap
 import termios
+import textwrap
 import webbrowser
 
 # 2to3 compatibility layer
@@ -476,7 +476,7 @@ def is_duration(arg):
 
 argparser = ExtendedArgumentParser(
     add_help=False,
-    description='Performs a Google search and prints the results to stdout.'
+    description='Perform a Google search and print results to stdout.'
 )
 addarg = argparser.add_argument
 addarg('-s', dest='start', type=int, metavar='N',
@@ -486,7 +486,9 @@ addarg('-n', dest='num', type=int, metavar='N',
 addarg('-N', dest='news', action='store_true',
        help='show results from news section')
 addarg('-c', dest='tld', metavar='TLD',
-       help='country-specific search (refer man or project page for details)')
+       help="""country-specific search with top-level domain .TLD, e.g., 'in'
+       for India (see https://en.wikipedia.org/wiki/List_of_Google_domains for
+       a full list of TLDs)""")
 addarg('-l', dest='lang', metavar='LANG',
        help='display in language LANG')
 addarg('-x', dest='exact', action='store_true',
