@@ -314,19 +314,83 @@ def is_int(string):
     except:
         return False
 
-def serverURL(domain):
-    # Google domain ref: https://en.wikipedia.org/wiki/List_of_Google_domains
-    # www.google.co.domain
-    if domain in ["id", "in", "jp", "kr", "uk"]:
-        return "www.google.co." + domain
-    if domain in ["be", "ca", "ch", "cz", "de", "es", "fi", "fr", "it", "nl",
-                  "pl", "pt", "ro", "ru", "se"]:    # www.google.domain
-        return "www.google." + domain
-    # www.google.com.domain
-    if domain in ["ar", "au", "br", "mx", "ph", "tw", "ua"]:
-        return "www.google.com." + domain
+def server_url(tld):
+    # Data source: https://en.wikipedia.org/wiki/List_of_Google_domains
+    # Scraper script: https://gist.github.com/zmwangx/b976e83c14552fe18b71
+    tld_to_domain_map = {
+        'ac': 'google.ac',      'ad': 'google.ad',      'ae': 'google.ae',
+        'af': 'google.com.af',  'ag': 'google.com.ag',  'ai': 'google.com.ai',
+        'al': 'google.al',      'am': 'google.am',      'ao': 'google.co.ao',
+        'ar': 'google.com.ar',  'as': 'google.as',      'at': 'google.at',
+        'au': 'google.com.au',  'az': 'google.az',      'ba': 'google.ba',
+        'bd': 'google.com.bd',  'be': 'google.be',      'bf': 'google.bf',
+        'bg': 'google.bg',      'bh': 'google.com.bh',  'bi': 'google.bi',
+        'bj': 'google.bj',      'bn': 'google.com.bn',  'bo': 'google.com.bo',
+        'br': 'google.com.br',  'bs': 'google.bs',      'bt': 'google.bt',
+        'bw': 'google.co.bw',   'by': 'google.by',      'bz': 'google.com.bz',
+        'ca': 'google.ca',      'cat': 'google.cat',    'cc': 'google.cc',
+        'cd': 'google.cd',      'cf': 'google.cf',      'cg': 'google.cg',
+        'ch': 'google.ch',      'ci': 'google.ci',      'ck': 'google.co.ck',
+        'cl': 'google.cl',      'cm': 'google.cm',      'cn': 'google.cn',
+        'co': 'google.com.co',  'cr': 'google.co.cr',   'cu': 'google.com.cu',
+        'cv': 'google.cv',      'cy': 'google.com.cy',  'cz': 'google.cz',
+        'de': 'google.de',      'dj': 'google.dj',      'dk': 'google.dk',
+        'dm': 'google.dm',      'do': 'google.com.do',  'dz': 'google.dz',
+        'ec': 'google.com.ec',  'ee': 'google.ee',      'eg': 'google.com.eg',
+        'es': 'google.es',      'et': 'google.com.et',  'fi': 'google.fi',
+        'fj': 'google.com.fj',  'fm': 'google.fm',      'fr': 'google.fr',
+        'ga': 'google.ga',      'ge': 'google.ge',      'gf': 'google.gf',
+        'gg': 'google.gg',      'gh': 'google.com.gh',  'gi': 'google.com.gi',
+        'gl': 'google.gl',      'gm': 'google.gm',      'gp': 'google.gp',
+        'gr': 'google.gr',      'gt': 'google.com.gt',  'gy': 'google.gy',
+        'hk': 'google.com.hk',  'hn': 'google.hn',      'hr': 'google.hr',
+        'ht': 'google.ht',      'hu': 'google.hu',      'id': 'google.co.id',
+        'ie': 'google.ie',      'il': 'google.co.il',   'im': 'google.im',
+        'in': 'google.co.in',   'io': 'google.io',      'iq': 'google.iq',
+        'is': 'google.is',      'it': 'google.it',      'je': 'google.je',
+        'jm': 'google.com.jm',  'jo': 'google.jo',      'jp': 'google.co.jp',
+        'ke': 'google.co.ke',   'kg': 'google.kg',      'kh': 'google.com.kh',
+        'ki': 'google.ki',      'kr': 'google.co.kr',   'kw': 'google.com.kw',
+        'kz': 'google.kz',      'la': 'google.la',      'lb': 'google.com.lb',
+        'lc': 'google.com.lc',  'li': 'google.li',      'lk': 'google.lk',
+        'ls': 'google.co.ls',   'lt': 'google.lt',      'lu': 'google.lu',
+        'lv': 'google.lv',      'ly': 'google.com.ly',  'ma': 'google.co.ma',
+        'md': 'google.md',      'me': 'google.me',      'mg': 'google.mg',
+        'mk': 'google.mk',      'ml': 'google.ml',      'mm': 'google.com.mm',
+        'mn': 'google.mn',      'ms': 'google.ms',      'mt': 'google.com.mt',
+        'mu': 'google.mu',      'mv': 'google.mv',      'mw': 'google.mw',
+        'mx': 'google.com.mx',  'my': 'google.com.my',  'mz': 'google.co.mz',
+        'na': 'google.com.na',  'ne': 'google.ne',      'nf': 'google.com.nf',
+        'ng': 'google.com.ng',  'ni': 'google.com.ni',  'nl': 'google.nl',
+        'no': 'google.no',      'np': 'google.com.np',  'nr': 'google.nr',
+        'nu': 'google.nu',      'nz': 'google.co.nz',   'om': 'google.com.om',
+        'pa': 'google.com.pa',  'pe': 'google.com.pe',  'pg': 'google.com.pg',
+        'ph': 'google.com.ph',  'pk': 'google.com.pk',  'pl': 'google.pl',
+        'pn': 'google.co.pn',   'pr': 'google.com.pr',  'ps': 'google.ps',
+        'pt': 'google.pt',      'py': 'google.com.py',  'qa': 'google.com.qa',
+        'ro': 'google.ro',      'rs': 'google.rs',      'ru': 'google.ru',
+        'rw': 'google.rw',      'sa': 'google.com.sa',  'sb': 'google.com.sb',
+        'sc': 'google.sc',      'se': 'google.se',      'sg': 'google.com.sg',
+        'sh': 'google.sh',      'si': 'google.si',      'sk': 'google.sk',
+        'sl': 'google.com.sl',  'sm': 'google.sm',      'sn': 'google.sn',
+        'so': 'google.so',      'sr': 'google.sr',      'st': 'google.st',
+        'sv': 'google.com.sv',  'td': 'google.td',      'tg': 'google.tg',
+        'th': 'google.co.th',   'tj': 'google.com.tj',  'tk': 'google.tk',
+        'tl': 'google.tl',      'tm': 'google.tm',      'tn': 'google.tn',
+        'to': 'google.to',      'tr': 'google.com.tr',  'tt': 'google.tt',
+        'tw': 'google.com.tw',  'tz': 'google.co.tz',   'ua': 'google.com.ua',
+        'ug': 'google.co.ug',   'uk': 'google.co.uk',   'uy': 'google.com.uy',
+        'uz': 'google.co.uz',   'vc': 'google.com.vc',  've': 'google.co.ve',
+        'vg': 'google.vg',      'vi': 'google.co.vi',   'vn': 'google.com.vn',
+        'vu': 'google.vu',      'ws': 'google.ws',      'za': 'google.co.za',
+        'zm': 'google.co.zm',   'zw': 'google.co.zw',
+    }
 
-    return "www.google.com"
+    try:
+        # Use www subdomain
+        return 'www.' + tld_to_domain_map[tld]
+    except KeyError:
+        return 'www.google.com'
 
 
 # Send a GET request to Google with the appropriate headers.
@@ -421,7 +485,7 @@ addarg('-n', dest='num', type=int, metavar='N',
        help='show N results (default 10)')
 addarg('-N', dest='news', action='store_true',
        help='show results from news section')
-addarg('-c', dest='country', metavar='SERV',
+addarg('-c', dest='tld', metavar='TLD',
        help='country-specific search (refer man or project page for details)')
 addarg('-l', dest='lang', metavar='LANG',
        help='display in language LANG')
@@ -449,8 +513,8 @@ if args.start:
 if args.num:
     num = str(args.num)
 news = args.news
-if args.country:
-    server = serverURL(args.country)
+if args.tld:
+    server = server_url(args.tld)
 lang = args.lang
 exact = args.exact
 colorize = args.colorize
