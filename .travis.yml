@@ -10,4 +10,4 @@ matrix:
   allow_failures:
     - python: "nightly"
 script:
-  - PYTHONIOENCODING=utf-8 PATH=$PWD:$PATH ./test --ci
+  - PATH=$PWD:$PATH ./test --ci

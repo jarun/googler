@@ -54,6 +54,11 @@ else:
     from urlparse import urljoin
     from httplib import HTTPSConnection
 
+    # Set the encoding of standard streams to UTF-8 (unnecessary for Python 3)
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr)
+
 
 # Global variables
 
