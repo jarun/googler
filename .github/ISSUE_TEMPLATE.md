@@ -12,3 +12,5 @@ If we need more information and there is no communication from the bug reporter 
   
 #### Feature requests
 Please consider contributing the feature back to `googler` yourself. Feel free to discuss. We are more than happy to help.
+
+---
