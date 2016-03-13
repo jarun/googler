@@ -123,7 +123,12 @@ class GoogleParser(HTMLParser.HTMLParser):
             self.handle_endtag = self.div_inner_end
 
     def div_outer_data(self, data):
-        pass
+        global news
+
+        if news:
+            self.text += data
+        else:
+            pass
 
     def div_outer_end(self, tag):
         global skipped
