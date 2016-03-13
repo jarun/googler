@@ -18,8 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function
+import argparse
 import fcntl
-import getopt
 import gzip
 import io
 import os
@@ -27,6 +27,7 @@ import readline
 import struct
 import sys
 import tempfile
+import textwrap
 import termios
 import webbrowser
 
@@ -308,37 +309,6 @@ def is_int(string):
     except:
         return False
 
-
-def usage():
-    print("Usage: googler [OPTIONS] KEYWORDS...")
-    print("Performs a Google search and prints the results to stdout.\n")
-    print("Options")
-    print("  -s N     start at the Nth result")
-    print("  -n N     show N results (default 10)")
-    print("  -N       show results from news section")
-    print("  -c SERV  country-specific search (refer man or project page for" +
-          " details)")
-    print("  -l LANG  display in language LANG, such as fi for Finnish")
-    print("  -x       disable automatic spelling correction")
-    print("  -C       disable color output")
-    print("  -j       open the first result in a web browser")
-    print("  -t dN    time limit search [h5 (5 hrs), d5 (5 days), " +
-          "w5 (5 weeks), m5 (5 months), y5 (5 years)]")
-    print("  -d       enable debugging\n")
-    print("Prompt Keys")
-    print("  g terms  initiate a new search for 'terms' with original options")
-    print("  n, p     fetch next or previous set of search results")
-    print("  1-N      open the Nth result index in browser")
-    print("  Enter    exit googler (same behaviour for an empty search)")
-    print("  *        any other string initiates a new search with original" +
-          " options\n")
-    print("Version 2.2")
-    print("Copyright (C) 2008 Henri Hakkinen.")
-    print("Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>")
-    print("Webpage: https://github.com/jarun/googler")
-    sys.exit(1)
-
-
 def serverURL(domain):
     # Google domain ref: https://en.wikipedia.org/wiki/List_of_Google_domains
     # www.google.co.domain
@@ -396,58 +366,94 @@ def show_omniprompt():
 optlist = None
 keywords = None
 
-if len(sys.argv) < 2:
-    usage()
+class ExtendedArgumentParser(argparse.ArgumentParser):
 
-try:
-    optlist, keywords = getopt.getopt(sys.argv[1:], "s:n:c:l:t:NCjdx")
-    for opt in optlist:
-        if opt[0] == "-s":
-            # Option -s N
-            if not opt[1].isdigit():
-                print("googler: option -s needs an integer")
-                sys.exit(1)
-            start = opt[1]
-        elif opt[0] == "-n":
-            # Option -n N
-            if not opt[1].isdigit():
-                print("googler: option -n needs an integer")
-                sys.exit(1)
-            num = opt[1]
-        elif opt[0] == "-N":
-            news = True
-        elif opt[0] == "-c":
-            server = serverURL(opt[1])
-        elif opt[0] == "-l":
-            # Option -l LANG
-            lang = opt[1]
-        elif opt[0] == "-C":
-            # Option -C
-            colorize = False
-        elif opt[0] == "-j":
-            # Option -j
-            openUrl = True
-            if num is None:
-                num = "3"
-        elif opt[0] == "-t":
-            # Option -t dN
-            duration = opt[1]
-            if opt[1][0] not in ("h", "d", "w", "m", "y",):
-                usage()
-                sys.exit(1)
-            if not opt[1][1].isdigit():
-                usage()
-                sys.exit(1)
-        elif opt[0] == "-x":
-            # Option -x
-            exact = True
-        elif opt[0] == "-d":
-            debug = True
-    if len(keywords) < 1:
-        usage()
-except getopt.GetoptError as e:
-    print("googler:", e)
+    # Augment print_help to print more than synopsis and options
+    def print_help(self, file=None):
+        super(ExtendedArgumentParser, self).print_help(file)
+        file.write(textwrap.dedent("""
+        prompt keys:
+          g terms  initiate a new search for 'terms' with original options
+          n, p     fetch next or previous set of search results
+          1-N      open the Nth result index in browser
+          Enter    exit googler (same behaviour for an empty search)
+          *        any other string initiates a new search with original options
+
+        Version 2.2
+        Copyright (C) 2008 Henri Hakkinen.
+        Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>
+        Webpage: https://github.com/jarun/googler
+        """))
+
+    # Automatically print full help text on error
+    def error(self, message):
+        sys.stderr.write('%s: error: %s\n\n' % (self.prog, message))
+        self.print_help(sys.stderr)
+        self.exit(2)
+
+def is_duration(arg):
+    """Check if a string is a valid duration accepted by Google.
+
+    A valid duration is of the form dNUM, where d is a single letter h
+    (hour), d (day), w (week), m (month), or y (year), and NUM is a
+    nonnegative integer.
+    """
+    try:
+        if arg[0] not in ('h', 'd', 'w', 'm', 'y') or int(arg[1:]) < 0:
+            raise ValueError
+    except (TypeError, IndexError, ValueError):
+        raise argparse.ArgumentTypeError('%s is not a valid duration' % arg)
+    return arg
+
+argparser = ExtendedArgumentParser(
+    add_help=False,
+    description='Performs a Google search and prints the results to stdout.'
+)
+addarg = argparser.add_argument
+addarg('-s', dest='start', type=int, metavar='N',
+       help='start at the Nth result')
+addarg('-n', dest='num', type=int, metavar='N',
+       help='show N results (default 10)')
+addarg('-N', dest='news', action='store_true',
+       help='show results from news section')
+addarg('-c', dest='country', metavar='SERV',
+       help='country-specific search (refer man or project page for details)')
+addarg('-l', dest='lang', metavar='LANG',
+       help='display in language LANG')
+addarg('-x', dest='exact', action='store_true',
+       help='disable automatic spelling correction')
+addarg('-C', dest='colorize', action='store_false',
+       help='disable color output')
+addarg('-j', dest='openUrl', action='store_true',
+       help='open the first result in a web browser')
+addarg('-t', dest='duration', type=is_duration, metavar='dN',
+       help='time limit search '
+       '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
+addarg('-d', dest='debug', action='store_true',
+       help='enable debugging')
+addarg('keywords', nargs='+', metavar='KEYWORD',
+       help='search keywords')
+
+if len(sys.argv) < 2:
+    argparser.print_help(sys.stderr)
     sys.exit(1)
+
+args = argparser.parse_args()
+if args.start:
+    start = str(args.start)
+if args.num:
+    num = str(args.num)
+news = args.news
+if args.country:
+    server = serverURL(args.country)
+lang = args.lang
+exact = args.exact
+colorize = args.colorize
+openUrl = args.openUrl
+duration = args.duration
+debug = args.debug
+keywords = args.keywords
+
 
 # Construct the query URL.
 url = "/search?ie=UTF-8&oe=UTF-8&"
