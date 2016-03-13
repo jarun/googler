@@ -18,34 +18,42 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function
-import sys
-import os
-import termios
 import fcntl
-import struct
-import webbrowser
+import getopt
 import gzip
-from getopt import getopt, GetoptError
+import io
+import os
 import readline
+import struct
+import sys
 import tempfile
-# Try to load Py3 modules, on error fall back to Py2 module names
-try:
-    from io import BytesIO
+import termios
+import webbrowser
+
+# 2to3 compatibility layer
+if sys.version_info > (3,):
     from html.entities import name2codepoint
     import html.parser as HTMLParser
-    from urllib.parse import urljoin, quote_plus, unquote
+    from urllib.parse import (
+        urljoin,
+        quote_plus as url_quote_plus,
+        unquote as url_unquote,
+    )
+    from urllib.parse import unquote as url_unquote
     from http.client import HTTPSConnection
-except ImportError:
-    import StringIO
-    from htmlentitydefs import name2codepoint
-    import HTMLParser
-    from urlparse import urljoin
-    from urllib import quote_plus, unquote
-    from httplib import HTTPSConnection
-# Additional compatibility layer
-if sys.version_info > (3,):
+
     unichr = chr
     raw_input = input
+else:
+    from htmlentitydefs import name2codepoint
+    import HTMLParser
+    from urllib import (
+        quote_plus as url_quote_plus,
+        unquote as url_unquote,
+    )
+    from urlparse import urljoin
+    from httplib import HTTPSConnection
+
 
 # Global variables
 
@@ -124,10 +132,11 @@ class GoogleParser(HTMLParser.HTMLParser):
                 self.url = self.url[:marker]
 
             if self.url != "":
-                if (self.url.find("://", 0, 12) >= 0):
+                if self.url.find("://", 0, 12) >= 0:
                     index = len(self.results) + 1
                     self.results.append(Result(index, self.title,
-                                    unquote(self.url), self.text))
+                                               url_unquote(self.url),
+                                               self.text))
                 else:
                     skipped += 1
 
@@ -391,7 +400,7 @@ if len(sys.argv) < 2:
     usage()
 
 try:
-    optlist, keywords = getopt(sys.argv[1:], "s:n:c:l:t:NCjdx")
+    optlist, keywords = getopt.getopt(sys.argv[1:], "s:n:c:l:t:NCjdx")
     for opt in optlist:
         if opt[0] == "-s":
             # Option -s N
@@ -423,7 +432,7 @@ try:
         elif opt[0] == "-t":
             # Option -t dN
             duration = opt[1]
-            if not opt[1][0] in ("h", "d", "w", "m", "y",):
+            if opt[1][0] not in ("h", "d", "w", "m", "y",):
                 usage()
                 sys.exit(1)
             if not opt[1][1].isdigit():
@@ -436,7 +445,7 @@ try:
             debug = True
     if len(keywords) < 1:
         usage()
-except GetoptError as e:
+except getopt.GetoptError as e:
     print("googler:", e)
     sys.exit(1)
 
@@ -454,7 +463,7 @@ if lang is not None:
 if duration is not None:
     url += "tbs=qdr:" + duration + "&"
 if exact:
-    url  += "nfpr=1&"
+    url += "nfpr=1&"
 
 baseurl = url
 basestart = start
@@ -462,9 +471,9 @@ basestart = start
 if debug:
     print("[DEBUG] Base URL [%s]" % url)
 
-url += "q=" + quote_plus(keywords[0])
+url += "q=" + url_quote_plus(keywords[0])
 for kw in keywords[1:]:
-    url += "+" + quote_plus(kw)
+    url += "+" + url_quote_plus(kw)
 
 if debug:
     print("[DEBUG] Search URL [%s : %s]" % (server, url))
@@ -509,7 +518,7 @@ def fetch_results():
             conn.close()
             if debug:
                 print("[DEBUG] Next Server [%s]" % url[url.find("//") +
-                      2:url.find("/search")])
+                                                       2:url.find("/search")])
             conn = new_connection(url[url.find("//") + 2:url.find("/search")])
             url = url[url.find("/search"):]
             if debug:
@@ -533,11 +542,7 @@ def fetch_results():
 
     # Parse the HTML document and print the results.
     parser = GoogleParser()
-
-    if sys.version_info > (3,):
-        resp_body = gzip.GzipFile(fileobj = BytesIO(resp.read())).read().decode('utf-8')
-    else:
-        resp_body = gzip.GzipFile(fileobj = StringIO.StringIO(resp.read())).read().decode('utf-8')
+    resp_body = gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8')
 
     if debug:
         fd, tmpfile = tempfile.mkstemp(prefix='googler-response-')
@@ -585,7 +590,7 @@ while True:
             start = str(int(start) - int(num))
         else:
             start = str(int(start) - 10)
-        print("");
+        print("")
     elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
         trimsearch = nav[2:].strip().replace(" ", "+")
         if trimsearch == "":
