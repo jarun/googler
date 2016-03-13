@@ -126,7 +126,10 @@ class GoogleParser(HTMLParser.HTMLParser):
         global news
 
         if news:
-            self.text += data
+            if data == '-':
+                self.text += ', '
+            else:
+                self.text += data
         else:
             pass
 
