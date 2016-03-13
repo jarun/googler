@@ -40,7 +40,6 @@ if sys.version_info > (3,):
         quote_plus as url_quote_plus,
         unquote as url_unquote,
     )
-    from urllib.parse import unquote as url_unquote
     from http.client import HTTPSConnection
 
     unichr = chr
