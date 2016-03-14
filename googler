@@ -436,6 +436,53 @@ def show_omniprompt():
         return raw_input("%s: " % message)
 
 
+# Messaging wrappers
+
+# Print message, led with [%(level)s] where level is a string, to
+# stderr.  If ansi is not None and the global variable colorize is True,
+# then print ansi at the beginning, and close with \x1b[0m.
+def message(msg, level="INFO", ansi=None):
+    global colorize
+
+    if ansi is not None and colorize:
+        opening = ansi
+        closing = "\x1b[0m"
+    else:
+        opening = closing = ""
+    print("{opening}[{level}] {msg}{closing}".format(
+        opening=opening, level=level, msg=msg, closing=closing
+    ), file=sys.stderr)
+
+
+# Print error message.
+def error(msg):
+    # Error in red if colorize
+    message(msg, "ERROR", "\x1b[31m")
+
+
+# Print warning message.
+def warning(msg):
+    # Warning in yellow if colorize
+    message(msg, "WARNING", "\x1b[33m")
+
+
+# Print debug message.
+#
+# debugp stands for "debug print". The name `debug' was already taken,
+# so we had to choose something else.
+def debugp(msg):
+    global debug
+
+    if debug:
+        # Debugging messages not colorized
+        message(msg, "DEBUG")
+
+
+# Print message, verbatim, to stderr.
+def printerr(msg):
+    print(msg, file=sys.stderr)
+
+
 # Program Main
 
 # Process command line options.
@@ -552,15 +599,13 @@ if exact:
 baseurl = url
 basestart = start
 
-if debug:
-    print("[DEBUG] Base URL [%s]" % url)
+debugp("Base URL [%s]" % url)
 
 url += "q=" + url_quote_plus(keywords[0])
 for kw in keywords[1:]:
     url += "+" + url_quote_plus(kw)
 
-if debug:
-    print("[DEBUG] Search URL [%s : %s]" % (server, url))
+debugp("Search URL [%s : %s]" % (server, url))
 
 # Get the terminal window size.
 try:
@@ -584,8 +629,7 @@ def fetch_results():
     try:
         resp = google_get(conn, url)
     except Exception as e:
-        if debug:
-            print("[DEBUG] Exception: %s" % e)
+        debugp("Exception: %s" % e)
         conn.close()
         conn = new_connection()
         resp = google_get(conn, url)
@@ -593,35 +637,32 @@ def fetch_results():
     if resp.status != 200:
         if resp.status in (301, 302,):
             url = urljoin(url, resp.getheader('location', ''))
-            if debug:
-                print("[DEBUG] Redirected URL [%s]" % url)
+            debugp("Redirected URL [%s]" % url)
             if url.find("sorry/IndexRedirect?") >= 0:
-                print("ERROR: Connection blocked due to unusual activity.")
+                error("Connection blocked due to unusual activity.")
                 quit(conn)
 
             conn.close()
-            if debug:
-                print("[DEBUG] Next Server [%s]" % url[url.find("//") +
-                                                       2:url.find("/search")])
-            conn = new_connection(url[url.find("//") + 2:url.find("/search")])
+            next_server = url[(url.find("//") + 2):url.find("/search")]
+            debugp("Next Server [%s]" % next_server)
+            conn = new_connection(next_server)
             url = url[url.find("/search"):]
-            if debug:
-                print("[DEBUG] Next GET [%s]" % url)
+            debugp("Next GET [%s]" % url)
 
             try:
                 resp = google_get(conn, url)
             except Exception as e:
-                print("[DEBUG] Exception: %s" % e)
+                debugp("Exception: %s" % e)
                 quit(conn)
 
             if resp.status != 200:
                 # Failed connecting to redirected server too!
-                print("ERROR after 1st redirection:", str(resp.status), ": ",
-                      resp.reason)
+                error("First redirection failed with HTTP %d: %s" %
+                      (resp.status, resp.reason))
                 quit(conn)
         else:
             # The server responded with an error.
-            print("ERROR:", str(resp.status), ": ", resp.reason)
+            error("HTTP %d: %s" % (resp.status, resp.reason))
             quit(conn)
 
     # Parse the HTML document and print the results.
@@ -633,7 +674,7 @@ def fetch_results():
         os.close(fd)
         with open(tmpfile, 'wb') as fp:
             fp.write(resp_body.encode('utf-8'))
-        print("[DEBUG] Response body written to '%s'.\n" % tmpfile)
+        debugp("Response body written to '%s'.\n" % tmpfile)
 
     parser.feed(resp_body)
 
@@ -643,9 +684,9 @@ def fetch_results():
 
     if skipped:
         if skipped == 1:
-            print("%d ad skipped." % skipped)
+            printerr("%d ad skipped." % skipped)
         else:
-            print("%d ads skipped." % skipped)
+            printerr("%d ads skipped." % skipped)
 
         skipped = 0
 
@@ -668,51 +709,49 @@ while True:
             start = str(int(start) + int(num))
         else:
             start = str(int(start) + 10)
-        print("")
+        printerr("")
     elif nav == "p":
         if num is not None:
             start = str(int(start) - int(num))
         else:
             start = str(int(start) - 10)
-        print("")
+        printerr("")
     elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
         trimsearch = nav[2:].strip().replace(" ", "+")
         if trimsearch == "":
-            print("Empty search. Exiting.")
+            printerr("Empty search. Exiting.")
             break
         url = baseurl + "q=" + trimsearch
-        if debug:
-            print("New search URL [%s]" % url)
+        debugp("New search URL [%s]" % url)
         nav = "g"
         start = basestart
-        print("")
+        printerr("")
         continue
     elif is_int(nav):
         index = int(nav) - 1
         if index < 0:
             if index < -1:
-                print("Index out of bound.")
+                printerr("Index out of bound.")
             else:
-                print("Index out of bound. To search %s, try \'g %s\'." % (nav, nav))
+                printerr("Index out of bound. To search %s, try \'g %s\'." % (nav, nav))
             continue
 
         try:
             results[index].open()
         except IndexError:
-            print("Index out of bound. To search %s, try \'g %s\'." % (nav, nav))
+            printerr("Index out of bound. To search %s, try \'g %s\'." % (nav, nav))
 
         continue
     elif len(nav):
         trimsearch = nav.strip().replace(" ", "+")
         if trimsearch == "":
-            print("Empty search. Exiting.")
+            printerr("Empty search. Exiting.")
             break
         url = baseurl + "q=" + trimsearch
-        if debug:
-            print("New search URL [%s]" % url)
+        debugp("New search URL [%s]" % url)
         nav = "g"
         start = basestart
-        print("")
+        printerr("")
         continue
     else:
         break
@@ -721,7 +760,6 @@ while True:
         start = "0"
 
     url = url.replace("start=" + oldstart + "&", "start=" + start + "&", 1)
-    if debug:
-        print("[DEBUG] Next URL [%s]\n" % url)
+    debugp("Next URL [%s]\n" % url)
 
 conn.close()
