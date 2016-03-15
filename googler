@@ -24,6 +24,7 @@ import gzip
 import io
 import os
 import readline
+import signal
 import struct
 import sys
 import tempfile
@@ -58,6 +59,15 @@ else:
     import codecs
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
     sys.stderr = codecs.getwriter('utf-8')(sys.stderr)
+
+
+# Install SIGINT handler
+
+def sigint_handler(signum, frame):
+    print('\nInterrupted.', file=sys.stderr)
+    sys.exit(1)
+
+signal.signal(signal.SIGINT, sigint_handler)
 
 
 # Global variables
