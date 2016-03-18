@@ -60,6 +60,120 @@ Any other string initiates a new search with original options.
 .BI BROWSER
 Overrides the default browser. Ref:
 .I http://docs.python.org/library/webbrowser.html
+.SH EXAMPLES
+.PP
+.IP 1. 4
+Google \fBhello world\fR:
+.PP
+.EX
+.IP
+.B googler hello world
+.EE
+.PP
+.IP 2. 4
+Fetch \fB15 results\fR updated within last \fB14 months\fR, starting from the \fB3rd result\fR for the string \fBcmdline utility\fR in \fBsite\fR tuxdiary.com:
+.PP
+.EX
+.IP
+.B googler -n 15 -s 3 -t m14 cmdline utility site:tuxdiary.com
+.EE
+.PP
+.IP 3. 4
+Read recent \fBnews\fR on gadgets:
+.PP
+.EX
+.IP
+.B googler -N gadgets
+.EE
+.PP
+.IP 4. 4
+Fetch results on IPL cricket from \fBGoogle India\fR server in \fBEnglish\fR:
+.PP
+.EX
+.IP
+.B googler -c in -l en IPL cricket
+.EE
+.PP
+.IP 5. 4
+Search quoted text e.g. \fBit's a "beautiful world" in spring\fR:
+.PP
+.EX
+.IP
+.B googler it\(rs's a \(rs\(dqbeautiful world\(rs\(dq in spring
+.EE
+.PP
+.IP 6. 4
+Search for a \fBspecific file type\fR:
+.PP
+.EX
+.IP
+.B googler instrumental filetype:mp3
+.EE
+.PP
+.IP 7. 4
+Disable \fBautomatic spelling correction\fR, e.g. fetch results for \fIgoogler\fR instead of \fIgoogle\fR:
+.PP
+.EX
+.IP
+.B googler -x googler
+.EE
+.PP
+.IP 8. 4
+\fBI'm feeling lucky\fR search:
+.PP
+.EX
+.IP
+.B googler -j leather jackets
+.EE
+.PP
+.IP 9. 4
+\fBWebsite specific\fR search alias:
+.PP
+.EX
+.IP
+.B alias t='googler -n 7 site:tuxdiary.com'
+.EE
+.PP
+.IP 10. 4
+Alias to find \fBdefinitions of words\fR:
+.PP
+.EX
+.IP
+.B alias define='googler -n 2 define'
+.EE
+.PP
+.IP 11. 4
+Look up \fBn\fR, \fBp\fR, \fBg co\fR or a number at the \fBnavigation prompt\fR: As the navigation prompt recognizes \fBn\fR, \Bp\fR, \fBg\fR or numbers as commands, you need to prefix them with \fBg\fR, e.g.,
+.PP
+.EX
+.PD 0
+.IP
+.B g n
+.IP
+.B g g keywords
+.IP
+.B g 1984
+.PD
+.EE
+.PP
+.IP 12. 4
+Input and output \fBredirection\fR:
+.PP
+.EX
+.IP
+.B googler -C hello world < input > output
+.EE
+.PP
+.IP "" 4
+Note that \fI-C\fR is required to avoid printing control characters (for colored output).
+.PP
+.IP 13. 4
+\fBPiping\fR `googler` output:
+.PP
+.EX
+.IP
+.B googler -C hello world | tee output
+.EE
 .SH AUTHOR
 Written by Henri Hakkinen. Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>.
 .SH HOME
