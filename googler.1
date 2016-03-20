@@ -7,7 +7,7 @@ googler \- Google from command line
 .I KEYWORDS...
 .SH DESCRIPTION
 .B googler
-is a command line tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. There is no configuration file as aliases serve the same purpose for this utility. Supports sequential searches in a single instance.
+is a command line tool to search Google (Web & News) from the terminal. Google site search works too. \fBgoogler\fR shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. There is no configuration file as aliases serve the same purpose for this utility. Supports sequential searches in a single instance.
 .SH OPTIONS
 .TP
 .BI \-s " N"
@@ -130,11 +130,15 @@ Disable \fBautomatic spelling correction\fR, e.g. fetch results for \fIgoogler\f
 .EE
 .PP
 .IP 9. 4
-\fBWebsite specific\fR search alias:
+\fBWebsite specific\fR search:
 .PP
 .EX
 .IP
-.B alias t='googler -n 7 site:tuxdiary.com'
+.B googler -w tuxdiary.com hello world
+.EE
+.PP
+.IP "" 4
+Site specific search continues as omniprompt. Use the \fBg\fR key to run a regular Google search.
 .EE
 .PP
 .IP 10. 4
@@ -171,7 +175,7 @@ Input and output \fBredirection\fR:
 Note that \fI-C\fR is required to avoid printing control characters (for colored output).
 .PP
 .IP 13. 4
-\fBPiping\fR `googler` output:
+\fBPipe\fR output:
 .PP
 .EX
 .IP
