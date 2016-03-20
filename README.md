@@ -192,7 +192,7 @@ Windows users can refer to [this discussion](http://stackoverflow.com/questions/
 9. **Website specific** search:
 
         $ googler -w tuxdiary.com hello world
-Site specific search continues as omniprompt. Use the `g` key to do a regular Google search.
+Site specific search continues as omniprompt. Use the `g` key to run a regular Google search.
 10. Alias to find **definitions of words**:
 
         alias define='googler -n 2 define'
@@ -205,7 +205,7 @@ Site specific search continues as omniprompt. Use the `g` key to do a regular Go
 
     Note that `-C` is required to avoid printing control characters (for colored output).
 
-13. **Piping** `googler` output:
+13. **Pipe** output:
 
         $ googler -C hello world | tee output
 
