@@ -85,6 +85,7 @@ skipped = 0       # Count for skipped ads or blank links
 debug = False     # Print debug logs
 news = False      # Read news
 exact = False     # If True, disable automatic spelling correction
+insite = None     # Google search a specific site
 server = "www.google.com"
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
@@ -506,11 +507,11 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
         super(ExtendedArgumentParser, self).print_help(file)
         file.write(textwrap.dedent("""
         prompt keys:
-          g terms  initiate a new search for 'terms' with original options
-          n, p     fetch next or previous set of search results
-          1-N      open the Nth result index in browser
-          Enter    exit googler (same behaviour for an empty search)
-          *        any other string initiates a new search with original options
+          g terms     initiate a new Google search for 'terms' with original options
+          n, p        fetch next or previous set of search results
+          1-N         open the Nth result index in browser
+          Enter       exit googler (same behaviour for an empty search)
+          *           any other string initiates a new search with original options
 
         Version 2.2
         Copyright (C) 2008 Henri Hakkinen.
@@ -564,6 +565,8 @@ addarg('-j', dest='openUrl', action='store_true',
 addarg('-t', dest='duration', type=is_duration, metavar='dN',
        help='time limit search '
        '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
+addarg('-w', dest='insite', metavar='website',
+       help='search a site using Google')
 addarg('-d', dest='debug', action='store_true',
        help='enable debugging')
 addarg('keywords', nargs='+', metavar='KEYWORD',
@@ -588,6 +591,7 @@ openUrl = args.openUrl
 duration = args.duration
 debug = args.debug
 keywords = args.keywords
+insite = args.insite
 
 
 # Construct the query URL.
@@ -614,6 +618,8 @@ debugp("Base URL [%s]" % url)
 url += "q=" + url_quote_plus(keywords[0])
 for kw in keywords[1:]:
     url += "+" + url_quote_plus(kw)
+if insite is not None:
+    url += "+site:" + url_quote_plus(insite)
 
 debugp("Search URL [%s : %s]" % (server, url))
 
@@ -731,7 +737,7 @@ while True:
         if trimsearch == "":
             printerr("Empty search. Exiting.")
             break
-        url = baseurl + "q=" + trimsearch
+        url = baseurl + "q=" + url_quote_plus(trimsearch)
         debugp("New search URL [%s]" % url)
         nav = "g"
         start = basestart
@@ -757,7 +763,9 @@ while True:
         if trimsearch == "":
             printerr("Empty search. Exiting.")
             break
-        url = baseurl + "q=" + trimsearch
+        url = baseurl + "q=" + url_quote_plus(trimsearch)
+        if insite is not None:
+            url += "+site:" + url_quote_plus(insite)
         debugp("New search URL [%s]" % url)
         nav = "g"
         start = basestart

@@ -33,6 +33,7 @@ If you find `googler` useful, please consider donating via PayPal.
 - Start at n<sup>th</sup> result
 - Fetch and navigate next or previous set of results
 - Continuous search: fire new searches without exiting
+- Search any website using Google
 - Reconnect on new search even if connection is closed due to inactivity
 - Disable automatic spelling correction and search exact keywords (default: enabled)
 - Easily open result URLs in browser from cmdline using index number
@@ -126,10 +127,11 @@ optional arguments:
   -j       open the first result in a web browser
   -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5
            months), y5 (5 years)]
+  -w       search a site using Google
   -d       enable debugging
 
 prompt keys:
-  g terms  initiate a new search for 'terms' with original options
+  g terms  initiate a new Google search for 'terms' with original options
   n, p     fetch next or previous set of search results
   1-N      open the Nth result index in browser
   Enter    exit googler (same behaviour for an empty search)
