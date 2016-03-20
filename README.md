@@ -163,7 +163,7 @@ Windows users can refer to [this discussion](http://stackoverflow.com/questions/
 
 2. Fetch **15 results** updated within last **14 months**, starting from the **3<sup>rd</sup> result** for the string **cmdline utility** in **site** tuxdiary.com:
 
-        $ googler -n 15 -s 3 -t m14 cmdline utility site:tuxdiary.com
+        $ googler -n 15 -s 3 -t m14 -w tuxdiary.com cmdline utility
 
 3. Read recent **news** on gadgets:
 
