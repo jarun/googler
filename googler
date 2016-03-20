@@ -496,7 +496,7 @@ def printerr(msg):
 
 # Program Main
 
-# Process command line options.
+# Process command-line options.
 optlist = None
 keywords = None
 
@@ -541,7 +541,7 @@ def is_duration(arg):
 
 argparser = ExtendedArgumentParser(
     add_help=False,
-    description='Perform a Google search and print results to stdout.'
+    description='Google from the command-line.'
 )
 addarg = argparser.add_argument
 addarg('-s', dest='start', type=int, metavar='N',

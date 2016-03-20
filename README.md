@@ -109,7 +109,7 @@ If you installed to a different prefix, you'll need to specify the same `PREFIX`
                [-d]
                KEYWORD [KEYWORD ...]
 
-Perform a Google search and print results to stdout.
+Google from the command-line.
 
 positional arguments:
   KEYWORD  search keywords
