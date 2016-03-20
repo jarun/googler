@@ -192,7 +192,7 @@ Windows users can refer to [this discussion](http://stackoverflow.com/questions/
 9. **Website specific** search:
 
         $ googler -w tuxdiary.com hello world
-Site specific search continues as omniprompt. Use the `g` key to run a regular Google search.
+Site specific search continues at omniprompt. Use the `g` key to run a regular Google search.
 10. Alias to find **definitions of words**:
 
         alias define='googler -n 2 define'
