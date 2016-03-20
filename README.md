@@ -2,7 +2,7 @@
 
 ![Screenshot](http://i.imgur.com/DlXq7MI.png)
 
-`googler` is a command-line power tool to search Google (Web & News) from the terminal. It shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. Supports sequential searches in a single instance.
+`googler` is a command-line power tool to search Google (Web & News) from the terminal. Google site search works too. `googler` shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. Supports sequential searches in a single instance.
 
 `googler` is **GPLv3** licensed. It doesn't have any affiliation to Google in any way.
 
@@ -33,7 +33,7 @@ If you find `googler` useful, please consider donating via PayPal.
 - Start at n<sup>th</sup> result
 - Fetch and navigate next or previous set of results
 - Continuous search: fire new searches without exiting
-- Search any website using Google
+- Search any website using Google (like Google Site Search)
 - Reconnect on new search even if connection is closed due to inactivity
 - Disable automatic spelling correction and search exact keywords (default: enabled)
 - Easily open result URLs in browser from cmdline using index number
@@ -189,10 +189,10 @@ Windows users can refer to [this discussion](http://stackoverflow.com/questions/
 
         $ googler -j leather jackets
 
-9. **Website specific** search alias:
+9. **Website specific** search:
 
-        alias t='googler -n 7 site:tuxdiary.com'
-
+        $ googler -w tuxdiary.com hello world
+Site specific search continues as omniprompt. Use the `g` key to do a regular Google search.
 10. Alias to find **definitions of words**:
 
         alias define='googler -n 2 define'
