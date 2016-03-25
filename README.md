@@ -20,6 +20,7 @@ If you find `googler` useful, please consider donating via PayPal.
         - [Running as a standalone utility](#running-as-a-standalone-utility)
     - [Installing with a package manager](#installing-with-a-package-manager)
 - [Usage](#usage)
+-   - [cmdline options](#cmdline-options)
     - [Configuration file](#configuration-file)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
@@ -104,6 +105,8 @@ If you installed to a different prefix, you'll need to specify the same `PREFIX`
 - [Homebrew](http://braumeister.org/formula/googler) for OS X, or its Linux fork, [Linuxbrew](https://github.com/Linuxbrew/linuxbrew/blob/master/Library/Formula/googler.rb).
 
 # Usage
+
+## cmdline options
 
 <pre>usage: googler [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C] [-j] [-t dN]
                [-d]
