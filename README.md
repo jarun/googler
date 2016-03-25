@@ -20,7 +20,7 @@ If you find `googler` useful, please consider donating via PayPal.
         - [Running as a standalone utility](#running-as-a-standalone-utility)
     - [Installing with a package manager](#installing-with-a-package-manager)
 - [Usage](#usage)
--   - [cmdline options](#cmdline-options)
+    - [cmdline options](#cmdline-options)
     - [Configuration file](#configuration-file)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
