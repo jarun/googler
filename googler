@@ -497,7 +497,6 @@ def printerr(msg):
 # Program Main
 
 # Process command-line options.
-optlist = None
 keywords = None
 
 class ExtendedArgumentParser(argparse.ArgumentParser):
