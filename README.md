@@ -42,6 +42,7 @@ If you find `googler` useful, please consider donating via PayPal.
 - Show full contextual text snippet in search results
 - Specify search duration (in hours / days / weeks / months / years)
 - Fetch results from Google News section
+- Supports both long and short program options
 - Country/domain specific search (28 top-level domains supported, default: .com)
 - Supports Google search keywords like `filetype:mime`, `site:somesite.com` etc.
 - Open filetype specific links in browser, the links are handled by browser for the type
