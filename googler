@@ -506,11 +506,11 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
         super(ExtendedArgumentParser, self).print_help(file)
         file.write(textwrap.dedent("""
         prompt keys:
-          g terms     initiate a new Google search for 'terms' with original options
-          n, p        fetch next or previous set of search results
-          1-N         open the Nth result index in browser
-          Enter       exit googler (same behaviour for an empty search)
-          *           any other string initiates a new search with original options
+          g terms               initiate a new Google search for 'terms' with original options
+          n, p                  fetch next or previous set of search results
+          1-N                   open the Nth result index in browser
+          q, Enter              exit googler (same behaviour for an empty search)
+          *                     any other string initiates a new search with original options
 
         Version 2.2
         Copyright (C) 2008 Henri Hakkinen.
@@ -732,6 +732,8 @@ while True:
         else:
             start = str(int(start) - 10)
         printerr("")
+    elif nav == "q":
+        break
     elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
         trimsearch = nav[2:].strip().replace(" ", "+")
         if trimsearch == "":
