@@ -109,29 +109,34 @@ If you installed to a different prefix, you'll need to specify the same `PREFIX`
 ## Cmdline options
 
 <pre>usage: googler [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C] [-j] [-t dN]
-               [-d]
+               [-w SITE] [-d]
                KEYWORD [KEYWORD ...]
 
 Google from the command-line.
 
 positional arguments:
-  KEYWORD  search keywords
+  KEYWORD               search keywords
 
 optional arguments:
-  -s N     start at the Nth result
-  -n N     show N results (default 10)
-  -N       show results from news section
-  -c TLD   country-specific search with top-level domain .TLD, e.g., 'in' for
-           India (see <a href="https://en.wikipedia.org/wiki/List_of_Google_domains" target="_blank">https://en.wikipedia.org/wiki/List_of_Google_domains</a> for
-           a full list of TLDs)
-  -l LANG  display in language LANG
-  -x       disable automatic spelling correction
-  -C       disable color output
-  -j       open the first result in a web browser
-  -t dN    time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5
-           months), y5 (5 years)]
-  -w       search a site using Google
-  -d       enable debugging
+  -s N, --start N       start at the Nth result
+  -n N, --number N, --count N
+                        show N results (default 10)
+  -N, --news            show results from news section
+  -c TLD, --country TLD, --tld TLD
+                        country-specific search with top-level domain .TLD,
+                        e.g., 'in' for India (see
+                        <a href="https://en.wikipedia.org/wiki/List_of_Google_domains" target="_blank">https://en.wikipedia.org/wiki/List_of_Google_domains</a>
+                        for a full list of TLDs)
+  -l LANG, --lang LANG  display in language LANG
+  -x, --exact, --nocorrect
+                        disable automatic spelling correction
+  -C, --nocolor         disable color output
+  -j, --first, --lucky  open the first result in a web browser
+  -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
+                        weeks), m5 (5 months), y5 (5 years)]
+  -w SITE, --website SITE, --site SITE
+                        search a site using Google
+  -d, --debug           enable debugging
 
 prompt keys:
   g terms  initiate a new Google search for 'terms' with original options
