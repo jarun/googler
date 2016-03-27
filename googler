@@ -762,7 +762,7 @@ while True:
         continue
     elif len(nav):
         trimsearch = nav.strip().replace(" ", "+")
-        if trimsearch == "":
+        if trimsearch == "" or trimsearch == "g":
             printerr("Empty search. Exiting.")
             break
         url = baseurl + "q=" + url_quote_plus(trimsearch)
