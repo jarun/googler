@@ -90,6 +90,7 @@ server = "www.google.com"
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
                   # Disguise as Microsoft Edge
+_VERSION_ = 2.2   # Current version
 
 
 # Classes
@@ -512,12 +513,12 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
           q, Enter              exit googler (same behaviour for an empty search)
           *                     any other string initiates a new search with original options
 
-        Version 2.2
+        Version %.1f
         Copyright (C) 2008 Henri Hakkinen.
         Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>
         License: GPLv3
         Webpage: https://github.com/jarun/googler
-        """))
+        """ % _VERSION_))
 
     # Automatically print full help text on error
     def error(self, message):
@@ -593,6 +594,7 @@ debug = args.debug
 keywords = args.keywords
 insite = args.insite
 
+debugp("Version %.1f" % _VERSION_)
 
 # Construct the query URL.
 url = "/search?ie=UTF-8&oe=UTF-8&"
