@@ -139,12 +139,13 @@ optional arguments:
                         search a site using Google
   -d, --debug           enable debugging
 
-prompt keys:
-  g terms               initiate a new Google search for 'terms' with original options
+omniprompt keys:
+  g keywords            initiate a new Google search for 'keywords' with original options
   n, p                  fetch next or previous set of search results
   1-N                   open the Nth result index in browser
   q, Enter              exit googler (same behaviour for an empty search)
   *                     any other string initiates a new search with original options
+  ?                     show omniprompt help
 </pre>
 
 ## Configuration file

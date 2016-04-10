@@ -441,7 +441,7 @@ def quit(conn):
 def show_omniprompt():
     global colorize
 
-    message = "Enter n, p, result number or new keywords"
+    message = "googler (? for help)"
     if colorize:
         return raw_input("\x1b[7m%s\x1b[0m " % message)
     else:
@@ -502,23 +502,33 @@ keywords = None
 
 class ExtendedArgumentParser(argparse.ArgumentParser):
 
-    # Augment print_help to print more than synopsis and options
-    def print_help(self, file=None):
-        super(ExtendedArgumentParser, self).print_help(file)
+    # Print omniprompt help
+    def print_omniprompt_help(self, file=None):
         file.write(textwrap.dedent("""
-        prompt keys:
-          g terms               initiate a new Google search for 'terms' with original options
+        omniprompt keys:
+          g keywords            initiate a new Google search for 'keywords' with original options
           n, p                  fetch next or previous set of search results
           1-N                   open the Nth result index in browser
           q, Enter              exit googler (same behaviour for an empty search)
           *                     any other string initiates a new search with original options
+          ?                     show omniprompt help
+        """))
 
+    # Print information on googler
+    def print_general_info(self, file=None):
+        file.write(textwrap.dedent("""
         Version %.1f
         Copyright (C) 2008 Henri Hakkinen.
         Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>
         License: GPLv3
         Webpage: https://github.com/jarun/googler
         """ % _VERSION_))
+
+    # Augment print_help to print more than synopsis and options
+    def print_help(self, file=None):
+        super(ExtendedArgumentParser, self).print_help(file)
+        self.print_omniprompt_help(file)
+        self.print_general_info(file)
 
     # Automatically print full help text on error
     def error(self, message):
@@ -736,6 +746,10 @@ while True:
         printerr("")
     elif nav == "q":
         break
+    elif nav == "?":
+        ExtendedArgumentParser().print_omniprompt_help(sys.stderr)
+        printerr("")
+        continue
     elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
         trimsearch = nav[2:].strip().replace(" ", "+")
         if trimsearch == "":

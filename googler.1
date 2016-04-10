@@ -42,10 +42,10 @@ Search a site using Google.
 .TP
 .BI "-d, --debug"
 Enable debugging.
-.SH PROMPT KEYS
+.SH OMNIPROMPT KEYS
 .TP
-.BI g " terms"
-Initiate a new Google search for 'terms' with original options.
+.BI g " keywords"
+Initiate a new Google search for \fIkeywords\fR with original options.
 .TP
 .BI "n, p"
 Fetch next or previous set of search results.
@@ -58,6 +58,9 @@ Exit googler.
 .TP
 .BI *
 Any other string initiates a new search with original options.
+.TP
+.BI "?"
+Show omniprompt help.
 .SH ENVIRONMENT
 .TP
 .BI BROWSER
