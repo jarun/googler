@@ -559,17 +559,17 @@ argparser = ExtendedArgumentParser(
 addarg = argparser.add_argument
 addarg('-s', '--start', dest='start', type=int, metavar='N',
        help='start at the Nth result')
-addarg('-n', '--number', '--count', dest='num', type=int, metavar='N',
+addarg('-n', '--count', dest='num', type=int, metavar='N',
        help='show N results (default 10)')
 addarg('-N', '--news', dest='news', action='store_true',
        help='show results from news section')
-addarg('-c', '--country', '--tld', dest='tld', metavar='TLD',
+addarg('-c', '--tld', dest='tld', metavar='TLD',
        help="""country-specific search with top-level domain .TLD, e.g., 'in'
-       for India (see https://en.wikipedia.org/wiki/List_of_Google_domains for
+       for India (refer https://en.wikipedia.org/wiki/List_of_Google_domains for
        a full list of TLDs)""")
 addarg('-l', '--lang', dest='lang', metavar='LANG',
        help='display in language LANG')
-addarg('-x', '--exact', '--nocorrect', dest='exact', action='store_true',
+addarg('-x', '--exact', dest='exact', action='store_true',
        help='disable automatic spelling correction')
 addarg('-C', '--nocolor', dest='colorize', action='store_false',
        help='disable color output')
@@ -578,7 +578,7 @@ addarg('-j', '--first', '--lucky', dest='openUrl', action='store_true',
 addarg('-t', '--time', dest='duration', type=is_duration, metavar='dN',
        help='time limit search '
        '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
-addarg('-w', '--website', '--site', dest='insite', metavar='SITE',
+addarg('-w', '--site', dest='insite', metavar='SITE',
        help='search a site using Google')
 addarg('-d', '--debug', dest='debug', action='store_true',
        help='enable debugging')

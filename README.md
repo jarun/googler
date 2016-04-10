@@ -120,23 +120,19 @@ positional arguments:
 
 optional arguments:
   -s N, --start N       start at the Nth result
-  -n N, --number N, --count N
-                        show N results (default 10)
+  -n N, --count N       show N results (default 10)
   -N, --news            show results from news section
-  -c TLD, --country TLD, --tld TLD
-                        country-specific search with top-level domain .TLD,
-                        e.g., 'in' for India (see
+  -c TLD, --tld TLD     country-specific search with top-level domain .TLD,
+                        e.g., 'in' for India (refer
                         <a href="https://en.wikipedia.org/wiki/List_of_Google_domains" target="_blank">https://en.wikipedia.org/wiki/List_of_Google_domains</a>
                         for a full list of TLDs)
   -l LANG, --lang LANG  display in language LANG
-  -x, --exact, --nocorrect
-                        disable automatic spelling correction
+  -x, --exact           disable automatic spelling correction
   -C, --nocolor         disable color output
   -j, --first, --lucky  open the first result in a web browser
   -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
                         weeks), m5 (5 months), y5 (5 years)]
-  -w SITE, --website SITE, --site SITE
-                        search a site using Google
+  -w SITE, --site SITE  search a site using Google
   -d, --debug           enable debugging
 
 omniprompt keys:
