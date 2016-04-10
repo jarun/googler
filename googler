@@ -441,7 +441,7 @@ def quit(conn):
 def show_omniprompt():
     global colorize
 
-    message = "googler (? for help)"
+    message = "Enter n, p, result number or new keywords (? for help)"
     if colorize:
         return raw_input("\x1b[7m%s\x1b[0m " % message)
     else:
@@ -503,7 +503,8 @@ keywords = None
 class ExtendedArgumentParser(argparse.ArgumentParser):
 
     # Print omniprompt help
-    def print_omniprompt_help(self, file=None):
+    @staticmethod
+    def print_omniprompt_help(file=None):
         file.write(textwrap.dedent("""
         omniprompt keys:
           g keywords            initiate a new Google search for 'keywords' with original options
@@ -515,7 +516,8 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
         """))
 
     # Print information on googler
-    def print_general_info(self, file=None):
+    @staticmethod
+    def print_general_info(file=None):
         file.write(textwrap.dedent("""
         Version %.1f
         Copyright (C) 2008 Henri Hakkinen.
@@ -527,8 +529,8 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
     # Augment print_help to print more than synopsis and options
     def print_help(self, file=None):
         super(ExtendedArgumentParser, self).print_help(file)
-        self.print_omniprompt_help(file)
-        self.print_general_info(file)
+        ExtendedArgumentParser.print_omniprompt_help(file)
+        ExtendedArgumentParser.print_general_info(file)
 
     # Automatically print full help text on error
     def error(self, message):
@@ -747,7 +749,7 @@ while True:
     elif nav == "q":
         break
     elif nav == "?":
-        ExtendedArgumentParser().print_omniprompt_help(sys.stderr)
+        ExtendedArgumentParser.print_omniprompt_help(sys.stderr)
         printerr("")
         continue
     elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
