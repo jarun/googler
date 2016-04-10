@@ -54,7 +54,7 @@ If you find `googler` useful, please consider donating via PayPal.
 - UTF-8 request and response
 - Fetch gzip compressed results
 - Works with Python 2.7.x and 3.3.x or later
-- Enable/disable color output (default: colorful)
+- Enable/disable colour output (default: colourful)
 - Enable/disable debug logs (default: disabled)
 - Manpage for quick reference
 - Fast and clean (no ads or clutter)
@@ -149,7 +149,7 @@ prompt keys:
 
 ## Configuration file
 
-`googler` doesn't have any! This is to retain the speed of the utlity and avoid OS-specific differences. Users can enjoy the advantage of config files using aliases. There's no need to memorize options.
+`googler` doesn't have any! This is to retain the speed of the utility and avoid OS-specific differences. Users can enjoy the advantages of config files using aliases. There's no need to memorize options.
 
 For example, the following alias for bash/zsh/ksh/etc.
 
@@ -159,7 +159,7 @@ fetches 7 results from the Google Russia server, with preference towards results
 
 The alias serves both the purposes of using config files:
 
-- Persistent settings: when the user invokes `g`, it expands to the preferred settings everytime.
+- Persistent settings: when the user invokes `g`, it expands to the preferred settings.
 - Override settings: thanks to the way Python `getopt()` works, `googler` is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs `g -l de -c de -n 12 hello world`, 12 results are returned from the Google Germany server, with preference towards results in German.
 
 Windows users can refer to [this discussion](http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt) on how to use aliases on Windows.
