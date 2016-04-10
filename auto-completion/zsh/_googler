@@ -1,0 +1,25 @@
+#compdef googler
+#
+# Completion definition for googler.
+#
+# Author:
+#   Zhiming Wang <zmwangx@gmail.com>
+#
+
+setopt localoptions noshwordsplit noksharrays
+local -a args
+args=(
+    '(-c --tld)'{-c,--tld}'[country-specific search with top-level domain]:top level domain without dot'
+    '(-C --nocolor)'{-C,--nocolor}'[disable color output]'
+    '(-d --debug)'{-d,--debug}'[enable debugging]'
+    '(-j --first --lucky)'{-j,--first,--lucky}'[open the first result in a web browser]'
+    '(-l --lang)'{-l,--lang}'[display in specified language]:language code'
+    '(-n --count)'{-n,--count}'[show specified number of results (default 10)]:count'
+    '(-N --news)'{-N,--news}'[show results from news section]'
+    '(-s --start)'{-s,--start}'[start at the Nth result]:result number'
+    '(-t --time)'{-t,--time}'[time limit search]:period (h/d/w/m/y + number)'
+    '(-w --site)'{-w,--site}'[search a site using Google]:domain'
+    '(-x --exact)'{-x,--exact}'[disable automatic spelling correction]'
+    '*: :_guard "^-*" keyword'
+)
+_arguments -S -s $args
