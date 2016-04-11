@@ -18,6 +18,7 @@ If you find `googler` useful, please consider donating via PayPal.
     - [Installing from this repository](#installing-from-this-repository)
         - [Installing to default or custom location](#installing-to-default-or-custom-location)
         - [Running as a standalone utility](#running-as-a-standalone-utility)
+        - [Shell completion](#shell-completion)
     - [Installing with a package manager](#installing-with-a-package-manager)
 - [Usage](#usage)
     - [Cmdline options](#cmdline-options)
@@ -96,6 +97,10 @@ If you installed to a different prefix, you'll need to specify the same `PREFIX`
 `googler` is a standalone executable. From the containing directory:
 
     $ ./googler
+
+### Shell completion
+
+Shell completion scripts for Bash, Fish and Zsh can be found in respective subdirectories of [`auto-completion/`](auto-completion). Please refer to your shell's manual for installation instructions.
 
 ## Installing with a package manager
 
