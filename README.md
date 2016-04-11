@@ -1,6 +1,6 @@
 # googler
 
-![Screenshot](http://i.imgur.com/DlXq7MI.png)
+![Screenshot](http://i.imgur.com/t9ejGST.png)
 
 `googler` is a power tool to search Google (Web & News) from the terminal. Google site search works too. `googler` shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. Supports sequential searches in a single instance.
 
