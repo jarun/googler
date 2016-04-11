@@ -10,4 +10,4 @@ matrix:
   allow_failures:
     - python: "nightly"
 script:
-  - PATH=$PWD:$PATH ./test --ci
+  - PATH=$PWD:$PATH ./tests/test --ci
