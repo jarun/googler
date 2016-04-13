@@ -1,6 +1,6 @@
 #### Bug reports
 
-Before opening an issue, please try to reproduce on [the latest developement version](https://github.com/jarun/googler#installing-from-this-repository) first. The bug you saw might have already been fixed.
+Before opening an issue, please try to reproduce on [the latest development version](https://github.com/jarun/googler#installing-from-this-repository) first. The bug you saw might have already been fixed.
 
 If the issue can be reproduced on master, then please make sure you provide the following:
 - Output of `googler -d`
@@ -14,4 +14,4 @@ If we need more information and there is no communication from the bug reporter 
 #### Feature requests
 Please consider contributing the feature back to `googler` yourself. Feel free to discuss. We are more than happy to help.
 
---- PLEASE DELETE THIS LINE AND EVERTHING ABOVE ---
+--- PLEASE DELETE THIS LINE AND EVERYTHING ABOVE ---
