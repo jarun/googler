@@ -2,13 +2,13 @@
 
 ![Screenshot](http://i.imgur.com/H2oDAg8.png)
 
-`googler` is a power tool to search Google (Web & News) and Google Site Search from the terminal. It shows the title, URL and text context for each result, which you can directly open in a browser from the terminal. Results are fetched in pages (with page navigation). Supports sequential searches in a single `googler` instance.
+`googler` is a power tool to Google (Web & News) and Google Site Search from the terminal. It shows the title, URL and text context for each result, which can be directly opened in a browser from the terminal. Results are fetched in pages (with page navigation). Supports sequential searches in a single `googler` instance.
 
 `googler` is **GPLv3** licensed. It doesn't have any affiliation to Google in any way.
 
 Got some suggestions? [![gitter chat](https://img.shields.io/gitter/room/jarun/googler.svg?maxAge=2592000)](https://gitter.im/jarun/googler) with us.
 
-Find `googler` useful? If you would like to donate, visit our 
+Find `googler` useful? If you would like to donate, visit our
 [![Donate Button](https://img.shields.io/badge/paypal-donate-orange.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q) page.
 
 # Table of contents
