@@ -8,8 +8,10 @@
 
 Why not use Google provided APIs? Check point 2 in [Notes](#notes) section.
 
-If you find `googler` useful, please consider donating via PayPal.
-[![Donate Button](https://img.shields.io/badge/paypal-donate-orange.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q)
+Got some suggestions? [![gitter chat](https://img.shields.io/gitter/room/jarun/googler.svg?maxAge=2592000)](https://gitter.im/jarun/googler) with us.
+
+Find `googler` useful? If you would like to donate, visit our 
+[![Donate Button](https://img.shields.io/badge/paypal-donate-orange.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q) page.
 
 # Table of contents
 
