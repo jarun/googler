@@ -231,21 +231,7 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
 # Troubleshooting
 
-1.  If `print()` throws the following error complaining about handling Unicode with `ascii` codec:
-
-        UnicodeEncodeError: 'ascii' codec can't encode character '\u201c' in position 0: ordinal not in range(128)
-
-    add the following to your shell's runcom (`rc`, `profile`, etc.):
-
-        export PYTHONIOENCODING=UTF-8
-
-    If you use fish shell, add the following to `~/.config/fish/config.fish`:
-
-        set -x PYTHONIOENCODING UTF-8
-
-    Ref issue [#21](https://github.com/jarun/googler/issues/21).
-
-2. In some instances `googler` may show fewer number of results than you expect, e.g., if you fetch a single result (`-n 1`) it may not show any results. The reason is Google shows some Google service (e.g. Youtube) results, map locations etc. depending on your geographical data, which `googler` tries to omit. In some cases Google (the web-service) doesn't show exactly 10 results (default) on a search. We chose to omit these results as far as possible. While this can be fixed, it would need more processing (and more time). You can just navigate forward to fetch the next set of results.
+1. In some instances `googler` may show fewer number of results than you expect, e.g., if you fetch a single result (`-n 1`) it may not show any results. The reason is Google shows some Google service (e.g. Youtube) results, map locations etc. depending on your geographical data, which `googler` tries to omit. In some cases Google (the web-service) doesn't show exactly 10 results (default) on a search. We chose to omit these results as far as possible. While this can be fixed, it would need more processing (and more time). You can just navigate forward to fetch the next set of results.
 
 # Developers
 
