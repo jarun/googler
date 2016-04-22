@@ -2,6 +2,7 @@
 
 [![AUR](https://img.shields.io/aur/version/googler.svg)](https://aur.archlinux.org/packages/googler)
 [![Homebrew](https://img.shields.io/homebrew/v/googler.svg)](http://braumeister.org/formula/googler)
+[![Build Status](https://travis-ci.org/jarun/googler.svg?branch=master)](https://travis-ci.org/jarun/googler)
 
 ![Screenshot](http://i.imgur.com/H2oDAg8.png)
 
@@ -243,8 +244,6 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 3. [Zhiming Wang](https://github.com/zmwangx)
 
 Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https://github.com/shaggytwodope) and [Narrat](https://github.com/Narrat) for their contributions and efforts in spreading `googler`.
-
-[![Build Status](https://travis-ci.org/jarun/googler.svg?branch=master)](https://travis-ci.org/jarun/googler)
 
 # Notes
 
