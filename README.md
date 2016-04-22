@@ -1,5 +1,8 @@
 # googler
 
+[![AUR](https://img.shields.io/aur/version/googler.svg)](https://aur.archlinux.org/packages/googler)
+[![Homebrew](https://img.shields.io/homebrew/v/googler.svg)](http://braumeister.org/formula/googler)
+
 ![Screenshot](http://i.imgur.com/H2oDAg8.png)
 
 `googler` is a power tool to Google (Web & News) and Google Site Search from the terminal. It shows the title, URL and text context for each result, which can be directly opened in a browser from the terminal. Results are fetched in pages (with page navigation). Supports sequential searches in a single `googler` instance.
