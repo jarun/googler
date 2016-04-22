@@ -1,13 +1,13 @@
 <h1 align="center">googler</h1>
 
 <p align="center">
-<a href="https://aur.archlinux.org/packages/googler" target="_blank"><img src="https://img.shields.io/aur/version/googler.svg" alt="AUR" /></a>
-<a href="http://braumeister.org/formula/googler" target="_blank"><img src="https://img.shields.io/homebrew/v/googler.svg" alt="Homebrew" /></a>
-<a href="https://travis-ci.org/jarun/googler" target="_blank"><img src="https://travis-ci.org/jarun/googler.svg?branch=master" alt="Build Status" /></a>
+<a href="https://aur.archlinux.org/packages/googler"><img src="https://img.shields.io/aur/version/googler.svg" alt="AUR" /></a>
+<a href="http://braumeister.org/formula/googler"><img src="https://img.shields.io/homebrew/v/googler.svg" alt="Homebrew" /></a>
+<a href="https://travis-ci.org/jarun/googler"><img src="https://travis-ci.org/jarun/googler.svg?branch=master" alt="Build Status" /></a>
 </p>
 
 <p align="center">
-<a href="https://asciinema.org/a/43222" target="_blank"><img src="https://asciinema.org/a/43222.png" alt="Asciicast" width="600"/></a>
+<a href="https://asciinema.org/a/43222"><img src="https://asciinema.org/a/43222.png" alt="Asciicast" width="600"/></a>
 </p>
 
 `googler` is a power tool to Google (Web & News) and Google Site Search from the terminal. It shows the title, URL and text context for each result, which can be directly opened in a browser from the terminal. Results are fetched in pages (with page navigation). Supports sequential searches in a single `googler` instance.
@@ -138,7 +138,7 @@ optional arguments:
   -N, --news            show results from news section
   -c TLD, --tld TLD     country-specific search with top-level domain .TLD,
                         e.g., 'in' for India (refer
-                        <a href="https://en.wikipedia.org/wiki/List_of_Google_domains" target="_blank">https://en.wikipedia.org/wiki/List_of_Google_domains</a>
+                        <a href="https://en.wikipedia.org/wiki/List_of_Google_domains">https://en.wikipedia.org/wiki/List_of_Google_domains</a>
                         for a full list of TLDs)
   -l LANG, --lang LANG  display in language LANG
   -x, --exact           disable automatic spelling correction
