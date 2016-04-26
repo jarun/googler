@@ -769,13 +769,13 @@ while True:
             if index < -1:
                 printerr("Index out of bound.")
             else:
-                printerr("Index out of bound. To search %s, try \'g %s\'." % (nav, nav))
+                printerr("Index out of bound. To search %s, try 'g %s'." % (nav, nav))
             continue
 
         try:
             results[index].open()
         except IndexError:
-            printerr("Index out of bound. To search %s, try \'g %s\'." % (nav, nav))
+            printerr("Index out of bound. To search %s, try 'g %s'." % (nav, nav))
 
         continue
     elif len(nav):
