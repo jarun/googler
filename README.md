@@ -3,6 +3,7 @@
 <p align="center">
 <a href="https://aur.archlinux.org/packages/googler"><img src="https://img.shields.io/aur/version/googler.svg" alt="AUR" /></a>
 <a href="http://braumeister.org/formula/googler"><img src="https://img.shields.io/homebrew/v/googler.svg" alt="Homebrew" /></a>
+<a href="https://github.com/jarun/googler/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPLv3-blue.svg" alt="License" /></a>
 <a href="https://travis-ci.org/jarun/googler"><img src="https://travis-ci.org/jarun/googler.svg?branch=master" alt="Build Status" /></a>
 </p>
 
@@ -12,7 +13,7 @@
 
 `googler` is a power tool to Google (Web & News) and Google Site Search from the terminal. It shows the title, URL and text context for each result, which can be directly opened in a browser from the terminal. Results are fetched in pages (with page navigation). Supports sequential searches in a single `googler` instance.
 
-`googler` is **GPLv3** licensed. It doesn't have any affiliation to Google in any way.
+`googler` isn't affiliated to Google in any way.
 
 Got some suggestions? [![gitter chat](https://img.shields.io/gitter/room/jarun/googler.svg?maxAge=2592000)](https://gitter.im/jarun/googler) with us.
 
