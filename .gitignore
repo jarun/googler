@@ -1,0 +1,9 @@
+*.py.swp
+*.pyc
+*.swp
+dist
+build
+googler.egg-info
+*.swo
+profile
+.cache

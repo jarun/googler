@@ -1,0 +1,6 @@
+include *.md
+include googler.1
+include LICENSE
+include auto-completion/fish/googler.fish
+include auto-completion/bash/googler-completion.bash
+include auto-completion/zsh/_googler
