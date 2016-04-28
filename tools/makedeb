@@ -1,0 +1,125 @@
+#!/usr/bin/env zsh
+
+# Automatically make .deb package from a commit or a tag.
+#
+# Prerequisites: zsh, build-essential, devscripts, debhelper (>= 9)
+#
+# Reference: https://wiki.debian.org/IntroDebianPackaging.
+
+setopt errexit noshwordsplit
+
+[[ $1 == (-h|--help) ]] && {
+    cat >&2 <<EOF
+Usage: $0:t [<commit-ish>]
+EOF
+}
+[[ -n $1 ]] && commitish=$1 || commitish=HEAD
+
+[[ -z $DEBFULLNAME ]] && DEBFULLNAME='Arun Prakash Jana'
+[[ -z $DEBEMAIL ]] && DEBEMAIL='arun@tuxdiary.com'
+export DEBFULLNAME DEBEMAIL
+
+here=$0:A:h
+repodir=$here/..
+builddir=$here/../build
+distdir=$here/../dist
+
+print_error () print -R $'\e[31m'"Error: $*"$'\e[0m' >&2
+
+mkdir -p $builddir $distdir
+cd $builddir
+
+pkgname=googler
+version="${$(git -C $repodir describe --tags $commitish)#v}" # Quoting just to make sh-mode happy
+[[ -n $version ]] || {
+    print_error 'Failed to extract version information.'
+    exit 1
+}
+debrevision=1
+
+upstream_tarball=$builddir/${pkgname}_${version}.orig.tar.gz
+buildsubdirname=${pkgname}-${version}
+git -C $repodir archive --format=tar.gz --prefix=$buildsubdirname/ --output=$upstream_tarball $commitish .
+rm -rf $buildsubdirname
+tar xf $upstream_tarball
+
+cd $buildsubdirname
+mkdir debian
+
+# Write debian/changelog
+# Use /bin/true as the dummy editor in order to avoid interactivity
+VISUAL=/bin/true dch --create -v ${version}-${debrevision} --package $pkgname
+
+# Write debian/compat
+cat >debian/compat <<'EOF'
+9
+EOF
+
+# Write debian/control
+cat >debian/control <<EOF
+Source: $pkgname
+Maintainer: $DEBFULLNAME <$DEBEMAIL>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.7
+Build-Depends: debhelper (>= 9)
+
+Package: $pkgname
+Architecture: all
+Depends: \${shlibs:Depends}, \${misc:Depends}, python (>= 2.7)
+Description: Google Search and News from the command-line
+ See https://github.com/jarun/googler#readme.
+EOF
+
+# Write debian/copyright
+copyright_file=$builddir/$buildsubdirname/debian/copyright
+cat >debian/copyright <<EOF
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: $pkgname
+Upstream-Contact: $DEBFULLNAME <$DEBEMAIL>
+Source: https://github.com/jarun/googler
+
+Files: *
+Copyright: 2008 Henri Hakkinen
+           2015, 2016 Arun Prakash Jana
+License: GPL-3
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License version 3 as published by the Free
+ Software Foundation.
+ .
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+ .
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems, the full text of the GNU General Public License version 3
+ can be found in the file \`/usr/share/common-licenses/GPL-3'.
+EOF
+
+# Write debian/rules
+cat >debian/rules <<EOF
+#!/usr/bin/make -f
+%:
+	dh \$@
+
+override_dh_auto_install:
+	\$(MAKE) DESTDIR=\$\$(pwd)/debian/$pkgname PREFIX=/usr install
+	cp -p ${(q-)copyright_file} \$\$(pwd)/debian/$pkgname/usr/share/doc/$pkgname/copyright
+EOF
+chmod +x debian/rules
+
+# Write debian/source/format
+mkdir -p debian/source
+cat >debian/source/format <<'EOF'
+3.0 (quilt)
+EOF
+
+# Build binary package
+debuild -us -uc
+
+# Copying deb to dist
+binary_package=$builddir/${pkgname}_${version}-${debrevision}_all.deb
+cp -p $binary_package $distdir
