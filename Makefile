@@ -1,11 +1,13 @@
 PREFIX=/usr/local
-BINDIR=$(PREFIX)/bin
-MANDIR=$(PREFIX)/share/man/man1
-DOCDIR=$(PREFIX)/share/doc/googler
+BINDIR=$(DESTDIR)$(PREFIX)/bin
+MANDIR=$(DESTDIR)$(PREFIX)/share/man/man1
+DOCDIR=$(DESTDIR)$(PREFIX)/share/doc/googler
 UNAME_S:=$(shell uname -s)
 
 
-.PHONY: install uninstall
+.PHONY: all install uninstall
+
+all:
 
 install:
 	install -m755 -d $(BINDIR)
