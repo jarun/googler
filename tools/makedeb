@@ -8,13 +8,7 @@
 # Reference: https://wiki.debian.org/IntroDebianPackaging.
 
 setopt errexit noshwordsplit nobashrematch
-
-[[ $1 == (-h|--help) ]] && {
-    cat >&2 <<EOF
-Usage: $0:t [<commit-ish>]
-EOF
-}
-[[ -n $1 ]] && commitish=$1 || commitish=HEAD
+[[ -n $DEBUG ]] && setopt xtrace
 
 ################### SET UP ENVIRONMENT AND BASE DIRECTORIES ####################
 
@@ -33,6 +27,8 @@ export GIT_DIR=$repodir/.git
 ############################### HELPER FUNCTIONS ###############################
 
 print_error () print -R $'\e[31m'"Error: $*"$'\e[0m' >&2
+
+print_warning () print -R $'\e[33m'"Warning: $*"$'\e[0m' >&2
 
 # Usage: apt_package_version <package_name>
 apt_package_version () {
@@ -103,20 +99,68 @@ git_commitish_timestamp () {
     git rev-list --format=format:%ct --max-count=1 $1 | tail -n1
 }
 
-################################################################################
+######################### PARSE COMMAND LINE ARGUMENTS #########################
+
+tag_only=0
+while [[ $1 == -* ]]; do
+    case $1 in
+        -h|--help)
+            cat >&2 <<EOF
+Usage: $0:t [options] [<commit-ish>]
+
+Make a deb package from a git commit-ish, which defaults to HEAD.
+
+Options:
+    -h, --help
+        Print this help and exit.
+    --tag-only
+        Only make deb if HEAD (or <commit-ish>, if specified) is a tag or a
+        tagged commit.
+EOF
+            exit 1
+            ;;
+        --tag-only)
+            tag_only=1
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            print_error "Unknown option ${(q-)1}."
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+[[ -n $1 ]] && { commitish=$1; shift } || commitish=HEAD
+(( $# > 0 )) && {
+    print_error 'Unrecognized arguments' ${(q-)@}
+    exit 1
+}
+
+##################################### MAIN #####################################
 
 mkdir -p $builddir $distdir
 cd $builddir
 
-pkgname=googler
 normalized_commitish=$(git_normalize_commitish $commitish)
-creation_timestamp=$(git_commitish_timestamp $normalized_commitish)
+git_ref_is_tag $normalized_commitish && commitish_is_tag=1 || commitish_is_tag=0
+
+(( tag_only && !commitish_is_tag )) && {
+    print_warning "${(q-)commitish} is not a tag or tagged commit, skipping build."
+    exit
+}
+
+pkgname=googler
 version="${$(git describe --tags $commitish)#v}" # Quoting just to make sh-mode happy
 [[ -n $version ]] || {
     print_error 'Failed to extract version information.'
     exit 1
 }
 debrevision=1
+creation_timestamp=$(git_commitish_timestamp $normalized_commitish)
 
 upstream_tarball=$builddir/${pkgname}_${version}.orig.tar.gz
 buildsubdirname=${pkgname}-${version}
@@ -129,7 +173,7 @@ mkdir debian
 
 # Write debian/changelog
 
-if git_ref_is_tag $normalized_commitish; then
+if (( commitish_is_tag )); then
     # Tag -- point to the release
     changelog_url=https://github.com/jarun/googler/releases/tag/$normalized_commitish
 else
