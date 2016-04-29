@@ -1,0 +1,182 @@
+googler v2.3
+2016-04-23
+
+Modifications
+- Google Site Search support (option -w)
+- Auto-completion scripts for Zsh, Bash and Fish shells
+- All Google top level domains supported
+- Show time for news
+- Integrated omniprompt help
+- Move to argparse
+  - Additional long options easier to remember
+- Graceful SIGINT handler
+- Add version to debug logs
+AND ...
+- An *awesssome* asciinema recording for the README from Zhiming
+
+-------------------------------------------------------------------------------
+
+googler v2.2
+2016-03-12
+
+Modifications
+- Show quotes in text and title
+- Option to disable automatic spelling correction
+- User agent identifier added for all requests
+- Improved concise omniprompt with color inversion to work as a page separator
+- Set column size to auto when sys.stderr is not a tty
+- Decode HTTPS response in UTF-8
+- Dynamically detect python version using /usr/bin/env
+- Handle EOF (Ctrl-d) at omniprompt
+
+Improvements
+- Refactored code
+  - Modularized code for repetitive logic
+  - Unnecessary code removal
+- Dump full HTML response in debug mode
+- Homebrew integration
+- Travis integration
+- A better readme in 100% markdown and ToC with references
+
+-------------------------------------------------------------------------------
+
+googler v2.1
+2016-02-01
+
+Modifications
+- Project renamed to googler, same as the utility
+- Gzip compression to fetch data
+- Improved continuous search (works without the `g` key at prompt now. Check
+  Example 10 in README for exceptions)
+- Skip Google News, Images links and ads
+- Show skipped link count
+
+-------------------------------------------------------------------------------
+
+google-cli v2.0
+2016-01-09
+
+Modifications
+- IMPORTANT fix for issue #19: Google replaced "li" with "div" as search result
+  separator. Users must update to this release or latest dev version for
+  google-cli to work.
+- Handle formatting on Mac OS X in emacs eshell (or any terminal envornment
+  where number of columns returned is 0).
+- PEP 8 style adaptation. Thanks @shaggytwodope!
+
+-------------------------------------------------------------------------------
+
+google-cli v1.9
+2015-11-13
+
+Modifications
+- Skip results without any URL (Google custom results like time, define etc.).
+- Use readline library to support arrow keys in input.
+- Support installation on OSX. Thanks @ibaaj.
+- Pre-check negative index before attempting to open URL.
+- Handle exception: "socket.gaierror: [Errno -2] Name or service not known"
+  due to connection throttle on low-bandwidth.
+- Print correct Exception in case of connection timeout.
+
+-------------------------------------------------------------------------------
+
+google-cli v1.8
+2015-10-11
+
+Modification
+- Added timeout to HTTPSConnection()
+- Redirected stdout and stderr to suppress all warning & error messages when
+  opening results in Firefox
+
+-------------------------------------------------------------------------------
+
+google-cli v1.7
+2015-10-07
+
+Modification
+- Added support for redirection and piping
+- Used stderr instead of stdin to determine console geometry
+
+-------------------------------------------------------------------------------
+
+google-cli v1.6
+2015-09-12
+
+Modification
+- Changed incremental search key from s to g keeping in mind that users may use
+  g as the alias for googler.
+
+Fix
+- Handle httplib.BadStatusLine exception. This happens if the connection is
+  closed due to inactivity. Now googler will reconnect and re-issue the search.
+
+-------------------------------------------------------------------------------
+
+google-cli v1.5
+2015-09-04
+
+New capabilities
+- Incremental search support from the same running instance
+- Utility name changed to googler to void any copyright infringements
+
+-------------------------------------------------------------------------------
+
+google-cli v1.2
+2015-09-03
+
+New capabilities
+- Open result in browser using index number (thanks jeremija)
+- Google News support
+- Time limit search by hours
+- Country specific search (28 top-level domains added)
+- Add switch to enable debug logs
+
+Removal
+- Removed file type specific search option -f in favour of filetype:mime Google
+  keyword
+
+Fixes
+- Convert %22 to " (double quote) in URLs
+- Inputs other than n, p or number (+ Enter) exit
+- Fix failure to open URL with " (double quotes) in browser
+- Fix version information in manpage
+- Get rid of Google Chrome debug/error messages in console when opening URL
+
+-------------------------------------------------------------------------------
+
+google-cli v1.1
+2015-08-25
+
+New capabilities
+- Add Python 3.x support
+- Add UTF-8 request and response
+[both the contributions are from Narrat]
+
+NOTE: The next change in queue is to support opening the URLs in browser. As we
+can see during preliminary tests, there are several issues around Google Chrome
+and its mods. This release works as a stable release before we hop on.
+
+-------------------------------------------------------------------------------
+
+google-cli v1.0
+2015-08-22
+
+New capabilities
+- HTTPS support
+- Navigate as in regular google search
+- File type in search as an option
+- Time limited search (day, week, month, year)
+- Show full text snippet of search results
+- Unicode in URL support
+- Honour -j even if -n is not used and open the result in browser
+- Skip browser to show result in console for empty URL, e.g., first result of
+  'define hello'
+- Handle google redirections (error 302)
+- Throw error in case of google error due to unusual activity from IP
+
+Fixes
+- Adapt to new google HTML response
+- Fixed character encoding problem in URL e.g. double quotes (%22) changed to
+  %2522
+
+-------------------------------------------------------------------------------
