@@ -10,4 +10,4 @@ matrix:
   allow_failures:
     - python: "nightly"
 script:
-  - PATH=$PWD:$PATH ./tests/test --ci
+  - ./tests/ci-test-wrapper --watch .travis.yml
