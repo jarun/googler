@@ -49,6 +49,12 @@ done
     exit 1
 }
 
+# Abort if the CI_SKIP_TEST environment variable is detected.
+if [[ -n $CI_SKIP_TEST ]]; then
+    printf 'Detected $CI_SKIP_TEST. Skipping tests.' >&2
+    exit
+fi
+
 # Diff HEAD against a base commit to see if the changes are worth
 # testing. (This check is kkipped entirely if the CI_FORCE_TEST environment
 # variable is set and non-nil.)
