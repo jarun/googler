@@ -24,6 +24,13 @@ distdir=$here/../dist
 
 export GIT_DIR=$repodir/.git
 
+################################# SET UP TRAPS #################################
+
+# Trap SIGUSR1: Abort program when functions called from within command
+# substitutions in heredocs fail.
+trap 'print_error "Encountered problem inside cmdsubst at line $LINENO."; exit 1' SIGUSR1
+export NOTIFY_PID=$$
+
 ############################### HELPER FUNCTIONS ###############################
 
 print_error () print -R $'\e[31m'"Error: $*"$'\e[0m' >&2
@@ -34,6 +41,7 @@ print_warning () print -R $'\e[33m'"Warning: $*"$'\e[0m' >&2
 apt_package_version () {
     local version="${$(apt-cache show $1 | grep '^Version')#Version: }" || {
         print_error "Version info not available for package ${(q-)1}."
+        [[ -n $NOTIFY_PID ]] && kill -SIGUSR1 $NOTIFY_PID
         exit 1
     }
     printf %s $version
@@ -44,6 +52,7 @@ debian_policy_version () {
     local match
     [[ $full_version =~ ^(([0-9]+\.){2}[0-9]+) ]] || {
         print_error "Invalid debian-policy version ${(q-)full_version}."
+        [[ -n $NOTIFY_PID ]] && kill -SIGUSR1 $NOTIFY_PID
         exit 1
     }
     printf %s $match[1]
@@ -62,6 +71,7 @@ git_normalize_commitish () {
     else
         commitsha=$(git rev-parse --verify --quite $1) || {
             print_error "Unable to parse ${(q-)1} as a git commit."
+            [[ -n $NOTIFY_PID ]] && kill -SIGUSR1 $NOTIFY_PID
             exit 1
         }
         printf %s $commitsha
