@@ -175,8 +175,6 @@ The alias serves both the purposes of using config files:
 - Persistent settings: when the user invokes `g`, it expands to the preferred settings.
 - Override settings: thanks to the way Python `getopt()` works, `googler` is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs `g -l de -c de -n 12 hello world`, 12 results are returned from the Google Germany server, with preference towards results in German.
 
-Windows users can refer to [this discussion](http://stackoverflow.com/questions/20530996/aliases-in-windows-command-prompt) on how to use aliases on Windows.
-
 # Examples
 
 1. Google **hello world**:
