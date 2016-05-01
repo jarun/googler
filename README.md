@@ -139,9 +139,8 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
       -n N, --count N       show N results (default 10)
       -N, --news            show results from news section
       -c TLD, --tld TLD     country-specific search with top-level domain .TLD,
-                            e.g., 'in' for India (refer
-                            <a href="https://en.wikipedia.org/wiki/List_of_Google_domains">https://en.wikipedia.org/wiki/List_of_Google_domains</a>
-                            for a full list of TLDs)
+                            e.g., 'in' for India. Ref:
+                            https://en.wikipedia.org/wiki/List_of_Google_domains
       -l LANG, --lang LANG  display in language LANG
       -x, --exact           disable automatic spelling correction
       -C, --nocolor         disable color output
