@@ -121,6 +121,12 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 - [Fossies](http://fossies.org/linux/googler);
 - [Homebrew](http://braumeister.org/formula/googler) for OS X, or its Linux fork, [Linuxbrew](https://github.com/Linuxbrew/linuxbrew/blob/master/Library/Formula/googler.rb).
 
+We also provide a deb package for Debian-based systems. Go to [the latest stable release](https://github.com/jarun/googler/releases/latest) to download the `.deb` package, then
+
+    $ sudo dpkg -i googler-$debpkgversion-all.deb
+
+Please substitute the appropriate package version into the command above.
+
 # Usage
 
 ## Cmdline options
