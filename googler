@@ -88,7 +88,7 @@ server = "www.google.com"
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
                   # Disguise as Microsoft Edge
-_VERSION_ = 2.3   # Current version
+_VERSION_ = 2.4   # Current version
 
 
 # Classes
