@@ -125,40 +125,39 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 
 ## Cmdline options
 
-<pre>usage: googler [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C] [-j] [-t dN]
-               [-w SITE] [-d]
-               KEYWORD [KEYWORD ...]
+    usage: googler [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C] [-j] [-t dN]
+                   [-w SITE] [-d]
+                   KEYWORD [KEYWORD ...]
 
-Google from the command-line.
+    Google from the command-line.
 
-positional arguments:
-  KEYWORD               search keywords
+    positional arguments:
+      KEYWORD               search keywords
 
-optional arguments:
-  -s N, --start N       start at the Nth result
-  -n N, --count N       show N results (default 10)
-  -N, --news            show results from news section
-  -c TLD, --tld TLD     country-specific search with top-level domain .TLD,
-                        e.g., 'in' for India (refer
-                        <a href="https://en.wikipedia.org/wiki/List_of_Google_domains">https://en.wikipedia.org/wiki/List_of_Google_domains</a>
-                        for a full list of TLDs)
-  -l LANG, --lang LANG  display in language LANG
-  -x, --exact           disable automatic spelling correction
-  -C, --nocolor         disable color output
-  -j, --first, --lucky  open the first result in a web browser
-  -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
-                        weeks), m5 (5 months), y5 (5 years)]
-  -w SITE, --site SITE  search a site using Google
-  -d, --debug           enable debugging
+    optional arguments:
+      -s N, --start N       start at the Nth result
+      -n N, --count N       show N results (default 10)
+      -N, --news            show results from news section
+      -c TLD, --tld TLD     country-specific search with top-level domain .TLD,
+                            e.g., 'in' for India (refer
+                            <a href="https://en.wikipedia.org/wiki/List_of_Google_domains">https://en.wikipedia.org/wiki/List_of_Google_domains</a>
+                            for a full list of TLDs)
+      -l LANG, --lang LANG  display in language LANG
+      -x, --exact           disable automatic spelling correction
+      -C, --nocolor         disable color output
+      -j, --first, --lucky  open the first result in a web browser
+      -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
+                            weeks), m5 (5 months), y5 (5 years)]
+      -w SITE, --site SITE  search a site using Google
+      -d, --debug           enable debugging
 
-omniprompt keys:
-  g keywords            initiate a new Google search for 'keywords' with original options
-  n, p                  fetch next or previous set of search results
-  1-N                   open the Nth result index in browser
-  q, Enter              exit googler (same behaviour for an empty search)
-  *                     any other string initiates a new search with original options
-  ?                     show omniprompt help
-</pre>
+    omniprompt keys:
+      g keywords            initiate a new Google search for 'keywords' with original options
+      n, p                  fetch next or previous set of search results
+      1-N                   open the Nth result index in browser
+      q, Enter              exit googler (same behaviour for an empty search)
+      *                     any other string initiates a new search with original options
+      ?                     show omniprompt help
 
 ## Configuration file
 
