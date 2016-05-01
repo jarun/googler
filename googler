@@ -19,16 +19,12 @@
 
 from __future__ import print_function
 import argparse
-import fcntl
 import gzip
 import io
 import os
-import readline
 import signal
-import struct
 import sys
 import tempfile
-import termios
 import textwrap
 import webbrowser
 
@@ -57,6 +53,48 @@ else:
     import codecs
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
     sys.stderr = codecs.getwriter('utf-8')(sys.stderr)
+
+# POSIX compatibility layer
+
+# - os.get_terminal_size is only available on Python 3.3+.
+# - fcntl and termios are only available on POSIX systems.
+#
+# Our version and platform-independent get_terminal_size always returns
+# a tuple (columns, lines), just like os.get_terminal_size. When
+# unavaliable, returns (0, 0).
+def _environ_get_terminal_size():
+    return (int(os.environ.get('COLUMNS', 0)), int(os.environ.get('LINES', 0)))
+
+if hasattr(os, 'get_terminal_size'):
+    def get_terminal_size():
+        try:
+            return os.get_terminal_size()
+        except OSError:
+            return _environ_get_terminal_size()
+else:
+    try:
+        import fcntl
+        import struct
+        import termios
+
+        def get_terminal_size():
+            try:
+                winsz = fcntl.ioctl(sys.stderr, termios.TIOCGWINSZ, '1234')
+                lines, columns = struct.unpack('HH', winsz)
+            except IOError:
+                lines, columns = (0, 0)
+            if lines > 0 and columns > 0:
+                return (columns, lines)
+            else:
+                return _environ_get_terminal_size()
+    except ImportError:
+        get_terminal_size = _environ_get_terminal_size
+
+# Python optional dependency compatility layer
+try:
+    import readline
+except ImportError:
+    pass
 
 
 # Install SIGINT handler
@@ -604,6 +642,9 @@ debug = args.debug
 keywords = args.keywords
 insite = args.insite
 
+# Get terminal width
+columns, _ = get_terminal_size()
+
 debugp("Version %.1f" % _VERSION_)
 
 # Construct the query URL.
@@ -634,16 +675,6 @@ if insite is not None:
     url += "+site:" + url_quote_plus(insite)
 
 debugp("Search URL [%s : %s]" % (server, url))
-
-# Get the terminal window size.
-try:
-    winsz = fcntl.ioctl(sys.stderr, termios.TIOCGWINSZ, "1234")
-    columns = struct.unpack("HH", winsz)[1]
-
-    if columns <= 0:
-        columns = int(os.environ.get('COLUMNS', 0))
-except IOError:
-    columns = 0
 
 # Connect to Google and request the result page.
 conn = new_connection()
