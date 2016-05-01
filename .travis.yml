@@ -9,5 +9,24 @@ python:
 matrix:
   allow_failures:
     - python: "nightly"
+addons:
+  apt:
+    packages:
+      - debhelper
+      - devscripts
+      - zsh
 script:
   - ./tests/ci-test-wrapper --watch .travis.yml
+  - git fetch --tags origin
+  - ./tools/makedeb
+deploy:
+  provider: releases
+  api-key:
+    secure: XVq/OhxfhvEV8E/F8mdqzCjM2KpkqImmzegiEoSUAsifVIewMokPiwN9l/77SsN7dIDSRL/6iUN3GY4kooKJKD7PzT2vBKj/vvGHIt/tNPF+74PzQ2+dwBw8ShJroBBroe5VFcutVoeulB7slCvj3WxPkUej9r+ZIrB16chm8xXtj4KOSbpfI4tKDGHVbl5MlZrD/TR+I7qaKyQEiJJfb7lJN+cFugLtibCwZcu24KjhvP16OZs+xBkWambYxwVwfyrGiaEnpsrg0/PzyVebfYzHBvcU6H7U/xb9g13xdsXNfb11WbvOKXZBGAd/dHwerZuNgJSUK0YEj+va1QQV/2JfLuk4cjna9G7jcQzNfyAiFaIbbW/rPdlgsO0vK4Aw+OCI8t7FL+298Rsf3lRje9tAk/vCOMecNp86JQH5/TWAeOexxoA+BaQSlxAmnIQTfZbxdnqtb4kIsQyRnisa6ySnSa0MnWYIMdAJnNkODbhpzXgY6euJ2F2KlmL5U+nq5wzvYtA2ree3WZblSK5v1koX6Wr9tfHAGQjTYT6D8ZfRJ5bPP6lRZna1307ZiBSNwZlRbIBhAwZa25D0TJQzLO6Qhjl5RxJBn3bDxGln9UEaYy96Tw9z3cca2+pZJ6Ex1ncwEfK91tvgo9CHyoN6jzq4tNXobxvmyU6rBHCxAys=
+  file_glob: true
+  file: dist/*.deb
+  on:
+    repo: jarun/googler
+    tags: true
+    # Upload from only one job (doesn't matter which one because we're packaging the same thing throughout the matrix)
+    python: "2.7"
