@@ -518,8 +518,9 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
     def print_general_info(file=None):
         file.write(textwrap.dedent("""
         Version %.1f
-        Copyright (C) 2008 Henri Hakkinen.
+        Copyright (C) 2008 Henri Hakkinen
         Modified (2015) by Arun Prakash Jana <engineerarun@gmail.com>
+        Modified (2016) by Zhiming Wang <zmwangx@gmail.com>
         License: GPLv3
         Webpage: https://github.com/jarun/googler
         """ % _VERSION_))
