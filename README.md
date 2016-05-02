@@ -30,6 +30,7 @@ Find `googler` useful? If you would like to donate, visit the
         - [Running as a standalone utility](#running-as-a-standalone-utility)
         - [Shell completion](#shell-completion)
     - [Installing with a package manager](#installing-with-a-package-manager)
+    - [Debian package](#debian-package)
 - [Usage](#usage)
     - [Cmdline options](#cmdline-options)
     - [Configuration file](#configuration-file)
@@ -121,11 +122,13 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 - [Fossies](http://fossies.org/linux/googler);
 - [Homebrew](http://braumeister.org/formula/googler) for OS X, or its Linux fork, [Linuxbrew](https://github.com/Linuxbrew/linuxbrew/blob/master/Library/Formula/googler.rb).
 
-We also provide a deb package for Debian-based systems. Go to [the latest stable release](https://github.com/jarun/googler/releases/latest) to download the `.deb` package, then
+## Debian package
 
-    $ sudo dpkg -i googler-$debpkgversion-all.deb
+If you are on a Debian (including Ubuntu) based system visit [the latest stable release](https://github.com/jarun/googler/releases/latest) and download the`.deb`package. To install, run:
 
-Please substitute the appropriate package version into the command above.
+    $ sudo dpkg -i googler-$version-all.deb
+
+Please substitute `$version` with the appropriate package version.
 
 # Usage
 
