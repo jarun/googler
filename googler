@@ -746,7 +746,7 @@ def fetch_results():
     for r in results:
         r.print_entry()
 
-    if skipped:
+    if skipped and not noninteractive:
         if skipped == 1:
             printerr("%d ad skipped." % skipped)
         else:
