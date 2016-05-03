@@ -112,7 +112,7 @@ columns = None    # Terminal window size.
 start = "0"       # The first result to display (option -s)
 num = None        # Number of results to display (option -n)
 lang = None       # Language to search for (option -l)
-openUrl = False   # If True, opens the first URL in browser (option -j)
+open_url = False  # If True, opens the first URL in browser (option -j)
 colorize = True   # If True, colorizes the output (option -C)
 duration = None   # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
 conn = None       # Use a single global connection during navigation
@@ -321,7 +321,7 @@ class Result:
         text = self.text
 
         # Open the URL in a web browser if option -j was specified.
-        if openUrl:
+        if open_url:
             self.open()
             quit(conn)
 
@@ -609,7 +609,7 @@ addarg('-x', '--exact', dest='exact', action='store_true',
        help='disable automatic spelling correction')
 addarg('-C', '--nocolor', dest='colorize', action='store_false',
        help='disable color output')
-addarg('-j', '--first', '--lucky', dest='openUrl', action='store_true',
+addarg('-j', '--first', '--lucky', dest='open_url', action='store_true',
        help='open the first result in a web browser')
 addarg('-t', '--time', dest='duration', type=is_duration, metavar='dN',
        help='time limit search '
@@ -636,7 +636,7 @@ if args.tld:
 lang = args.lang
 exact = args.exact
 colorize = args.colorize
-openUrl = args.openUrl
+open_url = args.open_url
 duration = args.duration
 debug = args.debug
 keywords = args.keywords
