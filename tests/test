@@ -93,17 +93,17 @@ test_googler () {
         printf 'failed with status %d.\033[0m\n' $last_status >&2
         exitcode=1
 
-        (( rerun )) && { googler -d "$@" </dev/null; printf '\n\033[33m[Exit status] %d\033[0m\n' $?; } || :
+        (( rerun )) && { googler --noprompt -d "$@"; printf '\n\033[33m[Exit status] %d\033[0m\n' $?; } || :
     }
 
     declare -g quiet
     if (( quiet )); then
-        googler -d "$@" </dev/null &>/dev/null || report_error --rerun "$@"
+        googler --noprompt -d "$@" &>/dev/null || report_error --rerun "$@"
     else
         printf '\033[34m==> googler ' >&2
         printf '%q ' "$@" >&2
         printf '\033[0m\n' >&2
-        googler -d "$@" </dev/null || report_error "$@"
+        googler --noprompt -d "$@" || report_error "$@"
         echo
     fi
 }

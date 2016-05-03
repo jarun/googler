@@ -112,7 +112,7 @@ columns = None    # Terminal window size.
 start = "0"       # The first result to display (option -s)
 num = None        # Number of results to display (option -n)
 lang = None       # Language to search for (option -l)
-openUrl = False   # If True, opens the first URL in browser (option -j)
+open_url = False  # If True, opens the first URL in browser (option -j)
 colorize = True   # If True, colorizes the output (option -C)
 duration = None   # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
 conn = None       # Use a single global connection during navigation
@@ -122,6 +122,8 @@ debug = False     # Print debug logs
 news = False      # Read news
 exact = False     # If True, disable automatic spelling correction
 insite = None     # Google search a specific site
+noninteractive = False
+                  # Non-interactive mode
 server = "www.google.com"
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
@@ -321,7 +323,7 @@ class Result:
         text = self.text
 
         # Open the URL in a web browser if option -j was specified.
-        if openUrl:
+        if open_url:
             self.open()
             quit(conn)
 
@@ -609,13 +611,15 @@ addarg('-x', '--exact', dest='exact', action='store_true',
        help='disable automatic spelling correction')
 addarg('-C', '--nocolor', dest='colorize', action='store_false',
        help='disable color output')
-addarg('-j', '--first', '--lucky', dest='openUrl', action='store_true',
+addarg('-j', '--first', '--lucky', dest='open_url', action='store_true',
        help='open the first result in a web browser')
 addarg('-t', '--time', dest='duration', type=is_duration, metavar='dN',
        help='time limit search '
        '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
 addarg('-w', '--site', dest='insite', metavar='SITE',
        help='search a site using Google')
+addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
+       help='perform search and exit, do not prompt for further interactions')
 addarg('-d', '--debug', dest='debug', action='store_true',
        help='enable debugging')
 addarg('keywords', nargs='+', metavar='KEYWORD',
@@ -636,11 +640,12 @@ if args.tld:
 lang = args.lang
 exact = args.exact
 colorize = args.colorize
-openUrl = args.openUrl
+open_url = args.open_url
 duration = args.duration
 debug = args.debug
 keywords = args.keywords
 insite = args.insite
+noninteractive = args.noninteractive
 
 # Get terminal width
 columns, _ = get_terminal_size()
@@ -741,7 +746,7 @@ def fetch_results():
     for r in results:
         r.print_entry()
 
-    if skipped:
+    if skipped and not noninteractive:
         if skipped == 1:
             printerr("%d ad skipped." % skipped)
         else:
@@ -756,6 +761,9 @@ results = []
 while True:
     if nav == "n" or nav == "p" or nav == "g":
         results = fetch_results()
+
+    if noninteractive:
+        break
 
     oldstart = start
     try:
