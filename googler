@@ -122,6 +122,8 @@ debug = False     # Print debug logs
 news = False      # Read news
 exact = False     # If True, disable automatic spelling correction
 insite = None     # Google search a specific site
+noninteractive = False
+                  # Non-interactive mode
 server = "www.google.com"
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
@@ -616,6 +618,8 @@ addarg('-t', '--time', dest='duration', type=is_duration, metavar='dN',
        '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
 addarg('-w', '--site', dest='insite', metavar='SITE',
        help='search a site using Google')
+addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
+       help='perform search and exit, do not prompt for further interactions')
 addarg('-d', '--debug', dest='debug', action='store_true',
        help='enable debugging')
 addarg('keywords', nargs='+', metavar='KEYWORD',
@@ -641,6 +645,7 @@ duration = args.duration
 debug = args.debug
 keywords = args.keywords
 insite = args.insite
+noninteractive = args.noninteractive
 
 # Get terminal width
 columns, _ = get_terminal_size()
@@ -756,6 +761,9 @@ results = []
 while True:
     if nav == "n" or nav == "p" or nav == "g":
         results = fetch_results()
+
+    if noninteractive:
+        break
 
     oldstart = start
     try:
