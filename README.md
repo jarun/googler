@@ -157,6 +157,7 @@ Please substitute `$version` with the appropriate package version.
       -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
                             weeks), m5 (5 months), y5 (5 years)]
       -w SITE, --site SITE  search a site using Google
+      --json                output in JSON format; implies --noprompt
       --np, --noprompt      perform search and exit, do not prompt for further
                             interactions
       -d, --debug           enable debugging

@@ -21,6 +21,7 @@ from __future__ import print_function
 import argparse
 import gzip
 import io
+import json
 import os
 import signal
 import sys
@@ -122,6 +123,7 @@ debug = False     # Print debug logs
 news = False      # Read news
 exact = False     # If True, disable automatic spelling correction
 insite = None     # Google search a specific site
+output_format = 'default'
 noninteractive = False
                   # Non-interactive mode
 server = "www.google.com"
@@ -345,6 +347,14 @@ class Result:
             print("\n")
         else:
             print("%s\n" % text.replace("\n", " "))
+
+    # Returns an object (dict) good for JSON serialization
+    def json_object(self):
+        return {
+            'title': self.title,
+            'url': self.url,
+            'abstract': self.text
+        }
 
     def open(self):
         _stderr = os.dup(2)
@@ -618,6 +628,8 @@ addarg('-t', '--time', dest='duration', type=is_duration, metavar='dN',
        '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
 addarg('-w', '--site', dest='insite', metavar='SITE',
        help='search a site using Google')
+addarg('--json', dest='json', action='store_true',
+       help='output in JSON format; implies --noprompt')
 addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
        help='perform search and exit, do not prompt for further interactions')
 addarg('-d', '--debug', dest='debug', action='store_true',
@@ -646,6 +658,9 @@ debug = args.debug
 keywords = args.keywords
 insite = args.insite
 noninteractive = args.noninteractive
+if args.json:
+    output_format = 'json'
+    noninteractive = True
 
 # Get terminal width
 columns, _ = get_terminal_size()
@@ -743,8 +758,12 @@ def fetch_results():
     parser.feed(resp_body)
 
     results = parser.results
-    for r in results:
-        r.print_entry()
+    if output_format == 'json':
+        results_object = [r.json_object() for r in results]
+        print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
+    else:
+        for r in results:
+            r.print_entry()
 
     if skipped and not noninteractive:
         if skipped == 1:
