@@ -15,4 +15,4 @@ complete -c googler -s j -l first -l lucky --description 'open the first result 
 complete -c googler -s t -l time   -r      --description 'time limit search (h/d/w/m/y + number)'
 complete -c googler -s w -l site   -r      --description 'search a site using Google'
 complete -c googler -s d -l debug          --description 'enable debugging'
-complete -c googler -l lp -l noprompt      --description 'perform search and exit'
+complete -c googler -l np -l noprompt      --description 'perform search and exit'
