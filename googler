@@ -55,19 +55,21 @@ else:
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
     sys.stderr = codecs.getwriter('utf-8')(sys.stderr)
 
-# POSIX compatibility layer
+"""
+POSIX compatibility layer
+ - os.get_terminal_size is only available on Python 3.3+.
+ - fcntl and termios are only available on POSIX systems.
 
-# - os.get_terminal_size is only available on Python 3.3+.
-# - fcntl and termios are only available on POSIX systems.
-#
-# Our version and platform-independent get_terminal_size always returns
-# a tuple (columns, lines), just like os.get_terminal_size. When
-# unavaliable, returns (0, 0).
+ This version of platform-independent get_terminal_size always returns a tuple
+ (columns, lines), just like os.get_terminal_size. When unavailable, returns (0, 0).
+"""
 def _environ_get_terminal_size():
     return (int(os.environ.get('COLUMNS', 0)), int(os.environ.get('LINES', 0)))
 
 if hasattr(os, 'get_terminal_size'):
     def get_terminal_size():
+        """Returns terminal size on Python 3.3+"""
+
         try:
             return os.get_terminal_size()
         except OSError:
@@ -79,6 +81,8 @@ else:
         import termios
 
         def get_terminal_size():
+            """Returns terminal size on POSIX systems"""
+
             try:
                 winsz = fcntl.ioctl(sys.stderr, termios.TIOCGWINSZ, '1234')
                 lines, columns = struct.unpack('HH', winsz)
@@ -91,51 +95,59 @@ else:
     except ImportError:
         get_terminal_size = _environ_get_terminal_size
 
-# Python optional dependency compatility layer
+# Python optional dependency compatibility layer
 try:
     import readline
 except ImportError:
     pass
 
 
-# Install SIGINT handler
-
 def sigint_handler(signum, frame):
+    """Install SIGINT handler"""
+
     print('\nInterrupted.', file=sys.stderr)
     sys.exit(1)
 
+# Register signal handler
 signal.signal(signal.SIGINT, sigint_handler)
 
 
 # Global variables
 
-columns = None    # Terminal window size.
-start = "0"       # The first result to display (option -s)
-num = None        # Number of results to display (option -n)
-lang = None       # Language to search for (option -l)
-open_url = False  # If True, opens the first URL in browser (option -j)
-colorize = True   # If True, colorizes the output (option -C)
-duration = None   # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
-conn = None       # Use a single global connection during navigation
-nav = "n"         # For user navigation
-skipped = 0       # Count for skipped ads or blank links
-debug = False     # Print debug logs
-news = False      # Read news
-exact = False     # If True, disable automatic spelling correction
-insite = None     # Google search a specific site
-output_format = 'default'
-noninteractive = False
-                  # Non-interactive mode
-server = "www.google.com"
+columns = None              # Terminal window size.
+start = '0'                 # The first result to display (option -s)
+num = None                  # Number of results to display (option -n)
+lang = None                 # Language to search for (option -l)
+open_url = False            # If True, opens the first URL in browser (option -j)
+colorize = True             # If True, colorizes the output (option -C)
+duration = None             # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
+conn = None                 # Use a single global connection during navigation
+nav = 'n'                   # For user navigation
+skipped = 0                 # Count for skipped ads or blank links
+debug = False               # Print debug logs
+news = False                # Read news
+exact = False               # If True, disable automatic spelling correction
+insite = None               # Google search a specific site
+output_format = 'default'   # Regular (normal) output or Json output
+noninteractive = False      # Non-interactive mode
+server = "www.google.com"   # Default server to connect to
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
-                  # Disguise as Microsoft Edge
-_VERSION_ = 2.4   # Current version
+                            # Set user agent as Microsoft Edge
+_VERSION_ = 2.4             # Current version
 
-
-# Classes
 
 class GoogleParser(HTMLParser.HTMLParser):
+    """The members of this class parse the result
+    HTML page fetched from Google server for a query.
+
+    The custom parser looks for tags enclosing search
+    results and extracts the URL, title and text for
+    each search result.
+
+    After parsing the complete HTML page results are
+    returned in a list of objects of class Result.
+    """
 
     def __init__(self):
         HTMLParser.HTMLParser.__init__(self)
