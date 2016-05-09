@@ -323,6 +323,9 @@ class GoogleParser(HTMLParser.HTMLParser):
 
 
 class Result:
+    """Encapsulates a search result as
+    an index, title, URL and text tuple.
+    """
 
     def __init__(self, index, title, url, text):
         self.index = index
@@ -387,6 +390,8 @@ class Result:
 # Functions
 
 def is_int(string):
+    """Check if a sting is an integer"""
+
     try:
         int(string)
         return True
@@ -394,8 +399,10 @@ def is_int(string):
         return False
 
 def server_url(tld):
-    # Data source: https://en.wikipedia.org/wiki/List_of_Google_domains
-    # Scraper script: https://gist.github.com/zmwangx/b976e83c14552fe18b71
+    """Data source: https://en.wikipedia.org/wiki/List_of_Google_domains
+    Scraper script: https://gist.github.com/zmwangx/b976e83c14552fe18b71
+    """
+
     tld_to_domain_map = {
         'ac': 'google.ac',      'ad': 'google.ad',      'ae': 'google.ae',
         'af': 'google.com.af',  'ag': 'google.com.ag',  'ai': 'google.com.ai',
@@ -472,9 +479,11 @@ def server_url(tld):
         return 'www.google.com'
 
 
-# Send a GET request to Google with the appropriate headers.
-# url can be relative (to the appropriate Google domain).
 def google_get(conn, url):
+    """Send a GET request to Google with the appropriate headers.
+    url can be relative (to the appropriate Google domain).
+    """
+
     global ua
     conn.request("GET", url, None, {
         "Accept-encoding": "gzip",
@@ -483,22 +492,25 @@ def google_get(conn, url):
     return conn.getresponse()
 
 
-# Returns a new connection to the given domain with appropriate options.
-# When the given domain is absent, the global variable server is used
-# instead.
 def new_connection(domain=None):
+    """Returns a new connection to the given domain with appropriate options.
+    When the given domain is absent, the global variable server is used instead.
+    """
+
     global server
     return HTTPSConnection(domain if domain else server, timeout=45)
 
 
-# Closes a connection and quits the program
 def quit(conn):
+    """Closes a connection and quits the program"""
+
     conn.close()
     sys.exit(1)
 
 
-# Show the search or navigation omniprompt:
 def show_omniprompt():
+    """Show the search or navigation omniprompt."""
+
     global colorize
 
     message = "Enter n, p, result number or new keywords (? for help)"
@@ -510,10 +522,12 @@ def show_omniprompt():
 
 # Messaging wrappers
 
-# Print message, led with [%(level)s] where level is a string, to
-# stderr.  If ansi is not None and the global variable colorize is True,
-# then print ansi at the beginning, and close with \x1b[0m.
 def message(msg, level="INFO", ansi=None):
+    """Print message, led with [%(level)s] where level is a string, to
+    stderr.  If ansi is not None and the global variable colorize is True,
+    then print ansi at the beginning, and close with \x1b[0m.
+    """
+
     global colorize
 
     if ansi is not None and colorize:
@@ -526,23 +540,27 @@ def message(msg, level="INFO", ansi=None):
     ), file=sys.stderr)
 
 
-# Print error message.
 def error(msg):
-    # Error in red if colorize
+    """Print error message.
+    Error in red if colorize.
+    """
+
     message(msg, "ERROR", "\x1b[31m")
 
 
-# Print warning message.
 def warning(msg):
-    # Warning in yellow if colorize
+    """Print warning message.
+    Warning in yellow if colorize
+    """
+
     message(msg, "WARNING", "\x1b[33m")
 
 
-# Print debug message.
-#
-# debugp stands for "debug print". The name `debug' was already taken,
-# so we had to choose something else.
 def debugp(msg):
+    """Print debug message.
+    debugp stands for "debug print".
+    """
+
     global debug
 
     if debug:
@@ -550,8 +568,9 @@ def debugp(msg):
         message(msg, "DEBUG")
 
 
-# Print message, verbatim, to stderr.
 def printerr(msg):
+    """Print message, verbatim, to stderr."""
+
     print(msg, file=sys.stderr)
 
 
