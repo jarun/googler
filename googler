@@ -580,6 +580,9 @@ def printerr(msg):
 keywords = None
 
 class ExtendedArgumentParser(argparse.ArgumentParser):
+    """Custom argument parser for googler,
+    extends classic ArgumentParser
+    """
 
     # Print omniprompt help
     @staticmethod
@@ -672,6 +675,7 @@ if len(sys.argv) < 2:
     argparser.print_help(sys.stderr)
     sys.exit(1)
 
+# Set global variables
 args = argparser.parse_args()
 if args.start:
     start = str(args.start)
@@ -732,6 +736,8 @@ conn = new_connection()
 
 
 def fetch_results():
+    """Connect to server and fetch results"""
+
     global conn
     global url
     global skipped
