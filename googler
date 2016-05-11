@@ -280,22 +280,23 @@ class GoogleParser(HTMLParser.HTMLParser):
     #
     # Google News
     #
-    # - Google News results differ from Google Search results in the following ways.
+    # - Google News results differ from Google Search results in the
+    #   following ways:
     #
-    # - For each result, the title in the same format, but there's a
+    #   For each result, the title in the same format, but there's a
     #   metadata field in a <div> tag with class "slp", and the abstract
     #   isn't as deeply embedded: it's in a <div> tag on the same level
     #   with class "st".
     #
     #   <!-- within the scope of result_* -->
     #   <h3 class="r"></h3>  <!-- as before -->
-    #   <div class="slp">    <!-- annotate as news_metadata, start_populating_textbuf -->
+    #   <div class="slp">    <!-- annotate as 'news_metadata', start_populating_textbuf -->
     #     ...
     #     <span>source</span>
     #     <span>-</span>     <!-- transform to ', ' -->
     #     <span>publishing time</span>
     #   </div>               <!-- stop_populating_textbuf, pop to self.metadata -->
-    #   <div class="st">     <!-- annotate as news_abstract, start_populating_textbuf -->
+    #   <div class="st">     <!-- annotate as 'news_abstract', start_populating_textbuf -->
     #     abstract text again with <em> markup on keywords
     #   </div>               <!-- stop_populating_textbuf, pop to self.abstract -->
 
@@ -368,13 +369,13 @@ class GoogleParser(HTMLParser.HTMLParser):
                 self.results.append(result)
             self.set_handlers_to('main')
         elif annotation == 'news_metadata':
+            self.stop_populating_textbuf()
             self.metadata = self.pop_textbuf()
             self.metadata_registered = True
-            self.stop_populating_textbuf()
         elif annotation == 'news_abstract':
+            self.stop_populating_textbuf()
             self.abstract = self.pop_textbuf()
             self.abstract_registered = True
-            self.stop_populating_textbuf()
 
     @annotate_tag
     def title_start(self, tag, attrs):
@@ -392,9 +393,9 @@ class GoogleParser(HTMLParser.HTMLParser):
         if annotation == 'title_filetype':
             self.stop_populating_textbuf()
         elif annotation == 'title_link':
+            self.stop_populating_textbuf()
             self.title = self.pop_textbuf()
             self.title_registered = True
-            self.stop_populating_textbuf()
         elif annotation == 'title':
             self.set_handlers_to('result')
 
@@ -407,9 +408,9 @@ class GoogleParser(HTMLParser.HTMLParser):
     @retrieve_tag_annotation
     def abstract_end(self, tag, annotation):
         if annotation == 'abstract_text':
+            self.stop_populating_textbuf()
             self.abstract = self.pop_textbuf()
             self.abstract_registered = False
-            self.stop_populating_textbuf()
         elif annotation == 'abstract':
             self.set_handlers_to('result')
 
