@@ -123,7 +123,6 @@ colorize = True             # If True, colorizes the output (option -C)
 duration = None             # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
 conn = None                 # Use a single global connection during navigation
 nav = 'n'                   # For user navigation
-skipped = 0                 # Count for skipped ads or blank links
 debug = False               # Print debug logs
 news = False                # Read news
 exact = False               # If True, disable automatic spelling correction
@@ -137,6 +136,32 @@ ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
 _VERSION_ = 2.4             # Current version
 
 
+def annotate_tag(annotated_starttag_handler):
+    # See parser logic within the GoogleParser class for documentation.
+    #
+    # annotated_starttag_handler(self, tag: str, attrsdict: dict) -> annotation
+    # Returns: HTMLParser.handle_starttag(self, tag: str, attrs: list) -> None
+
+    def handler(self, tag, attrs):
+        annotation = annotated_starttag_handler(self, tag, dict(attrs))
+        if tag not in self.tag_annotations:
+            self.tag_annotations[tag] = []
+        self.tag_annotations[tag].append(annotation)
+
+    return handler
+
+def retrieve_tag_annotation(annotated_endtag_handler):
+    # See parser logic within the GoogleParser class for documentation.
+    #
+    # annotated_endtag_handler(self, tag: str, annotation) -> None
+    # Returns: HTMLParser.handle_endtag(self, tag: str) -> None
+
+    def handler(self, tag):
+        annotation = self.tag_annotations[tag].pop()
+        annotated_endtag_handler(self, tag, annotation)
+
+    return handler
+
 class GoogleParser(HTMLParser.HTMLParser):
     """The members of this class parse the result
     HTML page fetched from Google server for a query.
@@ -149,156 +174,281 @@ class GoogleParser(HTMLParser.HTMLParser):
     returned in a list of objects of class Result.
     """
 
+    # Parser logic:
+    #
+    # - Guiding principles:
+    #
+    #   1. Tag handlers are contextual;
+    #
+    #   2. Contexual starttag and endtag handlers should come in pairs
+    #      and have a clear hierarchy;
+    #
+    #   3. Starttag handlers should only yield control to a pair of
+    #      child handlers (that is, one level down the hierachy), and
+    #      correspondingly, endtag handlers should only return control
+    #      to the parent (that is, the pair of handlers that gave it
+    #      control in the first place).
+    #
+    #   Principle 3 is meant to enforce a (possibly implicit) stack
+    #   structure and thus prevent careless jumps that result in what's
+    #   essentially spaghetti code with liberal use of GOTOs.
+    #
+    # - HTMLParser.handle_endtag gives us a bare tag name without
+    #   context, which is not good for enforcing principle 3 when we
+    #   have, say, nested div tags.
+    #
+    #   In order to precisely identify the matching opening tag, we
+    #   maintain a stack for each tag name with *annotations*. Important
+    #   opening tags (e.g., the ones where child handlers are
+    #   registered) can be annotated so that when we can watch for the
+    #   annotation in the endtag handler, and when the appropriate
+    #   annotation is popped, we perform the corresponding action (e.g.,
+    #   switch back to old handlers).
+    #
+    #   To facilitate this, each starttag handler is decorated with
+    #   @annotate_tag, which accepts a return value that is the
+    #   annotation (None by default), and additionally converts attrs to
+    #   a dict, which is much easier to work with; and each endtag
+    #   handler is decorated with @retrieve_tag_annotation which sends
+    #   an additional parameter that is the retrieved annotation to the
+    #   handler.
+    #
+    #   Note that some of our tag annotation stacks leak over time: this
+    #   happens to tags like <img> and <hr> which are not
+    #   closed. However, these tags play no structural role, and come
+    #   only in small quantities, so it's not really a problem.
+    #
+    # - All textual data (result title, result abstract, etc.) are
+    #   processed through a set of shared handlers. These handlers store
+    #   text in a shared buffer self.textbuf which can be retrieved and
+    #   cleared at appropriate times.
+    #
+    #   Data (including charrefs and entityrefs) are ignored initially,
+    #   and when data needs to be recorded, the start_populating_textbuf
+    #   method is called to register the appropriate data, charref and
+    #   entityref handlers so that they append to self.textbuf. When
+    #   recording ends, pop_textbuf should be called to extract the text
+    #   and clear the buffer. stop_populating_textbuf returns the
+    #   handlers to their pristine state (ignoring data).
+    #
+    #   Methods:
+    #   - start_populating_textbuf(self, data_transformer: Callable[[str], str]) -> None
+    #   - pop_textbuf(self) -> str
+    #   - stop_populating_textbuf(self) -> None
+    #
+    # - Outermost starttag and endtag handler methods: main_*. The whole
+    #   parser starts and ends in this state.
+    #
+    # - Each result is wrapped in a <div> tag with class "g".
+    #
+    #   <!-- within the scope of main_* -->
+    #   <div class="g">  <!-- annotate as 'result', hand over to result_* -->
+    #   </div>           <!-- hand back to main_*, register result -->
+    #
+    # - For each result, the first <h3> tag with class "r" contains the
+    #   hyperlinked title, and the (optional) first <div> tag with class
+    #   "s" contains the abstract of the result.
+    #
+    #   <!-- within the scope of result_* -->
+    #   <h3 class="r">   <!-- annotate as 'title', hand over to title_* -->
+    #   </h3>            <!-- hand back to result_* -->
+    #   <div class="s">  <!-- annotate as 'abstract', hand over to abstract_* -->
+    #   </div>           <!-- hand back to result_* -->
+    #
+    # - Each title looks like
+    #
+    #   <h3 class="r">
+    #     <!-- within the scope of title_* -->
+    #     <span>                 <!-- filetype (optional), annotate as title_filetype,
+    #                                 start_populating_textbuf -->
+    #       file type (e.g. [PDF])
+    #     </span>                <!-- stop_populating_textbuf -->
+    #     <a href="result url">  <!-- register self.url, annotate as 'title_link',
+    #                                 start_populating_textbuf -->
+    #       result title
+    #     </a>                   <!-- stop_populating_textbuf, pop to self.title -->
+    #   </h3>
+    #
+    # - For each abstract, the first <span> tag with class "st" contains
+    #   the body text of the abstract.
+    #
+    #   <!-- within the scope of abstract_* -->
+    #   <span class="st">  <!-- annotate as 'abstract_text', start_populating_textbuf -->
+    #     abstract text with <em> markup on keywords
+    #   </span>            <!-- stop_populating_textbuf, pop to self.abstract -->
+    #
+    #
+    # Google News
+    #
+    # - Google News results differ from Google Search results in the following ways.
+    #
+    # - For each result, the title in the same format, but there's a
+    #   metadata field in a <div> tag with class "slp", and the abstract
+    #   isn't as deeply embedded: it's in a <div> tag on the same level
+    #   with class "st".
+    #
+    #   <!-- within the scope of result_* -->
+    #   <h3 class="r"></h3>  <!-- as before -->
+    #   <div class="slp">    <!-- annotate as news_metadata, start_populating_textbuf -->
+    #     ...
+    #     <span>source</span>
+    #     <span>-</span>     <!-- transform to ', ' -->
+    #     <span>publishing time</span>
+    #   </div>               <!-- stop_populating_textbuf, pop to self.metadata -->
+    #   <div class="st">     <!-- annotate as news_abstract, start_populating_textbuf -->
+    #     abstract text again with <em> markup on keywords
+    #   </div>               <!-- stop_populating_textbuf, pop to self.abstract -->
+
     def __init__(self):
         HTMLParser.HTMLParser.__init__(self)
-        self.handle_starttag = self.main_start
-        self.handle_data = self.main_data
-        self.handle_endtag = self.main_end
-        # Use stacks to keep track of the hierarchy of entityref/charref handlers
-        self.old_entityref_handlers = [self.handle_entityref]
-        self.old_charref_handlers = [self.handle_charref]
+
         self.results = []
 
+        self.index = 0
+        self.textbuf = ''
+        self.tag_annotations = {}
+
+        self.set_handlers_to('main')
+
+    ### Tag handlers ###
+
+    @annotate_tag
     def main_start(self, tag, attrs):
-        if tag == "div" and len(attrs) > 0 and attrs[0] == ("class", "g"):
-            self.title = ""
-            self.url = ""
-            self.text = ""
-            self.handle_starttag = self.div_outer_start
-            self.handle_data = self.div_outer_data
-            self.handle_endtag = self.div_outer_end
+        # We omit "card" results which usually have a class list along
+        # the line of "g mnr-c g-blk".
+        if tag == 'div' and attrs.get('class') == 'g':
+            # Initialize result field registers
+            self.title = ''
+            self.url = ''
+            self.abstract = ''
+            self.metadata = '' # Only used for Google News
 
-    def main_data(self, data):
+            # Guard against sitelinks, which also have titles and
+            # abstracts.  In the case of news, guard against "card
+            # sections" (secondary results to the same event).
+            self.title_registered = False
+            self.abstract_registered = False
+            self.metadata_registered = False # Only used for Google News
+
+            self.set_handlers_to('result')
+            return 'result'
+
+    @retrieve_tag_annotation
+    def main_end(self, tag, annotation):
         pass
 
-    def main_end(self, tag):
-        pass
+    @annotate_tag
+    def result_start(self, tag, attrs):
+        if not self.title_registered and tag == 'h3' and 'r' in self.classes(attrs):
+            self.set_handlers_to('title')
+            return 'title'
 
-    # outer <div class="g"> ... </div>
-    def div_outer_start(self, tag, attrs):
-        if tag == "h3":
-            self.handle_starttag = self.h3_start
-            self.handle_data = self.h3_data
-            self.register_entityref_and_charref_handlers('title')
-            self.handle_endtag = self.h3_end
-        elif tag == "div" and len(attrs) > 0 and attrs[0] == ("class", "s"):
-            self.handle_starttag = self.div_inner_start
-            self.handle_data = self.div_inner_data
-            self.handle_endtag = self.div_inner_end
+        if not self.abstract_registered and tag == 'div' and 's' in self.classes(attrs):
+            self.set_handlers_to('abstract')
+            return 'abstract'
 
-    def div_outer_data(self, data):
         global news
-
         if news:
-            if data == '-':
-                self.text += ', '
-            else:
-                self.text += data
+            if not self.metadata_registered and tag == 'div' and 'slp' in self.classes(attrs):
+                # Change metadata field separator from '-' to ', ' for better appearance
+                self.start_populating_textbuf(lambda text: ', ' if text == '-' else text)
+                return 'news_metadata'
+
+            if not self.abstract_registered and tag == 'div' and 'st' in self.classes(attrs):
+                self.start_populating_textbuf()
+                return 'news_abstract'
+
+    @retrieve_tag_annotation
+    def result_end(self, tag, annotation):
+        if annotation == 'result':
+            if self.url:
+                self.index += 1
+                result = Result(self.index, self.title, self.url, self.abstract,
+                                metadata=self.metadata if self.metadata else None)
+                self.results.append(result)
+            self.set_handlers_to('main')
+        elif annotation == 'news_metadata':
+            self.metadata = self.pop_textbuf()
+            self.metadata_registered = True
+            self.stop_populating_textbuf()
+        elif annotation == 'news_abstract':
+            self.abstract = self.pop_textbuf()
+            self.abstract_registered = True
+            self.stop_populating_textbuf()
+
+    @annotate_tag
+    def title_start(self, tag, attrs):
+        if tag == 'span':
+            # Print a space after the filetype indicator
+            self.start_populating_textbuf(lambda text: text + ' ')
+            return 'title_filetype'
+        if tag == 'a' and 'href' in attrs:
+            self.url = attrs['href']
+            self.start_populating_textbuf()
+            return 'title_link'
+
+    @retrieve_tag_annotation
+    def title_end(self, tag, annotation):
+        if annotation == 'title_filetype':
+            self.stop_populating_textbuf()
+        elif annotation == 'title_link':
+            self.title = self.pop_textbuf()
+            self.title_registered = True
+            self.stop_populating_textbuf()
+        elif annotation == 'title':
+            self.set_handlers_to('result')
+
+    @annotate_tag
+    def abstract_start(self, tag, attrs):
+        if tag == 'span' and 'st' in self.classes(attrs):
+            self.start_populating_textbuf()
+            return 'abstract_text'
+
+    @retrieve_tag_annotation
+    def abstract_end(self, tag, annotation):
+        if annotation == 'abstract_text':
+            self.abstract = self.pop_textbuf()
+            self.abstract_registered = False
+            self.stop_populating_textbuf()
+        elif annotation == 'abstract':
+            self.set_handlers_to('result')
+
+    ### Generic methods ###
+
+    # Set handle_starttag to SCOPE_start, and handle_endtag to SCOPE_end.
+    def set_handlers_to(self, scope):
+        self.handle_starttag = getattr(self, scope + '_start')
+        self.handle_endtag = getattr(self, scope + '_end')
+
+    def start_populating_textbuf(self, data_transformer=None):
+        if data_transformer is None:
+            # Record data verbatim
+            self.handle_data = self.record_data
         else:
-            pass
+            def record_transformed_data(data):
+                self.textbuf += data_transformer(data)
 
-    def div_outer_end(self, tag):
-        global skipped
+            self.handle_data = record_transformed_data
 
-        if tag == "div":
-            marker = self.url.find("?q=")
-            if marker >= 0:
-                self.url = self.url[marker + 3:]
-            marker = self.url.find("&sa")
-            if marker >= 0:
-                self.url = self.url[:marker]
+        self.handle_entityref = self.record_entityref
+        self.handle_charref = self.record_charref
 
-            if self.url != "":
-                if self.url.find("://", 0, 12) >= 0:
-                    index = len(self.results) + 1
-                    self.results.append(Result(index, self.title,
-                                               self.url,
-                                               self.text))
-                else:
-                    skipped += 1
+    def pop_textbuf(self):
+        text = self.textbuf
+        self.textbuf = ''
+        return text
 
-            self.handle_starttag = self.main_start
-            self.handle_data = self.main_data
-            self.handle_endtag = self.main_end
+    def stop_populating_textbuf(self):
+        self.handle_data = lambda data: None
+        self.handle_entityref = lambda ref: None
+        self.handle_charref = lambda ref: None
 
-    # <h3> ... </h3>
-    def h3_start(self, tag, attrs):
-        if tag == "a":
-            for name, value in attrs:
-                if name == "href":
-                    self.url = value
+    def record_data(self, data):
+        self.textbuf += data
 
-    def h3_data(self, data):
-        self.title += data
-
-    def h3_end(self, tag):
-        if tag == "h3":
-            self.handle_starttag = self.div_outer_start
-            self.handle_data = self.div_outer_data
-            self.restore_entityref_and_charref_handlers()
-            self.handle_endtag = self.div_outer_end
-
-    # inner <div> ... </div>
-    def div_inner_start(self, tag, attrs):
-        if tag == "span" and len(attrs) > 0 and attrs[0] == ("class", "st"):
-            self.handle_starttag = self.span_outer_start
-            self.handle_data = self.span_outer_data
-            self.register_entityref_and_charref_handlers('text')
-            self.handle_endtag = self.span_outer_end
-
-    def div_inner_data(self, data):
-        pass
-
-    def div_inner_end(self, tag):
-        pass
-
-    def span_outer_start(self, tag, attrs):
-        if tag == "span" and len(attrs) > 0 and attrs[0] == ("class", "f"):
-            self.handle_starttag = self.span_inner_start
-            self.handle_data = self.span_inner_data
-            self.register_entityref_and_charref_handlers('text')
-            self.handle_endtag = self.span_inner_end
-
-    def span_outer_data(self, data):
-        self.text += data
-
-    def span_outer_end(self, tag):
-        if tag == "span":
-            self.handle_starttag = self.div_outer_start
-            self.handle_data = self.div_outer_data
-            self.restore_entityref_and_charref_handlers()
-            self.handle_endtag = self.div_outer_end
-
-    def span_inner_start(self, tag, start):
-        pass
-
-    def span_inner_data(self, data):
-        self.text += data
-
-    def span_inner_end(self, tag):
-        if tag == "span":
-            self.handle_starttag = self.span_outer_start
-            self.handle_data = self.span_outer_data
-            self.restore_entityref_and_charref_handlers()
-            self.handle_endtag = self.span_outer_end
-
-    # Register entityref and charref handlers so that decoded refs are
-    # appended to the attribute (of self) named dest (e.g., 'title' or
-    # 'text').
-    def register_entityref_and_charref_handlers(self, dest):
-        self.old_entityref_handlers.append(self.handle_entityref)
-        self.old_charref_handlers.append(self.handle_charref)
-        self.handle_entityref = lambda ref: self.entityref(dest, ref)
-        self.handle_charref = lambda ref: self.charref(dest, ref)
-
-    def restore_entityref_and_charref_handlers(self):
-        self.handle_entityref = self.old_entityref_handlers.pop()
-        self.handle_charref = self.old_charref_handlers.pop()
-
-    def entityref(self, dest, ref):
+    def record_entityref(self, ref):
         try:
-            char = unichr(name2codepoint[ref])
-            setattr(self, dest, getattr(self, dest) + char)
+            self.textbuf += unichr(name2codepoint[ref])
         except KeyError:
             # Entity name not found; most likely rather sloppy HTML
             # where a literal ampersand is not escaped; For instance,
@@ -312,32 +462,39 @@ class GoogleParser(HTMLParser.HTMLParser):
             #
             # where &p is interpreted by HTMLParser as an entity (this
             # behaviour seems to be specific to Python 2.7).
-            setattr(self, dest, getattr(self, dest) + '&' + ref)
+            self.textbuf += '&' + ref
 
-    def charref(self, dest, ref):
+    def record_charref(self, ref):
         if ref.startswith('x'):
             char = unichr(int(ref[1:], 16))
         else:
             char = unichr(int(ref))
-        setattr(self, dest, getattr(self, dest) + char)
+        self.textbuf += char
+
+    @staticmethod
+    def classes(attrs):
+        """Get tag's classes from its attribute dict."""
+        return attrs.get('class', '').split()
 
 
 class Result:
-    """Encapsulates a search result as
-    an index, title, URL and text tuple.
+    """Encapsulates a search result's index, title, URL and abstract
+    (and optionally metadata for Google News).
     """
 
-    def __init__(self, index, title, url, text):
+    def __init__(self, index, title, url, abstract, metadata=None):
         self.index = index
         self.title = title
         self.url = url
-        self.text = text
+        self.abstract = abstract
+        self.metadata = metadata
 
     def print_entry(self):
         index = self.index
         title = self.title
         url = self.url
-        text = self.text
+        metadata = self.metadata
+        abstract = self.abstract
 
         # Open the URL in a web browser if option -j was specified.
         if open_url:
@@ -350,10 +507,15 @@ class Result:
                   "\x1B[0m\n\x1B[93m%s\x1B[39m" % url)
         else:
             print("", index, title, "\n%s" % url)
-        # Hard wrap text if the number of columns is available.
+
+        # Print metadata for Google News.
+        if metadata:
+            print(metadata)
+
+        # Hard wrap abstract if the number of columns is available.
         if columns > 0:
             col = 0
-            for w in text.split():
+            for w in abstract.split():
                 if (col + len(w) + 1) > columns:
                     col = 0
                     print()
@@ -361,15 +523,18 @@ class Result:
                 col += len(w) + 1
             print("\n")
         else:
-            print("%s\n" % text.replace("\n", " "))
+            print("%s\n" % abstract.replace("\n", " "))
 
     # Returns an object (dict) good for JSON serialization
     def json_object(self):
-        return {
+        obj = {
             'title': self.title,
             'url': self.url,
-            'abstract': self.text
+            'abstract': self.abstract
         }
+        if self.metadata:
+            obj['metadata'] = self.metadata
+        return obj
 
     def open(self):
         _stderr = os.dup(2)
@@ -740,7 +905,6 @@ def fetch_results():
 
     global conn
     global url
-    global skipped
 
     try:
         resp = google_get(conn, url)
@@ -801,14 +965,6 @@ def fetch_results():
     else:
         for r in results:
             r.print_entry()
-
-    if skipped and not noninteractive:
-        if skipped == 1:
-            printerr("%d ad skipped." % skipped)
-        else:
-            printerr("%d ads skipped." % skipped)
-
-        skipped = 0
 
     return results
 
