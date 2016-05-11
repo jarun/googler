@@ -118,7 +118,7 @@ columns = None              # Terminal window size.
 start = '0'                 # The first result to display (option -s)
 num = None                  # Number of results to display (option -n)
 lang = None                 # Language to search for (option -l)
-open_url = False            # If True, opens the first URL in browser (option -j)
+lucky = False               # If True, opens the first URL in browser (option -j)
 colorize = True             # If True, colorizes the output (option -C)
 duration = None             # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
 conn = None                 # Use a single global connection during navigation
@@ -277,6 +277,42 @@ class GoogleParser(HTMLParser.HTMLParser):
     #     abstract text with <em> markup on keywords
     #   </span>            <!-- stop_populating_textbuf, pop to self.abstract -->
     #
+    # - Certain results may come with sitelinks, secondary results that
+    #   are usually subdomains or deep links within the primary
+    #   result. They are organized into a <table> tag, and each sitelink
+    #   is in a separate <td>:
+    #
+    #   <!-- within the scope of result_* -->
+    #   <table>    <!-- annotate as 'sitelink_table', hand over to sitelink_table_* -->
+    #     <tr>
+    #       <td>   <!-- annotate as 'sitelink', hand over to sitelink_* -->
+    #       </td>  <!-- append to self.sitelinks, hand back to sitelink_table_* -->
+    #       <td></td>
+    #       ...
+    #     </tr>
+    #     <tr></tr>
+    #     ...
+    #   </table>   <!-- hand back to result_* -->
+    #
+    #   Then for each sitelink, the hyperlinked title is in an <h3> tag
+    #   with class "r", and the abstract is in a <div> tag with class
+    #   "st". They are not necessarily on the same level, but we don't
+    #   really care.
+    #
+    #   <!-- within the scope of sitelink_* -->
+    #   <h3 class="r">             <!-- annotate as 'sitelink_title',
+    #                                   hand over to sitelink_title_* -->
+    #     <a href="sitelink url">  <!-- register sitelink url, annotate as 'sitelink_title_link',
+    #                                   start_populating_textbuf -->
+    #       sitelink title
+    #     </a>                     <!-- stop_populating_textbuf, pop to sitelink title -->
+    #   </h3>                      <!-- hand back to sitelink_* -->
+    #
+    #   <!-- still within the scope of sitelink_* -->
+    #   <div class="st">  <!-- annotate as 'sitelink_abstract', start_populating_textbuf -->
+    #     abstract text
+    #   </div>            <!-- stop_populating_textbuf, pop to sitelink abstract -->
+    #
     #
     # Google News
     #
@@ -323,6 +359,7 @@ class GoogleParser(HTMLParser.HTMLParser):
             self.url = ''
             self.abstract = ''
             self.metadata = '' # Only used for Google News
+            self.sitelinks = []
 
             # Guard against sitelinks, which also have titles and
             # abstracts.  In the case of news, guard against "card
@@ -348,6 +385,10 @@ class GoogleParser(HTMLParser.HTMLParser):
             self.set_handlers_to('abstract')
             return 'abstract'
 
+        if not self.sitelinks and tag == 'table':
+            self.set_handlers_to('sitelink_table')
+            return 'sitelink_table'
+
         global news
         if news:
             if not self.metadata_registered and tag == 'div' and 'slp' in self.classes(attrs):
@@ -365,7 +406,8 @@ class GoogleParser(HTMLParser.HTMLParser):
             if self.url:
                 self.index += 1
                 result = Result(self.index, self.title, self.url, self.abstract,
-                                metadata=self.metadata if self.metadata else None)
+                                metadata=self.metadata if self.metadata else None,
+                                sitelinks=self.sitelinks)
                 self.results.append(result)
             self.set_handlers_to('main')
         elif annotation == 'news_metadata':
@@ -413,6 +455,53 @@ class GoogleParser(HTMLParser.HTMLParser):
             self.abstract_registered = False
         elif annotation == 'abstract':
             self.set_handlers_to('result')
+
+    @annotate_tag
+    def sitelink_table_start(self, tag, attrs):
+        if tag == 'td':
+            # Initialize a new sitelink
+            self.current_sitelink = Sitelink('', '', '')
+            self.set_handlers_to('sitelink')
+            return 'sitelink'
+
+    @retrieve_tag_annotation
+    def sitelink_table_end(self, tag, annotation):
+        if annotation == 'sitelink_table':
+            self.set_handlers_to('result')
+
+    @annotate_tag
+    def sitelink_start(self, tag, attrs):
+        if tag == 'h3' and 'r' in self.classes(attrs):
+            self.set_handlers_to('sitelink_title')
+            return 'sitelink_title'
+        if tag == 'div' and 'st' in self.classes(attrs):
+            self.start_populating_textbuf()
+            return 'sitelink_abstract'
+
+    @retrieve_tag_annotation
+    def sitelink_end(self, tag, annotation):
+        if annotation == 'sitelink_abstract':
+            self.stop_populating_textbuf()
+            self.current_sitelink.abstract = self.pop_textbuf()
+        elif annotation == 'sitelink':
+            if self.current_sitelink.url:
+                self.sitelinks.append(self.current_sitelink)
+            self.set_handlers_to('sitelink_table')
+
+    @annotate_tag
+    def sitelink_title_start(self, tag, attrs):
+        if tag == 'a' and 'href' in attrs:
+            self.current_sitelink.url = attrs['href']
+            self.start_populating_textbuf()
+            return 'sitelink_title_link'
+
+    @retrieve_tag_annotation
+    def sitelink_title_end(self, tag, annotation):
+        if annotation == 'sitelink_title_link':
+            self.stop_populating_textbuf()
+            self.current_sitelink.title = self.pop_textbuf()
+        elif annotation == 'sitelink_title':
+            self.set_handlers_to('sitelink')
 
     ### Generic methods ###
 
@@ -478,53 +567,95 @@ class GoogleParser(HTMLParser.HTMLParser):
         return attrs.get('class', '').split()
 
 
+class Sitelink:
+    """Container for a sitelink's title, URL and abstract."""
+
+    def __init__(self, title, url, abstract):
+        self.title = title
+        self.url = url
+        self.abstract = abstract
+
+
 class Result:
     """Encapsulates a search result's index, title, URL and abstract
     (and optionally metadata for Google News).
     """
 
-    def __init__(self, index, title, url, abstract, metadata=None):
+    def __init__(self, index, title, url, abstract, metadata=None, sitelinks=None):
         self.index = index
         self.title = title
         self.url = url
         self.abstract = abstract
         self.metadata = metadata
+        self.sitelinks = [] if sitelinks is None else sitelinks
+
+    @staticmethod
+    def print_title_and_url(index, title, url, indent=0):
+        # Pad index and url with `indent` number of spaces
+        index = " " * indent + str(index)
+        url = " " * indent + url
+        if colorize:
+            print("\x1B[1m\x1B[36m %s\x1B[92m %s\x1B[0m" % (index, title))
+            print("\x1B[93m%s\x1B[39m" % url)
+        else:
+            print(" %s %s" % (index, title))
+            print(url)
+
+    @staticmethod
+    def print_abstract(abstract, indent=0):
+        global columns
+        if columns > indent + 1:
+            # Try to fill to columns
+            fillwidth = columns - indent - 1
+            for line in textwrap.wrap(abstract, width=fillwidth):
+                print("%s%s" % (" " * indent, line))
+            print("")
+        else:
+            print("%s\n" % abstract.replace("\n", " "))
 
     def print_entry(self):
+        """Print an entry and returns an URL index.
+
+        The URL "index" is a dict of index: URL pairs (here index is the
+        result index, e.g., "1", "1a", etc.).
+
+        The URL index usually contains a single element, but
+        occasionally there could be more due to sitelinks.
+        """
+
         index = self.index
         title = self.title
         url = self.url
         metadata = self.metadata
         abstract = self.abstract
+        sitelinks = self.sitelinks
+
+        index_url_map = {}
 
         # Open the URL in a web browser if option -j was specified.
-        if open_url:
+        if lucky:
             self.open()
             quit(conn)
 
-        # Print the title and the URL.
-        if colorize:
-            print("\x1B[1m\x1B[36m", index, "\x1B[92m", title,
-                  "\x1B[0m\n\x1B[93m%s\x1B[39m" % url)
-        else:
-            print("", index, title, "\n%s" % url)
+        self.print_title_and_url(index, title, url)
+        index_url_map[str(index)] = url
 
         # Print metadata for Google News.
         if metadata:
             print(metadata)
 
-        # Hard wrap abstract if the number of columns is available.
-        if columns > 0:
-            col = 0
-            for w in abstract.split():
-                if (col + len(w) + 1) > columns:
-                    col = 0
-                    print()
-                print(w, end=' ')
-                col += len(w) + 1
-            print("\n")
-        else:
-            print("%s\n" % abstract.replace("\n", " "))
+        self.print_abstract(abstract)
+
+        subindex = 'a'
+        for sitelink in sitelinks:
+            fullindex = str(index) + subindex
+            self.print_title_and_url(fullindex, sitelink.title, sitelink.url, indent=4)
+            self.print_abstract(sitelink.abstract, indent=4)
+            index_url_map[fullindex] = sitelink.url
+            # Increment subindex
+            subindex = chr(ord(subindex) + 1)
+
+        return index_url_map
 
     # Returns an object (dict) good for JSON serialization
     def json_object(self):
@@ -535,34 +666,12 @@ class Result:
         }
         if self.metadata:
             obj['metadata'] = self.metadata
+        if self.sitelinks:
+            obj['sitelinks'] = [sitelink.__dict__ for sitelink in self.sitelinks]
         return obj
-
-    def open(self):
-        _stderr = os.dup(2)
-        os.close(2)
-        _stdout = os.dup(1)
-        os.close(1)
-        fd = os.open(os.devnull, os.O_RDWR)
-        os.dup2(fd, 2)
-        os.dup2(fd, 1)
-        try:
-            webbrowser.open(self.url)
-        finally:
-            os.close(fd)
-            os.dup2(_stderr, 2)
-            os.dup2(_stdout, 1)
 
 
 # Functions
-
-def is_int(string):
-    """Check if a sting is an integer"""
-
-    try:
-        int(string)
-        return True
-    except:
-        return False
 
 def server_url(tld):
     """Data source: https://en.wikipedia.org/wiki/List_of_Google_domains
@@ -679,11 +788,27 @@ def show_omniprompt():
 
     global colorize
 
-    message = "Enter n, p, result number or new keywords (? for help)"
+    message = "Enter n, p, result index or new keywords (? for help)"
     if colorize:
         return raw_input("\x1b[7m%s\x1b[0m " % message)
     else:
         return raw_input("%s: " % message)
+
+
+def open_url(url):
+    _stderr = os.dup(2)
+    os.close(2)
+    _stdout = os.dup(1)
+    os.close(1)
+    fd = os.open(os.devnull, os.O_RDWR)
+    os.dup2(fd, 2)
+    os.dup2(fd, 1)
+    try:
+        webbrowser.open(url)
+    finally:
+        os.close(fd)
+        os.dup2(_stderr, 2)
+        os.dup2(_stdout, 1)
 
 
 # Messaging wrappers
@@ -757,7 +882,7 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
         omniprompt keys:
           g keywords            initiate a new Google search for 'keywords' with original options
           n, p                  fetch next or previous set of search results
-          1-N                   open the Nth result index in browser
+          index                 open the result corresponding to index in browser
           q, Enter              exit googler (same behaviour for an empty search)
           *                     any other string initiates a new search with original options
           ?                     show omniprompt help
@@ -821,7 +946,7 @@ addarg('-x', '--exact', dest='exact', action='store_true',
        help='disable automatic spelling correction')
 addarg('-C', '--nocolor', dest='colorize', action='store_false',
        help='disable color output')
-addarg('-j', '--first', '--lucky', dest='open_url', action='store_true',
+addarg('-j', '--first', '--lucky', dest='lucky', action='store_true',
        help='open the first result in a web browser')
 addarg('-t', '--time', dest='duration', type=is_duration, metavar='dN',
        help='time limit search '
@@ -853,7 +978,7 @@ if args.tld:
 lang = args.lang
 exact = args.exact
 colorize = args.colorize
-open_url = args.open_url
+lucky = args.lucky
 duration = args.duration
 debug = args.debug
 keywords = args.keywords
@@ -960,20 +1085,22 @@ def fetch_results():
     parser.feed(resp_body)
 
     results = parser.results
+    urlindex = {}
     if output_format == 'json':
         results_object = [r.json_object() for r in results]
         print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
     else:
         for r in results:
-            r.print_entry()
+            urlindex.update(r.print_entry())
 
-    return results
+    return results, urlindex
 
 
 results = []
+urlindex = {}
 while True:
     if nav == "n" or nav == "p" or nav == "g":
-        results = fetch_results()
+        results, urlindex = fetch_results()
 
     if noninteractive:
         break
@@ -1013,20 +1140,8 @@ while True:
         start = basestart
         printerr("")
         continue
-    elif is_int(nav):
-        index = int(nav) - 1
-        if index < 0:
-            if index < -1:
-                printerr("Index out of bound.")
-            else:
-                printerr("Index out of bound. To search %s, try 'g %s'." % (nav, nav))
-            continue
-
-        try:
-            results[index].open()
-        except IndexError:
-            printerr("Index out of bound. To search %s, try 'g %s'." % (nav, nav))
-
+    elif nav in urlindex:
+        open_url(urlindex[nav])
         continue
     elif len(nav):
         trimsearch = nav.strip().replace(" ", "+")

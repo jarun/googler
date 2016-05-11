@@ -57,8 +57,8 @@ Initiate a new Google search for \fIkeywords\fR with original options.
 .BI "n, p"
 Fetch next or previous set of search results.
 .TP
-.BI "1-N"
-Open the Nth result index in browser.
+.BI "index"
+Open the result corresponding to index in browser.
 .TP
 .BI "q, Enter"
 Exit googler.
@@ -160,7 +160,7 @@ Alias to find \fBdefinitions of words\fR:
 .EE
 .PP
 .IP 11. 4
-Look up \fBn\fR, \fBp\fR, \fBq\fR, \fBg keywords\fR or a number at the \fBomniprompt\fR: As the omniprompt recognizes \fBn\fR, \fBp\fR, \fBq\fR, \fBg\fR or numbers as commands, you need to prefix them with \fBg\fR, e.g.,
+Look up \fBn\fR, \fBp\fR, \fBq\fR, \fBg keywords\fR or an index string at the \fBomniprompt\fR: As the omniprompt recognizes \fBn\fR, \fBp\fR, \fBq\fR, \fBg\fR or index strings as commands, you need to prefix them with \fBg\fR, e.g.,
 .PP
 .EX
 .PD 0
@@ -169,7 +169,7 @@ Look up \fBn\fR, \fBp\fR, \fBq\fR, \fBg keywords\fR or a number at the \fBomnipr
 .IP
 .B g g keywords
 .IP
-.B g 1984
+.B g 1
 .PD
 .EE
 .PP
