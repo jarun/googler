@@ -166,6 +166,7 @@ Please substitute `$version` with the appropriate package version.
       g keywords            initiate a new Google search for 'keywords' with original options
       n, p                  fetch next or previous set of search results
       index                 open the result corresponding to index in browser
+      o                     open the current search in browser
       q, Enter              exit googler (same behaviour for an empty search)
       *                     any other string initiates a new search with original options
       ?                     show omniprompt help
@@ -227,7 +228,7 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
         alias define='googler -n 2 define'
 
-11. Look up `n`, `p`, `q`, `g keywords` or an index string at the **omniprompt**: As the omniprompt recognizes `n`, `p`, `q`, `g` or index strings as commands, you need to prefix them with `g`, e.g.,
+11. Look up `n`, `p`, `o`, `q`, `g keywords` or an index string at the **omniprompt**: As the omniprompt recognizes `n`, `p`, `o`, `q`, `g` or index strings as commands, you need to prefix them with `g`, e.g.,
 
         g n
         g g keywords
