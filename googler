@@ -964,9 +964,11 @@ if len(sys.argv) < 2:
 # Set global variables
 args = argparser.parse_args()
 if args.start:
-    start = str(args.start)
+    if args.start > 0:
+        start = str(args.start)
 if args.num:
-    num = str(args.num)
+    if args.num > 0:
+        num = str(args.num)
 news = args.news
 if args.tld:
     server = server_url(args.tld)
