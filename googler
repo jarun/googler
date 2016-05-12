@@ -21,11 +21,9 @@ from __future__ import print_function
 import argparse
 import gzip
 import io
-import json
 import os
 import signal
 import sys
-import tempfile
 import textwrap
 import webbrowser
 
@@ -977,13 +975,16 @@ exact = args.exact
 colorize = args.colorize
 lucky = args.lucky
 duration = args.duration
-debug = args.debug
+if args.debug:
+    debug = args.debug
+    import tempfile
 keywords = args.keywords
 insite = args.insite
 noninteractive = args.noninteractive
 if args.json:
     output_format = 1
     noninteractive = True
+    import json
 
 # Get terminal width
 columns, _ = get_terminal_size()
