@@ -589,11 +589,9 @@ class Result:
         index = " " * indent + str(index)
         url = " " * indent + url
         if colorize:
-            print("\x1B[1m\x1B[36m %s\x1B[92m %s\x1B[0m" % (index, title))
-            print("\x1B[93m%s\x1B[39m" % url)
+            print("\x1B[1m\x1B[36m %s\x1B[92m %s\x1B[0m\n\x1B[93m%s\x1B[39m" % (index, title, url))
         else:
-            print(" %s %s" % (index, title))
-            print(url)
+            print(" %s %s\n%s" % (index, title, url))
 
     @staticmethod
     def print_abstract(abstract, indent=0):
