@@ -788,7 +788,7 @@ def show_omniprompt():
 
     global colorize
 
-    message = "Enter n, p, result index or new keywords (? for help)"
+    message = "Enter n, p, o, result index or new keywords (? for help)"
     if colorize:
         return raw_input("\x1b[7m%s\x1b[0m " % message)
     else:
@@ -883,6 +883,7 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
           g keywords            initiate a new Google search for 'keywords' with original options
           n, p                  fetch next or previous set of search results
           index                 open the result corresponding to index in browser
+          o                     open the current search in browser
           q, Enter              exit googler (same behaviour for an empty search)
           *                     any other string initiates a new search with original options
           ?                     show omniprompt help
@@ -1123,6 +1124,8 @@ while True:
         else:
             start = str(int(start) - 10)
         printerr("")
+    elif nav == "o":
+        open_url("https://" + server + url)
     elif nav == "q":
         break
     elif nav == "?":
