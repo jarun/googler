@@ -1126,6 +1126,7 @@ while True:
         printerr("")
     elif nav == "o":
         open_url("https://" + server + url)
+        continue
     elif nav == "q":
         break
     elif nav == "?":
