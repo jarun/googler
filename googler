@@ -131,14 +131,52 @@ _VERSION_ = 2.4             # Current version
 def annotate_tag(annotated_starttag_handler):
     # See parser logic within the GoogleParser class for documentation.
     #
+    # In particular, search for "Ignore List" to view detailed
+    # documentation of the ignore list.
+    #
     # annotated_starttag_handler(self, tag: str, attrsdict: dict) -> annotation
     # Returns: HTMLParser.handle_starttag(self, tag: str, attrs: list) -> None
 
     def handler(self, tag, attrs):
-        annotation = annotated_starttag_handler(self, tag, dict(attrs))
-        if tag not in self.tag_annotations:
-            self.tag_annotations[tag] = []
-        self.tag_annotations[tag].append(annotation)
+        # Get context; assumes that the handler is called SCOPE_start
+        context = annotated_starttag_handler.__name__[:-6]
+
+        # If context is 'ignore', ignore all tests
+        if context == 'ignore':
+            self.insert_annotation(tag, None)
+            return
+
+        attrs = dict(attrs)
+
+        # Compare against ignore list
+        ignored = False
+        for selector in self.IGNORE_LIST:
+            for attr in selector:
+                if attr == 'tag':
+                    if tag != selector['tag']:
+                        break
+                elif attr == 'class':
+                    tag_classes = set(self.classes(attrs))
+                    selector_classes = set(self.classes(selector))
+                    if not selector_classes.issubset(tag_classes):
+                        break
+                else:
+                    if attrs[attr] != selector[attr]:
+                        break
+            else:
+                # Passed all criterions of the selector
+                ignored = True
+                break
+
+        # If tag matches ignore list, annotate and hand over to ignore_*
+        if ignored:
+            self.insert_annotation(tag, context + '_ignored')
+            self.set_handlers_to('ignore')
+            return
+
+        # Standard
+        annotation = annotated_starttag_handler(self, tag, attrs)
+        self.insert_annotation(tag, annotation)
 
     return handler
 
@@ -327,6 +365,32 @@ class GoogleParser(HTMLParser.HTMLParser):
     #   <div class="st">     <!-- annotate as 'news_abstract', start_populating_textbuf -->
     #     abstract text again with <em> markup on keywords
     #   </div>               <!-- stop_populating_textbuf, pop to self.abstract -->
+    #
+    #
+    # Ignore List
+    #
+    # - As good as our result criterions might be, sometimes results of
+    #   dubious value (usually from Google's value-add features) slip
+    #   through. The "People also ask" feature is a good example of this
+    #   type (a sample query is "VPN"; see screenshot
+    #   https://i.imgur.com/yfcsoQz.png). In these cases, we may want to
+    #   skip enclosing containers entirely. The ignore list feature is
+    #   designed for this purpose.
+    #
+    #   The current ignore list is available in self.IGNORE_LIST. Each
+    #   entry (called a "selector") is a dict of attribute-value
+    #   pairs. Each attribute is matched verbatim to a tag's attribute,
+    #   except the "class" attribute, where we test for inclusion
+    #   instead (e.g. "c b a" matches "a b", just like it matches the
+    #   CSS selector ".a.b"). There's also a special "attribute" -- tag,
+    #   the meaning of which is obvious. A tag has to match all given
+    #   attributes to be considered a match for the selector.
+    #
+    #   When a match is found, the tag is annotated as SCOPE_ignored,
+    #   where SCOPE is the current handler scope (e.g., main, result,
+    #   title, etc.), and the scope is switched to 'ignore'. All
+    #   descendants of the tag are ignored. When the corresponding end
+    #   tag is finally reach, the former scope is restored.
 
     def __init__(self):
         HTMLParser.HTMLParser.__init__(self)
@@ -338,6 +402,17 @@ class GoogleParser(HTMLParser.HTMLParser):
         self.tag_annotations = {}
 
         self.set_handlers_to('main')
+
+    ### Ignore list ###
+    IGNORE_LIST = [
+        # "People also ask"
+        # Sample query: VPN
+        # Screenshot: https://i.imgur.com/yfcsoQz.png
+        {
+            'tag': 'div',
+            'class': 'related-question-pair'
+        }
+    ]
 
     ### Tag handlers ###
 
@@ -501,6 +576,23 @@ class GoogleParser(HTMLParser.HTMLParser):
     def set_handlers_to(self, scope):
         self.handle_starttag = getattr(self, scope + '_start')
         self.handle_endtag = getattr(self, scope + '_end')
+
+    def insert_annotation(self, tag, annotation):
+        if tag not in self.tag_annotations:
+            self.tag_annotations[tag] = []
+        self.tag_annotations[tag].append(annotation)
+
+    @annotate_tag
+    def ignore_start(self, tag, attrs):
+        pass
+
+    @retrieve_tag_annotation
+    def ignore_end(self, tag, annotation):
+        if annotation and annotation.endswith('_ignored'):
+            # Strip '-ignore' suffix from annotation to obtain the outer
+            # context name.
+            context = annotation[:-8]
+            self.set_handlers_to(context)
 
     def start_populating_textbuf(self, data_transformer=None):
         if data_transformer is None:
