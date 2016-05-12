@@ -127,7 +127,7 @@ debug = False               # Print debug logs
 news = False                # Read news
 exact = False               # If True, disable automatic spelling correction
 insite = None               # Google search a specific site
-output_format = 'default'   # Regular (normal) output or Json output
+output_format = 0           # 0: Regular (normal) output, 1: Json output
 noninteractive = False      # Non-interactive mode
 server = "www.google.com"   # Default server to connect to
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
@@ -986,7 +986,7 @@ keywords = args.keywords
 insite = args.insite
 noninteractive = args.noninteractive
 if args.json:
-    output_format = 'json'
+    output_format = 1
     noninteractive = True
 
 # Get terminal width
@@ -1043,17 +1043,18 @@ def fetch_results():
 
     if resp.status != 200:
         if resp.status in (301, 302,):
-            url = urljoin(url, resp.getheader('location', ''))
+            url = resp.getheader('location', '')
             debugp("Redirected URL [%s]" % url)
             if url.find("sorry/IndexRedirect?") >= 0:
                 error("Connection blocked due to unusual activity.")
                 quit(conn)
 
             conn.close()
-            next_server = url[(url.find("//") + 2):url.find("/search")]
+            mark = url.find("/search")
+            next_server = url[(url.find("//") + 2):mark]
             debugp("Next Server [%s]" % next_server)
             conn = new_connection(next_server)
-            url = url[url.find("/search"):]
+            url = url[mark:]
             debugp("Next GET [%s]" % url)
 
             try:
@@ -1074,25 +1075,26 @@ def fetch_results():
 
     # Parse the HTML document and print the results.
     parser = GoogleParser()
-    resp_body = gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8')
 
-    if debug:
+    if not debug:
+        parser.feed(gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8'))
+    else:
+        resp_body = gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8')
         fd, tmpfile = tempfile.mkstemp(prefix='googler-response-')
         os.close(fd)
         with open(tmpfile, 'wb') as fp:
             fp.write(resp_body.encode('utf-8'))
         debugp("Response body written to '%s'.\n" % tmpfile)
-
-    parser.feed(resp_body)
+        parser.feed(resp_body)
 
     results = parser.results
     urlindex = {}
-    if output_format == 'json':
-        results_object = [r.json_object() for r in results]
-        print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
-    else:
+    if output_format == 0:          # Regular output
         for r in results:
             urlindex.update(r.print_entry())
+    elif output_format == 1:        # Json output
+        results_object = [r.json_object() for r in results]
+        print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
 
     return results, urlindex
 
