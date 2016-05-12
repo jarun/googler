@@ -657,6 +657,10 @@ class Result:
 
         return index_url_map
 
+    # Open the URL in browser
+    def open(self):
+        open_url(self.url)
+
     # Returns an object (dict) good for JSON serialization
     def json_object(self):
         obj = {
