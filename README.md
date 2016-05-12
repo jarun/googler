@@ -228,7 +228,7 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
         alias define='googler -n 2 define'
 
-11. Look up `n`, `p`, `o`, `q`, `g keywords` or an index string at the **omniprompt**: As the omniprompt recognizes `n`, `p`, `o`, `q`, `g` or index strings as commands, you need to prefix them with `g`, e.g.,
+11. Look up `n`, `p`, `o`, `q`, `g keywords` or a result index at the **omniprompt**: As the omniprompt recognizes `n`, `p`, `o`, `q`, `g` or index strings as commands, you need to prefix them with `g`, e.g.,
 
         g n
         g g keywords
