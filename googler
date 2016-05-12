@@ -34,7 +34,6 @@ if sys.version_info > (3,):
     from html.entities import name2codepoint
     import html.parser as HTMLParser
     from urllib.parse import (
-        urljoin,
         quote_plus as url_quote_plus,
     )
     from http.client import HTTPSConnection
@@ -47,7 +46,6 @@ else:
     from urllib import (
         quote_plus as url_quote_plus,
     )
-    from urlparse import urljoin
     from httplib import HTTPSConnection
 
     # Set the encoding of standard streams to UTF-8 (unnecessary for Python 3)
@@ -1001,8 +999,7 @@ debugp("Version %.1f" % _VERSION_)
 # Construct the query URL.
 url = "/search?ie=UTF-8&oe=UTF-8&"
 
-if start is not None:
-    url += "start=" + start + "&"
+url += "start=" + start + "&"
 if num is not None:
     url += "num=" + num + "&"
 if news:
