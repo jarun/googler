@@ -33,9 +33,7 @@ import webbrowser
 if sys.version_info > (3,):
     from html.entities import name2codepoint
     import html.parser as HTMLParser
-    from urllib.parse import (
-        quote_plus as url_quote_plus,
-    )
+    from urllib.parse import quote_plus as url_quote_plus
     from http.client import HTTPSConnection
 
     unichr = chr
@@ -43,9 +41,7 @@ if sys.version_info > (3,):
 else:
     from htmlentitydefs import name2codepoint
     import HTMLParser
-    from urllib import (
-        quote_plus as url_quote_plus,
-    )
+    from urllib import quote_plus as url_quote_plus
     from httplib import HTTPSConnection
 
     # Set the encoding of standard streams to UTF-8 (unnecessary for Python 3)
