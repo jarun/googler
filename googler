@@ -1209,22 +1209,32 @@ while True:
             start = str(int(start) + int(num))
         else:
             start = str(int(start) + 10)
+
+        url = url.replace("start=" + oldstart + "&", "start=" + start + "&", 1)
+        debugp("Next URL [%s]\n" % url)
         printerr("")
     elif nav == "p":
+        newstart = 0
         if num is not None:
-            start = str(int(start) - int(num))
+            newstart = int(start) - int(num)
         else:
-            start = str(int(start) - 10)
+            newstart = int(start) - 10
+
+        if newstart >= 0:
+            start = str(newstart)
+        else:
+            start = "0"
+
+        url = url.replace("start=" + oldstart + "&", "start=" + start + "&", 1)
+        debugp("Next URL [%s]\n" % url)
         printerr("")
     elif nav == "o":
         open_url("https://" + server + url)
-        continue
     elif nav == "q":
         break
     elif nav == "?":
         ExtendedArgumentParser.print_omniprompt_help(sys.stderr)
         printerr("")
-        continue
     elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
         trimsearch = nav[2:].strip().replace(" ", "+")
         if trimsearch == "":
@@ -1235,10 +1245,8 @@ while True:
         nav = "g"
         start = basestart
         printerr("")
-        continue
     elif nav in urlindex:
         open_url(urlindex[nav])
-        continue
     elif len(nav):
         trimsearch = nav.strip().replace(" ", "+")
         if trimsearch == "" or trimsearch == "g":
@@ -1251,14 +1259,8 @@ while True:
         nav = "g"
         start = basestart
         printerr("")
-        continue
     else:
         break
 
-    if int(start) < 0:
-        start = "0"
-
-    url = url.replace("start=" + oldstart + "&", "start=" + start + "&", 1)
-    debugp("Next URL [%s]\n" % url)
 
 conn.close()
