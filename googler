@@ -1214,7 +1214,11 @@ while True:
         debugp("Next URL [%s]\n" % url)
         printerr("")
     elif nav == "p":
-        newstart = 0
+        if start == 0:
+            printerr("Already at the first page.")
+            nav = "" # Unset nav so that we don't fetch result in the next iteration
+            continue
+
         if num is not None:
             newstart = start - num
         else:
