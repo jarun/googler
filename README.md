@@ -44,7 +44,7 @@ Find `googler` useful? If you would like to donate, visit the
 - Uses HTTPS connection
 - Fetch n results in a go
 - Start at n<sup>th</sup> result
-- Fetch and navigate next or previous set of results
+- Navigate search result pages
 - Continuous search: fire new searches without exiting
 - Search any website using Google (like Google Site Search)
 - Reconnect on new search even if connection is closed due to inactivity
@@ -166,8 +166,9 @@ Please substitute `$version` with the appropriate package version.
       g keywords            initiate a new Google search for 'keywords' with original options
       n, p                  fetch next or previous set of search results
       index                 open the result corresponding to index in browser
+      f                     jump to the first page
       o                     open the current search in browser
-      q, Enter              exit googler (same behaviour for an empty search)
+      q, Enter              exit googler
       *                     any other string initiates a new search with original options
       ?                     show omniprompt help
 

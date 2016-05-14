@@ -874,7 +874,7 @@ def show_omniprompt():
 
     global colorize
 
-    message = "Enter n, p, o, result index or new keywords (? for help)"
+    message = "Enter n, p, f, o, result index or new keywords (? for help)"
     if colorize:
         return raw_input("\x1b[7m%s\x1b[0m " % message)
     else:
@@ -969,8 +969,9 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
           g keywords            initiate a new Google search for 'keywords' with original options
           n, p                  fetch next or previous set of search results
           index                 open the result corresponding to index in browser
+          f                     jump to the first page
           o                     open the current search in browser
-          q, Enter              exit googler (same behaviour for an empty search)
+          q, Enter              exit googler
           *                     any other string initiates a new search with original options
           ?                     show omniprompt help
         """))
@@ -1192,7 +1193,7 @@ def fetch_results():
 results = []
 urlindex = {}
 while True:
-    if nav == "n" or nav == "p" or nav == "g":
+    if nav == "n" or nav == "p" or nav == "f" or nav == "g":
         results, urlindex = fetch_results()
 
     if noninteractive:
@@ -1213,21 +1214,24 @@ while True:
         url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
         debugp("Next URL [%s]\n" % url)
         printerr("")
-    elif nav == "p":
+    elif nav == "p" or nav == "f":
         if start == 0:
             printerr("Already at the first page.")
             nav = "" # Unset nav so that we don't fetch result in the next iteration
             continue
 
-        if num is not None:
-            newstart = start - num
-        else:
-            newstart = start - 10
+        if nav == "p":
+            if num is not None:
+                newstart = start - num
+            else:
+                newstart = start - 10
 
-        if newstart >= 0:
-            start = newstart
+            if newstart >= 0:
+                start = newstart
+            else:
+                start = 0
         else:
-            start = "0"
+            start = basestart
 
         url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
         debugp("Next URL [%s]\n" % url)
