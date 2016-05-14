@@ -61,6 +61,7 @@ Find `googler` useful? If you would like to donate, visit the
 - Open filetype specific links in browser, the links are handled by browser for the type
 - Optionally open the first result directly in browser (as in <i>I'm Feeling Lucky</i>)
 - Specify language preference for results
+- Open current search in browser
 - Handle first level of Google redirections (reports IP blocking by Google)
 - Unicode in URL works
 - Skip links to Google News, Images or blank URLs in web search results
