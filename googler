@@ -971,7 +971,7 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
           index                 open the result corresponding to index in browser
           f                     jump to the first page
           o                     open the current search in browser
-          q, ^C, ^D             exit googler
+          q, ^D                 exit googler
           *                     any other string initiates a new search with original options
           ?                     show omniprompt help
         """))
