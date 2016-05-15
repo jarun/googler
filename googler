@@ -1213,7 +1213,6 @@ while True:
 
         url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
         debugp("Next URL [%s]\n" % url)
-        printerr("")
     elif nav == "p" or nav == "f":
         if start == 0:
             printerr("Already at the first page.")
@@ -1235,7 +1234,6 @@ while True:
 
         url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
         debugp("Next URL [%s]\n" % url)
-        printerr("")
     elif nav == "o":
         open_url("https://" + server + url)
     elif nav == "q":
@@ -1252,7 +1250,6 @@ while True:
         debugp("New search URL [%s]" % url)
         nav = "g"
         start = basestart
-        printerr("")
     elif nav in urlindex:
         open_url(urlindex[nav])
     elif len(nav):
@@ -1266,7 +1263,6 @@ while True:
         debugp("New search URL [%s]" % url)
         nav = "g"
         start = basestart
-        printerr("")
     else:
         continue
 
