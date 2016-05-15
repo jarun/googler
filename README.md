@@ -169,7 +169,7 @@ Please substitute `$version` with the appropriate package version.
       index                 open the result corresponding to index in browser
       f                     jump to the first page
       o                     open the current search in browser
-      q, Enter              exit googler
+      q, ^C, ^D             exit googler
       *                     any other string initiates a new search with original options
       ?                     show omniprompt help
 
