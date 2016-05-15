@@ -1231,7 +1231,7 @@ while True:
             else:
                 start = 0
         else:
-            start = basestart
+            start = 0
 
         url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
         debugp("Next URL [%s]\n" % url)
