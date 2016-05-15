@@ -1180,6 +1180,9 @@ def fetch_results():
 
     results = parser.results
     urlindex = {}
+    if (len(results) > 0):      # print a newline for more clarity
+        printerr("")
+
     if output_format == 0:          # Regular output
         for r in results:
             urlindex.update(r.print_entry())
@@ -1206,6 +1209,9 @@ while True:
         break
 
     if nav == "n":
+        if len(results) == 0:
+            nav = ""
+            continue
         if num is not None:
             start = start + num
         else:
@@ -1214,6 +1220,9 @@ while True:
         url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
         debugp("Next URL [%s]\n" % url)
     elif nav == "p" or nav == "f":
+        if len(results) == 0:
+            nav = ""
+            continue
         if start == 0:
             printerr("Already at the first page.")
             nav = "" # Unset nav so that we don't fetch result in the next iteration
