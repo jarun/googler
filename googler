@@ -1203,7 +1203,7 @@ while True:
     try:
         nav = show_omniprompt()
     except EOFError:
-        nav = ""
+        break
 
     if nav == "n":
         if num is not None:
@@ -1246,8 +1246,8 @@ while True:
     elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
         trimsearch = nav[2:].strip().replace(" ", "+")
         if trimsearch == "":
-            printerr("Empty search. Exiting.")
-            break
+            nav = ""
+            continue
         url = baseurl + "q=" + url_quote_plus(trimsearch)
         debugp("New search URL [%s]" % url)
         nav = "g"
@@ -1258,8 +1258,8 @@ while True:
     elif len(nav):
         trimsearch = nav.strip().replace(" ", "+")
         if trimsearch == "" or trimsearch == "g":
-            printerr("Empty search. Exiting.")
-            break
+            nav = ""
+            continue
         url = baseurl + "q=" + url_quote_plus(trimsearch)
         if insite is not None:
             url += "+site:" + url_quote_plus(insite)
@@ -1268,7 +1268,7 @@ while True:
         start = basestart
         printerr("")
     else:
-        break
+        continue
 
 
 conn.close()
