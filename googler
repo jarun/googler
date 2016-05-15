@@ -874,7 +874,7 @@ def show_omniprompt():
 
     global colorize
 
-    message = "Enter n, p, f, o, result index or new keywords (? for help)"
+    message = "googler (? for help)"
     if colorize:
         return raw_input("\x1b[7m%s\x1b[0m " % message)
     else:
