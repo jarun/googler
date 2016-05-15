@@ -1220,9 +1220,6 @@ while True:
         url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
         debugp("Next URL [%s]\n" % url)
     elif nav == "p" or nav == "f":
-        if len(results) == 0:
-            nav = ""
-            continue
         if start == 0:
             printerr("Already at the first page.")
             nav = "" # Unset nav so that we don't fetch result in the next iteration
