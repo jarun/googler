@@ -17,7 +17,7 @@ addons:
       - zsh
 script:
   - ./tests/ci-test-wrapper --watch .travis.yml
-  - git fetch --tags origin
+  - git fetch --unshallow --tags origin
   - ./tools/makedeb
 deploy:
   provider: releases
