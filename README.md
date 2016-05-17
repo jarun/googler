@@ -164,14 +164,14 @@ Please substitute `$version` with the appropriate package version.
       -d, --debug           enable debugging
 
     omniprompt keys:
-      g keywords            initiate a new Google search for 'keywords' with original options
-      n, p                  fetch next or previous set of search results
+      n, p                  fetch the next or previous set of search results
       index                 open the result corresponding to index in browser
       f                     jump to the first page
       o                     open the current search in browser
+      g keywords            initiate a new Google search for 'keywords' with original options
       q, ^D                 exit googler
-      *                     any other string initiates a new search with original options
       ?                     show omniprompt help
+      *                     any other string initiates a new search with original options
 
 ## Configuration file
 
