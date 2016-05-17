@@ -41,39 +41,18 @@ Find `googler` useful? If you would like to donate, visit the
 
 # Features
 
-- Uses HTTPS connection
-- Fetch n results in a go
-- Start at n<sup>th</sup> result
-- Navigate search result pages
-- Continuous search: fire new searches without exiting
-- Search any website using Google (like Google Site Search)
-- Reconnect on new search even if connection is closed due to inactivity
-- Disable automatic spelling correction and search exact keywords (default: enabled)
-- Easily open result URLs in browser from cmdline using index number
-- Browser (Chromium and Firefox based) errors and warnings suppression
-- Show full contextual text snippet in search results
-- Specify search duration (in hours / days / weeks / months / years)
-- Fetch results from Google News section
-- Supports both long and short program options
-- Shell completion scripts for bash, zsh and fish
-- Country/domain specific search (28 top-level domains supported, default: .com)
+- Google Search, Google Site Search, Google News
+- Fast and clean (no ads, stray URLs or clutter)
+- Open result URLs (or the actual search) in browser
+- Navigate search result pages from omniprompt
+- Fetch n results in a go, start at the n<sup>th</sup> result
+- Disable automatic spelling correction and search exact keywords
+- Limit search by duration, country/domain specific search (default: .com), language preference
 - Supports Google search keywords like `filetype:mime`, `site:somesite.com` etc.
-- Open filetype specific links in browser, the links are handled by browser for the type
-- Optionally open the first result directly in browser (as in <i>I'm Feeling Lucky</i>)
-- Specify language preference for results
-- Open current search in browser
-- Handle first level of Google redirections (reports IP blocking by Google)
-- Unicode in URL works
-- Skip links to Google News, Images or blank URLs in web search results
-- UTF-8 request and response
-- Fetch gzip compressed results
-- Works with Python 2.7.x and 3.3.x or later
-- Enable/disable colour output (default: colourful)
-- Enable/disable debug logs (default: disabled)
-- Manpage for quick reference
-- Fast and clean (no ads or clutter)
+- Optionally open the first result directly in browser (as in *I'm Feeling Lucky*)
+- Non-stop searches: fire new searches at omniprompt without exiting
+- Manpage with examples, shell completion scripts for Bash, Zsh and Fish
 - Minimal dependencies
-- Open source and free
 
 # Installation
 
