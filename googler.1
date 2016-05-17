@@ -51,11 +51,8 @@ Perform search and exit; do not prompt for further interactions.
 Enable debugging.
 .SH OMNIPROMPT KEYS
 .TP
-.BI g " keywords"
-Initiate a new Google search for \fIkeywords\fR with original options.
-.TP
 .BI "n, p"
-Fetch next or previous set of search results.
+Fetch the next or previous set of search results.
 .TP
 .BI "index"
 Open the result corresponding to index in browser.
@@ -66,14 +63,17 @@ Jump to the first page.
 .BI "o"
 Open the current search in browser.
 .TP
+.BI g " keywords"
+Initiate a new Google search for \fIkeywords\fR with original options.
+.TP
 .BI "q, ^D"
 Exit googler.
 .TP
-.BI *
-Any other string initiates a new search with original options.
-.TP
 .BI "?"
 Show omniprompt help.
+.TP
+.BI *
+Any other string initiates a new search with original options.
 .SH ENVIRONMENT
 .TP
 .BI BROWSER
