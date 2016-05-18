@@ -12,7 +12,7 @@ _googler () {
     local -a opts opts_with_args
     opts=(-c --tld -C --nocolor -d --debug -j --first --lucky --json -l --lang
           -n --count -N --news --np --noprompt -s --start -t --time -w --site -x --exact)
-    opts_with_arg=(-c --tld -l --lang -n --count -s --start -t --time -w --site)
+    opts_with_arg=(-c --tld --colors -l --lang -n --count -s --start -t --time -w --site)
 
     # Do not complete non option names
     [[ $cur == -* ]] || return 1

@@ -34,6 +34,7 @@ Find `googler` useful? If you would like to donate, visit the
 - [Usage](#usage)
     - [Cmdline options](#cmdline-options)
     - [Configuration file](#configuration-file)
+    - [Colors](#colors)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
 - [Developers](#developers)
@@ -133,6 +134,7 @@ Please substitute `$version` with the appropriate package version.
       -l LANG, --lang LANG  display in language LANG
       -x, --exact           disable automatic spelling correction
       -C, --nocolor         disable color output
+      --colors COLORS       set output colors (see man page for details)
       -j, --first, --lucky  open the first result in a web browser
       -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
                             weeks), m5 (5 months), y5 (5 years)]
@@ -154,7 +156,7 @@ Please substitute `$version` with the appropriate package version.
 
 ## Configuration file
 
-`googler` doesn't have any! This is to retain the speed of the utility and avoid OS-specific differences. Users can enjoy the advantages of config files using aliases. There's no need to memorize options.
+`googler` doesn't have any! This is to retain the speed of the utility and avoid OS-specific differences. Users can enjoy the advantages of config files using aliases (with the exception of the color scheme, which can be additionally customized through an environment variable; see [Colors](#colors)). There's no need to memorize options.
 
 For example, the following alias for bash/zsh/ksh/etc.
 
@@ -166,6 +168,63 @@ The alias serves both the purposes of using config files:
 
 - Persistent settings: when the user invokes `g`, it expands to the preferred settings.
 - Override settings: thanks to the way Python `argparse` works, `googler` is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs `g -l de -c de -n 12 hello world`, 12 results are returned from the Google Germany server, with preference towards results in German.
+
+## Colors
+
+`googler` allows you to customize the color scheme via a six-letter string, reminiscent of BSD `LSCOLORS`. The six letters represent the colors of
+
+- indices
+- titles
+- URLs
+- metadata/publishing info (Google News only)
+- abstracts
+- prompts
+
+respectively. The six-letter string is passed in either as the argument to the `--colors` option, or as the value of the environment variable `GOOGLER_COLORS`.
+
+We offer the following colors/styles:
+
+Letter | Color/Style
+------ | -----------
+a      | black
+b      | red
+c      | green
+d      | yellow
+e      | blue
+f      | magenta
+g      | cyan
+h      | white
+i      | bright black
+j      | bright red
+k      | bright green
+l      | bright yellow
+m      | bright blue
+n      | bright magenta
+o      | bright cyan
+p      | bright white
+A-H    | bold version of the lowercase-letter color
+I-P    | bold version of the lowercase-letter bright color
+x      | normal
+X      | bold
+y      | reverse video
+Y      | bold reverse video
+
+The default colors string is `GKlxxy`, which stands for
+
+- bold bright cyan indices
+- bold bright green titles
+- bright yellow URLs
+- normal metadata/publishing info
+- normal abstracts
+- reverse video prompts
+
+Note that
+
+- Bright colors (implemented as `\x1b[90m`–`\x1b[97m`) may not be available in all color-capable terminal emulators;
+- Some terminal emulators draw bold text in bright colors instead;
+- Some terminal emulators only distinguish between bold and bright colors via a default-off switch.
+
+Please consult the manual of your terminal emulator as well as the [Wikipedia article](https://en.wikipedia.org/wiki/ANSI_escape_code) on ANSI escape sequences.
 
 # Examples
 
@@ -224,6 +283,11 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 13. **Pipe** output:
 
         $ googler -C hello world | tee output
+
+14. Use a **custom color scheme**, e.g., a warm color scheme designed for Solarized Dark ([screenshot](https://i.imgur.com/6L8VlfS.png)):
+
+        $ googler --colors bjdxxy google
+        $ GOOGLER_COLORS=bjdxxy googler google
 
 14. More **help**:
 

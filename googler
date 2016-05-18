@@ -19,6 +19,7 @@
 
 from __future__ import print_function
 import argparse
+import collections
 import gzip
 import io
 import os
@@ -104,6 +105,21 @@ def sigint_handler(signum, frame):
 signal.signal(signal.SIGINT, sigint_handler)
 
 
+# Constants
+
+COLORMAP = {k: '\x1b[%sm' % v for k, v in {
+    'a': '30', 'b': '31', 'c': '32', 'd': '33',
+    'e': '34', 'f': '35', 'g': '36', 'h': '37',
+    'i': '90', 'j': '91', 'k': '92', 'l': '93',
+    'm': '94', 'n': '95', 'o': '96', 'p': '97',
+    'A': '30;1', 'B': '31;1', 'C': '32;1', 'D': '33;1',
+    'E': '34;1', 'F': '35;1', 'G': '36;1', 'H': '37;1',
+    'I': '90;1', 'J': '91;1', 'K': '92;1', 'L': '93;1',
+    'M': '94;1', 'N': '95;1', 'O': '96;1', 'P': '97;1',
+    'x': '0', 'X': '1', 'y': '7', 'Y': '7;1',
+}.items()}
+
+
 # Global variables
 
 columns = None              # Terminal window size.
@@ -112,6 +128,7 @@ num = None                  # Number of results to display (option -n)
 lang = None                 # Language to search for (option -l)
 lucky = False               # If True, opens the first URL in browser (option -j)
 colorize = True             # If True, colorizes the output (option -C)
+colors = None               # Colors object, set after reading color settings (option --colors)
 duration = None             # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
 conn = None                 # Use a single global connection during navigation
 nav = 'n'                   # For user navigation
@@ -127,6 +144,8 @@ ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
                             # Set user agent as Microsoft Edge
 _VERSION_ = 2.4             # Current version
 
+
+# Classes
 
 def annotate_tag(annotated_starttag_handler):
     # See parser logic within the GoogleParser class for documentation.
@@ -675,17 +694,28 @@ class Result:
 
     @staticmethod
     def print_title_and_url(index, title, url, indent=0):
+        global colorize, colors
         # Pad index and url with `indent` number of spaces
         index = " " * indent + str(index)
         url = " " * indent + url
         if colorize:
-            print("\x1B[1m\x1B[36m %s\x1B[92m %s\x1B[0m\n\x1B[93m%s\x1B[39m" % (index, title, url))
+            print(colors.index + index + colors.reset, end="")
+            print(' ' + colors.title + title + colors.reset)
+            print(colors.url + url + colors.reset)
         else:
             print(" %s %s\n%s" % (index, title, url))
 
     @staticmethod
-    def print_abstract(abstract, indent=0):
-        global columns
+    def print_metadata_and_abstract(abstract, metadata=None, indent=0):
+        global colorize, colors, columns
+        if metadata:
+            if colorize:
+                print(colors.metadata + metadata + colors.reset)
+            else:
+                print(metadata)
+
+        if colorize:
+            print(colors.abstract, end="")
         if columns > indent + 1:
             # Try to fill to columns
             fillwidth = columns - indent - 1
@@ -694,6 +724,8 @@ class Result:
             print("")
         else:
             print("%s\n" % abstract.replace("\n", " "))
+        if colorize:
+            print(colors.reset, end="")
 
     def print_entry(self):
         """Print an entry and returns an URL index.
@@ -719,20 +751,15 @@ class Result:
             self.open()
             quit(conn)
 
-        self.print_title_and_url(index, title, url)
         index_url_map[str(index)] = url
-
-        # Print metadata for Google News.
-        if metadata:
-            print(metadata)
-
-        self.print_abstract(abstract)
+        self.print_title_and_url(index, title, url)
+        self.print_metadata_and_abstract(abstract, metadata=metadata)
 
         subindex = 'a'
         for sitelink in sitelinks:
             fullindex = str(index) + subindex
             self.print_title_and_url(fullindex, sitelink.title, sitelink.url, indent=4)
-            self.print_abstract(sitelink.abstract, indent=4)
+            self.print_metadata_and_abstract(sitelink.abstract, indent=4)
             index_url_map[fullindex] = sitelink.url
             # Increment subindex
             subindex = chr(ord(subindex) + 1)
@@ -755,6 +782,9 @@ class Result:
         if self.sitelinks:
             obj['sitelinks'] = [sitelink.__dict__ for sitelink in self.sitelinks]
         return obj
+
+
+Colors = collections.namedtuple('Colors', 'index, title, url, metadata, abstract, prompt, reset')
 
 
 # Functions
@@ -872,11 +902,11 @@ def quit(conn):
 def show_omniprompt():
     """Show the search or navigation omniprompt."""
 
-    global colorize
+    global colorize, colors
 
     message = "googler (? for help)"
     if colorize:
-        return raw_input("\x1b[7m%s\x1b[0m " % message)
+        return raw_input(colors.prompt + message + colors.reset + ' ')
     else:
         return raw_input("%s: " % message)
 
@@ -1014,6 +1044,19 @@ def is_duration(arg):
         raise argparse.ArgumentTypeError('%s is not a valid duration' % arg)
     return arg
 
+def is_colorstr(arg):
+    """Check if a string is a valid color string."""
+    try:
+        assert len(arg) == 6
+        for c in arg:
+            assert c in COLORMAP
+    except AssertionError:
+        raise argparse.ArgumentTypeError('%s is not a valid color string' % arg)
+    return arg
+
+# Retrieve GOOGLER_COLORS
+colorstr_env = os.getenv('GOOGLER_COLORS')
+
 argparser = ExtendedArgumentParser(
     add_help=False,
     description='Google from the command-line.'
@@ -1034,6 +1077,9 @@ addarg('-x', '--exact', dest='exact', action='store_true',
        help='disable automatic spelling correction')
 addarg('-C', '--nocolor', dest='colorize', action='store_false',
        help='disable color output')
+addarg('--colors', dest='colorstr', default=colorstr_env if colorstr_env else 'GKlxxy',
+       type=is_colorstr, metavar='COLORS',
+       help='set output colors (see man page for details)')
 addarg('-j', '--first', '--lucky', dest='lucky', action='store_true',
        help='open the first result in a web browser')
 addarg('-t', '--time', dest='duration', type=is_duration, metavar='dN',
@@ -1068,6 +1114,7 @@ if args.tld:
 lang = args.lang
 exact = args.exact
 colorize = args.colorize
+colors = Colors(*map(lambda c: COLORMAP[c], args.colorstr), reset=COLORMAP['x'])
 lucky = args.lucky
 duration = args.duration
 if args.debug:

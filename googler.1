@@ -32,6 +32,9 @@ Disable automatic spelling correction. Search exact keywords.
 .B "-C, --nocolor"
 Disable color output.
 .TP
+.BI "--colors=" COLORS
+Set output colors. Refer to the \fBCOLORS\fR section below for details.
+.TP
 .B "-j, --first, --lucky"
 Open the first result in a web browser. Feeling Lucky?
 .TP
@@ -74,6 +77,82 @@ Show omniprompt help.
 .TP
 .BI *
 Any other string initiates a new search with original options.
+.SH COLORS
+\fBgoogler\fR allows you to customize the color scheme via a six-letter string, reminiscent of BSD \fBLSCOLORS\fR. The six letters represent the colors of
+.IP - 2
+indices
+.PD 0 \" Change paragraph spacing to 0 in the list
+.IP - 2
+titles
+.IP - 2
+URLs
+.IP - 2
+metadata/publishing info (Google News only)
+.IP - 2
+abstracts
+.IP - 2
+prompts
+.PD 1 \" Restore paragraph spacing
+.TP
+respectively. The six-letter string is passed in either as the argument to the \fB--colors\fR option, or as the value of the environment variable \fBGOOGLER_COLORS\fR.
+.TP
+We offer the following colors/styles:
+.TS
+tab(;) box;
+l|l
+-|-
+l|l.
+Letter;Color/Style
+a;black
+b;red
+c;green
+d;yellow
+e;blue
+f;magenta
+g;cyan
+h;white
+i;bright black
+j;bright red
+k;bright green
+l;bright yellow
+m;bright blue
+n;bright magenta
+o;bright cyan
+p;bright white
+A-H;bold version of the lowercase-letter color
+I-P;bold version of the lowercase-letter bright color
+x;normal
+X;bold
+y;reverse video
+Y;bold reverse video
+.TE
+.TP
+.TP
+The default colors string is \fIGKlxxy\fR, which stands for
+.IP - 2
+bold bright cyan indices
+.PD 0 \" Change paragraph spacing to 0 in the list
+.IP - 2
+bold bright green titles
+.IP - 2
+bright yellow URLs
+.IP - 2
+normal metadata/publishing info
+.IP - 2
+normal abstracts
+.IP - 2
+reverse video prompts
+.PD 1 \" Restore paragraph spacing
+.TP
+Note that
+.IP - 2
+Bright colors (implemented as \\x1b[90m - \\x1b[97m) may not be available in all color-capable terminal emulators;
+.IP - 2
+Some terminal emulators draw bold text in bright colors instead;
+.IP - 2
+Some terminal emulators only distinguish between bold and bright colors via a default-off switch.
+.TP
+Please consult the manual of your terminal emulator as well as \fIhttps://en.wikipedia.org/wiki/ANSI_escape_code\fR for details.
 .SH ENVIRONMENT
 .TP
 .BI BROWSER
@@ -189,7 +268,6 @@ Input and output \fBredirection\fR:
 .PP
 .IP "" 4
 Note that \fI-C\fR is required to avoid printing control characters (for colored output).
-.PP
 .IP 13. 4
 \fBPipe\fR output:
 .PP
@@ -197,6 +275,16 @@ Note that \fI-C\fR is required to avoid printing control characters (for colored
 .IP
 .B googler -C hello world | tee output
 .EE
+.IP 14. 4
+Use a \fBcustom color scheme\fR, e.g., one warm color scheme designed for Solarized Dark:
+.PP
+.EX
+.IP
+.B googler --colors bjdxxy google
+.IP
+.B GOOGLER_COLORS=bjdxxy googler google
+.EE
+.PP
 .SH AUTHORS
 Henri Hakkinen
 .br
