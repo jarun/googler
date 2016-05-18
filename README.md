@@ -43,7 +43,7 @@ Find `googler` useful? If you would like to donate, visit the
 # Features
 
 - Google Search, Google Site Search, Google News
-- Fast and clean (no ads, stray URLs or clutter)
+- Fast and clean (no ads, stray URLs or clutter), custom color
 - Open result URLs (or the actual search) in browser
 - Navigate search result pages from omniprompt
 - Fetch n results in a go, start at the n<sup>th</sup> result
@@ -52,7 +52,7 @@ Find `googler` useful? If you would like to donate, visit the
 - Supports Google search keywords like `filetype:mime`, `site:somesite.com` etc.
 - Optionally open the first result directly in browser (as in *I'm Feeling Lucky*)
 - Non-stop searches: fire new searches at omniprompt without exiting
-- Manpage with examples, shell completion scripts for Bash, Zsh and Fish
+- Man page with examples, shell completion scripts for Bash, Zsh and Fish
 - Minimal dependencies
 
 # Installation
@@ -289,7 +289,7 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
         $ googler --colors bjdxxy google
         $ GOOGLER_COLORS=bjdxxy googler google
 
-14. More **help**:
+15. More **help**:
 
         $ googler
         $ man googler

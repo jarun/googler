@@ -1,5 +1,5 @@
 #
-# fish completion definition for googler.
+# Fish completion definition for googler.
 #
 # Author:
 #   Arun Prakash Jana <engineerarun@gmail.com>
