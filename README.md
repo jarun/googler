@@ -150,7 +150,7 @@ Please substitute `$version` with the appropriate package version.
       f                     jump to the first page
       o                     open the current search in browser
       g keywords            initiate a new Google search for 'keywords' with original options
-      q, ^D                 exit googler
+      q, ^D, double Enter   exit googler
       ?                     show omniprompt help
       *                     any other string initiates a new search with original options
 
