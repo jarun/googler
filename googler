@@ -1303,9 +1303,9 @@ while True:
     elif nav == "?":
         ExtendedArgumentParser.print_omniprompt_help(sys.stderr)
         printerr("")
-    elif len(nav) > 2 and nav[0] == "g" and nav[1] == " ":
+    elif nav.startswith("g "):
         trimsearch = nav[2:].strip().replace(" ", "+")
-        if trimsearch == "":
+        if not trimsearch:
             nav = ""
             continue
         url = baseurl + "q=" + url_quote_plus(trimsearch)
