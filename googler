@@ -899,6 +899,81 @@ def quit(conn):
     sys.exit(1)
 
 
+def fetch_results():
+    """Connect to server and fetch results"""
+
+    global conn
+    global url
+
+    try:
+        resp = google_get(conn, url)
+    except Exception as e:
+        debugp("Exception: %s" % e)
+        conn.close()
+        conn = new_connection()
+        resp = google_get(conn, url)
+
+    if resp.status != 200:
+        if resp.status in (301, 302,):
+            url = resp.getheader('location', '')
+            debugp("Redirected URL [%s]" % url)
+            if url.find("sorry/IndexRedirect?") >= 0:
+                error("Connection blocked due to unusual activity.")
+                quit(conn)
+
+            conn.close()
+            mark = url.find("/search")
+            next_server = url[(url.find("//") + 2):mark]
+            debugp("Next Server [%s]" % next_server)
+            conn = new_connection(next_server)
+            url = url[mark:]
+            debugp("Next GET [%s]" % url)
+
+            try:
+                resp = google_get(conn, url)
+            except Exception as e:
+                debugp("Exception: %s" % e)
+                quit(conn)
+
+            if resp.status != 200:
+                # Failed connecting to redirected server too!
+                error("First redirection failed with HTTP %d: %s" %
+                      (resp.status, resp.reason))
+                quit(conn)
+        else:
+            # The server responded with an error.
+            error("HTTP %d: %s" % (resp.status, resp.reason))
+            quit(conn)
+
+    # Parse the HTML document and print the results.
+    parser = GoogleParser()
+
+    if not debug:
+        parser.feed(gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8'))
+    else:
+        resp_body = gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8')
+        fd, tmpfile = tempfile.mkstemp(prefix='googler-response-')
+        os.close(fd)
+        with open(tmpfile, 'wb') as fp:
+            fp.write(resp_body.encode('utf-8'))
+        debugp("Response body written to '%s'.\n" % tmpfile)
+        parser.feed(resp_body)
+
+    results = parser.results
+    urlindex = {}
+    if (len(results) > 0):      # print a newline for more clarity
+        printerr("")
+
+    if output_format == 0:          # Regular output
+        for r in results:
+            urlindex.update(r.print_entry())
+    elif output_format == 1:        # Json output
+        results_object = [r.json_object() for r in results]
+        print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
+
+    return results, urlindex
+
+
 def show_omniprompt():
     """Show the search or navigation omniprompt."""
 
@@ -1177,82 +1252,6 @@ url = construct_search_url(baseurl, keywords, site=insite)
 
 # Connect to Google and request the result page.
 conn = new_connection()
-
-
-def fetch_results():
-    """Connect to server and fetch results"""
-
-    global conn
-    global url
-
-    try:
-        resp = google_get(conn, url)
-    except Exception as e:
-        debugp("Exception: %s" % e)
-        conn.close()
-        conn = new_connection()
-        resp = google_get(conn, url)
-
-    if resp.status != 200:
-        if resp.status in (301, 302,):
-            url = resp.getheader('location', '')
-            debugp("Redirected URL [%s]" % url)
-            if url.find("sorry/IndexRedirect?") >= 0:
-                error("Connection blocked due to unusual activity.")
-                quit(conn)
-
-            conn.close()
-            mark = url.find("/search")
-            next_server = url[(url.find("//") + 2):mark]
-            debugp("Next Server [%s]" % next_server)
-            conn = new_connection(next_server)
-            url = url[mark:]
-            debugp("Next GET [%s]" % url)
-
-            try:
-                resp = google_get(conn, url)
-            except Exception as e:
-                debugp("Exception: %s" % e)
-                quit(conn)
-
-            if resp.status != 200:
-                # Failed connecting to redirected server too!
-                error("First redirection failed with HTTP %d: %s" %
-                      (resp.status, resp.reason))
-                quit(conn)
-        else:
-            # The server responded with an error.
-            error("HTTP %d: %s" % (resp.status, resp.reason))
-            quit(conn)
-
-    # Parse the HTML document and print the results.
-    parser = GoogleParser()
-
-    if not debug:
-        parser.feed(gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8'))
-    else:
-        resp_body = gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8')
-        fd, tmpfile = tempfile.mkstemp(prefix='googler-response-')
-        os.close(fd)
-        with open(tmpfile, 'wb') as fp:
-            fp.write(resp_body.encode('utf-8'))
-        debugp("Response body written to '%s'.\n" % tmpfile)
-        parser.feed(resp_body)
-
-    results = parser.results
-    urlindex = {}
-    if (len(results) > 0):      # print a newline for more clarity
-        printerr("")
-
-    if output_format == 0:          # Regular output
-        for r in results:
-            urlindex.update(r.print_entry())
-    elif output_format == 1:        # Json output
-        results_object = [r.json_object() for r in results]
-        print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
-
-    return results, urlindex
-
 
 results = []
 urlindex = {}
