@@ -1314,7 +1314,7 @@ while True:
         start = basestart
     elif nav in urlindex:
         open_url(urlindex[nav])
-    elif (nav[1:] if nav[0] == '-' else nav).isdigit() and int(nav) < 100:
+    elif nav.isdigit() and int(nav) < 100:
         printerr("Index out of bound. To search for the number, use g.")
     elif nav:
         trimsearch = nav.strip().replace(" ", "+")
