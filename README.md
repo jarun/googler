@@ -59,7 +59,7 @@ Find `googler` useful? If you would like to donate, visit the
 
 `googler` requires Python 3.3 or later to work. Only the latest patch release of each minor version is supported.
 
-Python 2.x support has been deprecated from `googler v2.4.1`.
+Python 2.x support has been deprecated from `googler` v2.4.1.
 
 ## Installing from this repository
 
