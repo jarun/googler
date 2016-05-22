@@ -1,3 +1,27 @@
+googler v2.4
+2016-05-22
+
+**NOTICE:** Python 2.x support is deprecated now. While it's still
+possible to use Python 2.x by editing the shebang, we have found
+issues with Python 2.x (e.g. readline doesn't work) which don't
+have a satisfactory solution without impacting other features.
+Python 2.x support will be completely removed in the next version.
+
+Modifications
+- Sitelinks support
+- Customizable colours
+- Context in News results
+- .deb package for Debian and Ubuntu family
+- Basic support for ConEmu terminal on Windows
+- New omniprompt option -f to jump to first results page
+- New omniprompt key -o to open the current search in browser
+- Shorter omniprompt
+- Non-interactive mode to fetch results and exit
+- JSON output support
+- A complete re-write of the HTML parser
+
+-------------------------------------------------------------------------------
+
 googler v2.3
 2016-04-23
 

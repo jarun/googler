@@ -218,7 +218,7 @@ Build-Depends: debhelper (>= 9)
 
 Package: $pkgname
 Architecture: all
-Depends: \${shlibs:Depends}, \${misc:Depends}, python (>= 2.7)
+Depends: \${shlibs:Depends}, \${misc:Depends}, python (>= 3.3)
 Description: Google Search and News from the command-line
  See https://github.com/jarun/googler#readme.
 EOF
