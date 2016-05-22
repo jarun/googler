@@ -911,6 +911,26 @@ def show_omniprompt():
         return raw_input("%s: " % message)
 
 
+def construct_search_url(baseurl, keywords, site=None):
+    """Construct the search URL with keywords and optionally a site.
+
+    baseurl should already contain queries such as start and num. This
+    function only adds the q query.
+
+    keywords should either be a list of keywords, or a single
+    space-delimited string of keywords.
+    """
+    url = baseurl
+    if type(keywords) == list:
+        url += "q=" + "+".join(map(url_quote_plus, keywords))
+    else:
+        url += "q=" + url_quote_plus(keywords)
+    if site:
+        url += "+site:" + url_quote_plus(site)
+    debugp("Search URL [%s : %s]" % (server, url))
+    return url
+
+
 def open_url(url):
     _stderr = os.dup(2)
     os.close(2)
@@ -1153,13 +1173,7 @@ basestart = start
 
 debugp("Base URL [%s]" % url)
 
-url += "q=" + url_quote_plus(keywords[0])
-for kw in keywords[1:]:
-    url += "+" + url_quote_plus(kw)
-if insite is not None:
-    url += "+site:" + url_quote_plus(insite)
-
-debugp("Search URL [%s : %s]" % (server, url))
+url = construct_search_url(baseurl, keywords, site=insite)
 
 # Connect to Google and request the result page.
 conn = new_connection()
@@ -1304,12 +1318,11 @@ while True:
         ExtendedArgumentParser.print_omniprompt_help(sys.stderr)
         printerr("")
     elif nav.startswith("g "):
-        trimsearch = nav[2:].strip().replace(" ", "+")
-        if not trimsearch:
+        keywords = nav[2:].strip()
+        if not keywords:
             nav = ""
             continue
-        url = baseurl + "q=" + url_quote_plus(trimsearch)
-        debugp("New search URL [%s]" % url)
+        url = construct_search_url(baseurl, keywords, site=insite)
         nav = "g"
         start = basestart
     elif nav in urlindex:
@@ -1317,14 +1330,11 @@ while True:
     elif nav.isdigit() and int(nav) < 100:
         printerr("Index out of bound. To search for the number, use g.")
     elif nav:
-        trimsearch = nav.strip().replace(" ", "+")
-        if trimsearch == "" or trimsearch == "g":
+        keywords = nav.strip()
+        if not keywords:
             nav = ""
             continue
-        url = baseurl + "q=" + url_quote_plus(trimsearch)
-        if insite is not None:
-            url += "+site:" + url_quote_plus(insite)
-        debugp("New search URL [%s]" % url)
+        url = construct_search_url(baseurl, keywords, site=insite)
         nav = "g"
         start = basestart
 
