@@ -142,7 +142,7 @@ server = "www.google.com"   # Default server to connect to
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
                             # Set user agent as Microsoft Edge
-_VERSION_ = 2.4             # Current version
+_VERSION_ = '2.4.1'         # Current version
 
 
 # Classes
@@ -1105,7 +1105,7 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
     @staticmethod
     def print_general_info(file=None):
         file.write(textwrap.dedent("""
-        Version %.1f
+        Version %s
         Copyright (C) 2008 Henri Hakkinen
         Copyright (C) 2015-2016 Arun Prakash Jana <engineerarun@gmail.com>
         Zhiming Wang <zmwangx@gmail.com>
@@ -1226,7 +1226,7 @@ if args.json:
 # Get terminal width
 columns, _ = get_terminal_size()
 
-debugp("Version %.1f" % _VERSION_)
+debugp("Version %s" % _VERSION_)
 
 # Construct the query URL.
 url = "/search?ie=UTF-8&oe=UTF-8&"
