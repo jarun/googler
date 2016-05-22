@@ -12,7 +12,7 @@ Modifications
 - Customizable colours
 - Context in News results
 - .deb package for Debian and Ubuntu family
-- Basic support for ConEmu terminal on Windows
+- Basic support for terminal emulators having ANSI escape sequence support on Windows
 - New omniprompt option -f to jump to first results page
 - New omniprompt key -o to open the current search in browser
 - Shorter omniprompt
