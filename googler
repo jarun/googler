@@ -21,72 +21,16 @@ from __future__ import print_function
 import argparse
 import collections
 import gzip
+import http.client
+import html.entities
+import html.parser
 import io
 import os
 import signal
 import sys
 import textwrap
+import urllib.parse
 import webbrowser
-
-# 2to3 compatibility layer
-if sys.version_info > (3,):
-    from html.entities import name2codepoint
-    import html.parser as HTMLParser
-    from urllib.parse import quote_plus as url_quote_plus
-    from http.client import HTTPSConnection
-
-    unichr = chr
-    raw_input = input
-else:
-    from htmlentitydefs import name2codepoint
-    import HTMLParser
-    from urllib import quote_plus as url_quote_plus
-    from httplib import HTTPSConnection
-
-    # Set the encoding of standard streams to UTF-8 (unnecessary for Python 3)
-    import codecs
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
-    sys.stderr = codecs.getwriter('utf-8')(sys.stderr)
-
-"""
-POSIX compatibility layer
- - os.get_terminal_size is only available on Python 3.3+.
- - fcntl and termios are only available on POSIX systems.
-
- This version of platform-independent get_terminal_size always returns a tuple
- (columns, lines), just like os.get_terminal_size. When unavailable, returns (0, 0).
-"""
-def _environ_get_terminal_size():
-    return (int(os.environ.get('COLUMNS', 0)), int(os.environ.get('LINES', 0)))
-
-if hasattr(os, 'get_terminal_size'):
-    def get_terminal_size():
-        """Returns terminal size on Python 3.3+"""
-
-        try:
-            return os.get_terminal_size()
-        except OSError:
-            return _environ_get_terminal_size()
-else:
-    try:
-        import fcntl
-        import struct
-        import termios
-
-        def get_terminal_size():
-            """Returns terminal size on POSIX systems"""
-
-            try:
-                winsz = fcntl.ioctl(sys.stderr, termios.TIOCGWINSZ, '1234')
-                lines, columns = struct.unpack('HH', winsz)
-            except IOError:
-                lines, columns = (0, 0)
-            if lines > 0 and columns > 0:
-                return (columns, lines)
-            else:
-                return _environ_get_terminal_size()
-    except ImportError:
-        get_terminal_size = _environ_get_terminal_size
 
 # Python optional dependency compatibility layer
 try:
@@ -101,7 +45,6 @@ def sigint_handler(signum, frame):
     print('\nInterrupted.', file=sys.stderr)
     sys.exit(1)
 
-# Register signal handler
 signal.signal(signal.SIGINT, sigint_handler)
 
 
@@ -211,7 +154,7 @@ def retrieve_tag_annotation(annotated_endtag_handler):
 
     return handler
 
-class GoogleParser(HTMLParser.HTMLParser):
+class GoogleParser(html.parser.HTMLParser):
     """The members of this class parse the result
     HTML page fetched from Google server for a query.
 
@@ -412,7 +355,7 @@ class GoogleParser(HTMLParser.HTMLParser):
     #   tag is finally reach, the former scope is restored.
 
     def __init__(self):
-        HTMLParser.HTMLParser.__init__(self)
+        html.parser.HTMLParser.__init__(self)
 
         self.results = []
 
@@ -641,7 +584,7 @@ class GoogleParser(HTMLParser.HTMLParser):
 
     def record_entityref(self, ref):
         try:
-            self.textbuf += unichr(name2codepoint[ref])
+            self.textbuf += chr(html.entities.name2codepoint[ref])
         except KeyError:
             # Entity name not found; most likely rather sloppy HTML
             # where a literal ampersand is not escaped; For instance,
@@ -659,9 +602,9 @@ class GoogleParser(HTMLParser.HTMLParser):
 
     def record_charref(self, ref):
         if ref.startswith('x'):
-            char = unichr(int(ref[1:], 16))
+            char = chr(int(ref[1:], 16))
         else:
-            char = unichr(int(ref))
+            char = chr(int(ref))
         self.textbuf += char
 
     @staticmethod
@@ -749,7 +692,7 @@ class Result:
         # Open the URL in a web browser if option -j was specified.
         if lucky:
             self.open()
-            quit(conn)
+            quit_program(conn)
 
         index_url_map[str(index)] = url
         self.print_title_and_url(index, title, url)
@@ -889,10 +832,10 @@ def new_connection(domain=None):
     """
 
     global server
-    return HTTPSConnection(domain if domain else server, timeout=45)
+    return http.client.HTTPSConnection(domain if domain else server, timeout=45)
 
 
-def quit(conn):
+def quit_program(conn):
     """Closes a connection and quits the program"""
 
     conn.close()
@@ -919,7 +862,7 @@ def fetch_results():
             debugp("Redirected URL [%s]" % url)
             if url.find("sorry/IndexRedirect?") >= 0:
                 error("Connection blocked due to unusual activity.")
-                quit(conn)
+                quit_program(conn)
 
             conn.close()
             mark = url.find("/search")
@@ -933,17 +876,17 @@ def fetch_results():
                 resp = google_get(conn, url)
             except Exception as e:
                 debugp("Exception: %s" % e)
-                quit(conn)
+                quit_program(conn)
 
             if resp.status != 200:
                 # Failed connecting to redirected server too!
                 error("First redirection failed with HTTP %d: %s" %
                       (resp.status, resp.reason))
-                quit(conn)
+                quit_program(conn)
         else:
             # The server responded with an error.
             error("HTTP %d: %s" % (resp.status, resp.reason))
-            quit(conn)
+            quit_program(conn)
 
     # Parse the HTML document and print the results.
     parser = GoogleParser()
@@ -961,13 +904,13 @@ def fetch_results():
 
     results = parser.results
     urlindex = {}
-    if (len(results) > 0):      # print a newline for more clarity
+    if results: # print a newline for more clarity
         printerr("")
 
-    if output_format == 0:          # Regular output
+    if output_format == 0: # Regular output
         for r in results:
             urlindex.update(r.print_entry())
-    elif output_format == 1:        # Json output
+    elif output_format == 1: # Json output
         results_object = [r.json_object() for r in results]
         print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
 
@@ -981,9 +924,9 @@ def show_omniprompt():
 
     message = "googler (? for help)"
     if colorize:
-        return raw_input(colors.prompt + message + colors.reset + ' ')
+        return input(colors.prompt + message + colors.reset + ' ')
     else:
-        return raw_input("%s: " % message)
+        return input("%s: " % message)
 
 
 def construct_search_url(baseurl, keywords, site=None):
@@ -996,12 +939,12 @@ def construct_search_url(baseurl, keywords, site=None):
     space-delimited string of keywords.
     """
     url = baseurl
-    if type(keywords) == list:
-        url += "q=" + "+".join(map(url_quote_plus, keywords))
+    if isinstance(keywords, list):
+        url += "q=" + "+".join([urllib.parse.quote_plus(kw) for kw in keywords])
     else:
-        url += "q=" + url_quote_plus(keywords)
+        url += "q=" + urllib.parse.quote_plus(keywords)
     if site:
-        url += "+site:" + url_quote_plus(site)
+        url += "+site:" + urllib.parse.quote_plus(site)
     debugp("Search URL [%s : %s]" % (server, url))
     return url
 
@@ -1209,7 +1152,7 @@ if args.tld:
 lang = args.lang
 exact = args.exact
 colorize = args.colorize
-colors = Colors(*map(lambda c: COLORMAP[c], args.colorstr), reset=COLORMAP['x'])
+colors = Colors(*[COLORMAP[c] for c in args.colorstr], reset=COLORMAP['x'])
 lucky = args.lucky
 duration = args.duration
 if args.debug:
@@ -1224,7 +1167,10 @@ if args.json:
     import json
 
 # Get terminal width
-columns, _ = get_terminal_size()
+try:
+    columns, _ = os.get_terminal_size()
+except OSError:
+    columns = 0
 
 debugp("Version %s" % _VERSION_)
 
