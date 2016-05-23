@@ -71,21 +71,15 @@ or download a source code archive: [the latest stable release](https://github.co
 
 ### Installing to default or custom location
 
-Run
+To install to the default location (`/usr/local`):
 
     $ sudo make install
-
-to install to `/usr/local`. To install to a different prefix, run
-
-    $ PREFIX=/path/to/prefix make install
-
-You may need to prepend `sudo` if the prefix is only writable by root.
 
 To remove `googler` and associated docs, run
 
     $ sudo make uninstall
 
-If you installed to a different prefix, you'll need to specify the same `PREFIX` as when you ran `make install`.
+`PREFIX` is supported, in case you want to install to a different location.
 
 ### Running as a standalone utility
 
