@@ -1,8 +1,7 @@
-PREFIX=/usr/local
-BINDIR=$(DESTDIR)$(PREFIX)/bin
-MANDIR=$(DESTDIR)$(PREFIX)/share/man/man1
-DOCDIR=$(DESTDIR)$(PREFIX)/share/doc/googler
-
+PREFIX ?= /usr/local
+BINDIR = $(DESTDIR)$(PREFIX)/bin
+MANDIR = $(DESTDIR)$(PREFIX)/share/man/man1
+DOCDIR = $(DESTDIR)$(PREFIX)/share/doc/googler
 
 .PHONY: all install uninstall
 
