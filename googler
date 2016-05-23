@@ -904,7 +904,7 @@ def fetch_results():
 
     results = parser.results
     urlindex = {}
-    if results: # print a newline for more clarity
+    if results and not noninteractive: # print a newline for more clarity
         printerr("")
 
     if output_format == 0: # Regular output
