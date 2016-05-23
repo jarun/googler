@@ -917,8 +917,8 @@ def fetch_results():
     return results, urlindex
 
 
-def show_omniprompt():
-    """Show the search or navigation omniprompt."""
+def read_command():
+    """Show omniprompt and read user command."""
 
     global colorize, colors
 
@@ -1210,13 +1210,13 @@ while True:
 
     oldstart = start
     try:
-        nav = show_omniprompt()
+        nav = read_command()
     except EOFError:
         break
 
     if not nav:
         try:
-            nav = show_omniprompt()
+            nav = read_command()
         except EOFError:
             break
         if not nav:
