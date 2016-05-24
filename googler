@@ -150,7 +150,11 @@ def retrieve_tag_annotation(annotated_endtag_handler):
     # Returns: HTMLParser.handle_endtag(self, tag: str) -> None
 
     def handler(self, tag):
-        annotation = self.tag_annotations[tag].pop()
+        try:
+            annotation = self.tag_annotations[tag].pop()
+        except IndexError:
+            # Malformed HTML -- more close tags than open tags
+            annotation = None
         annotated_endtag_handler(self, tag, annotation)
 
     return handler
