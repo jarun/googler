@@ -82,7 +82,7 @@ exact = False               # If True, disable automatic spelling correction
 insite = None               # Google search a specific site
 output_format = 0           # 0: Regular (normal) output, 1: Json output
 noninteractive = False      # Non-interactive mode
-server = "www.google.com"   # Default server to connect to
+server = 'www.google.com'   # Default server to connect to
 ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
                             # Set user agent as Microsoft Edge
@@ -640,14 +640,14 @@ class Result:
     def print_title_and_url(index, title, url, indent=0):
         global colorize, colors
         # Pad index and url with `indent` number of spaces
-        index = " " * indent + str(index)
-        url = " " * indent + url
+        index = ' ' * indent + str(index)
+        url = ' ' * indent + url
         if colorize:
-            print(colors.index + index + colors.reset, end="")
+            print(colors.index + index + colors.reset, end='')
             print(' ' + colors.title + title + colors.reset)
             print(colors.url + url + colors.reset)
         else:
-            print(" %s %s\n%s" % (index, title, url))
+            print(' %s %s\n%s' % (index, title, url))
 
     @staticmethod
     def print_metadata_and_abstract(abstract, metadata=None, indent=0):
@@ -659,17 +659,17 @@ class Result:
                 print(metadata)
 
         if colorize:
-            print(colors.abstract, end="")
+            print(colors.abstract, end='')
         if columns > indent + 1:
             # Try to fill to columns
             fillwidth = columns - indent - 1
             for line in textwrap.wrap(abstract, width=fillwidth):
-                print("%s%s" % (" " * indent, line))
-            print("")
+                print('%s%s' % (' ' * indent, line))
+            print('')
         else:
-            print("%s\n" % abstract.replace("\n", " "))
+            print('%s\n' % abstract.replace('\n', ' '))
         if colorize:
-            print(colors.reset, end="")
+            print(colors.reset, end='')
 
     def print_entry(self):
         """Print an entry and returns an URL index.
@@ -820,9 +820,9 @@ def google_get(conn, url):
     """
 
     global ua
-    conn.request("GET", url, None, {
-        "Accept-encoding": "gzip",
-        "User-Agent": ua,
+    conn.request('GET', url, None, {
+        'Accept-encoding': 'gzip',
+        'User-Agent': ua,
     })
     return conn.getresponse()
 
@@ -853,7 +853,7 @@ def fetch_results():
     try:
         resp = google_get(conn, url)
     except Exception as e:
-        debugp("Exception: %s" % e)
+        debugp('Exception: %s' % e)
         conn.close()
         conn = new_connection()
         resp = google_get(conn, url)
@@ -861,33 +861,33 @@ def fetch_results():
     if resp.status != 200:
         if resp.status in (301, 302,):
             url = resp.getheader('location', '')
-            debugp("Redirected URL [%s]" % url)
-            if url.find("sorry/IndexRedirect?") >= 0:
-                error("Connection blocked due to unusual activity.")
+            debugp('Redirected URL [%s]' % url)
+            if url.find('sorry/IndexRedirect?') >= 0:
+                error('Connection blocked due to unusual activity.')
                 quit_program()
 
             conn.close()
-            mark = url.find("/search")
-            next_server = url[(url.find("//") + 2):mark]
-            debugp("Next Server [%s]" % next_server)
+            mark = url.find('/search')
+            next_server = url[(url.find('//') + 2):mark]
+            debugp('Next Server [%s]' % next_server)
             conn = new_connection(next_server)
             url = url[mark:]
-            debugp("Next GET [%s]" % url)
+            debugp('Next GET [%s]' % url)
 
             try:
                 resp = google_get(conn, url)
             except Exception as e:
-                debugp("Exception: %s" % e)
+                debugp('Exception: %s' % e)
                 quit_program()
 
             if resp.status != 200:
                 # Failed connecting to redirected server too!
-                error("First redirection failed with HTTP %d: %s" %
+                error('First redirection failed with HTTP %d: %s' %
                       (resp.status, resp.reason))
                 quit_program()
         else:
             # The server responded with an error.
-            error("HTTP %d: %s" % (resp.status, resp.reason))
+            error('HTTP %d: %s' % (resp.status, resp.reason))
             quit_program()
 
     # Parse the HTML document and print the results.
@@ -907,7 +907,7 @@ def fetch_results():
     results = parser.results
     urlindex = {}
     if results and not noninteractive: # print a newline for more clarity
-        printerr("")
+        printerr('')
 
     if output_format == 0: # Regular output
         for r in results:
@@ -924,8 +924,8 @@ def read_next_command():
 
     global colorize, colors
 
-    message = "googler (? for help)"
-    prompt = (colors.prompt + message + colors.reset + " ") if colorize else (message + ": ")
+    message = 'googler (? for help)'
+    prompt = (colors.prompt + message + colors.reset + ' ') if colorize else (message + ': ')
     try:
         return input(prompt)
     except EOFError:
@@ -943,12 +943,12 @@ def construct_search_url(baseurl, keywords, site=None):
     """
     url = baseurl
     if isinstance(keywords, list):
-        url += "q=" + "+".join([urllib.parse.quote_plus(kw) for kw in keywords])
+        url += 'q=' + '+'.join([urllib.parse.quote_plus(kw) for kw in keywords])
     else:
-        url += "q=" + urllib.parse.quote_plus(keywords)
+        url += 'q=' + urllib.parse.quote_plus(keywords)
     if site:
-        url += "+site:" + urllib.parse.quote_plus(site)
-    debugp("Search URL [%s : %s]" % (server, url))
+        url += '+site:' + urllib.parse.quote_plus(site)
+    debugp('Search URL [%s : %s]' % (server, url))
     return url
 
 
@@ -970,7 +970,7 @@ def open_url(url):
 
 # Messaging wrappers
 
-def message(msg, level="INFO", ansi=None):
+def message(msg, level='INFO', ansi=None):
     """Print message, led with [%(level)s] where level is a string, to
     stderr.  If ansi is not None and the global variable colorize is True,
     then print ansi at the beginning, and close with \x1b[0m.
@@ -980,10 +980,10 @@ def message(msg, level="INFO", ansi=None):
 
     if ansi is not None and colorize:
         opening = ansi
-        closing = "\x1b[0m"
+        closing = '\x1b[0m'
     else:
-        opening = closing = ""
-    print("{opening}[{level}] {msg}{closing}".format(
+        opening = closing = ''
+    print('{opening}[{level}] {msg}{closing}'.format(
         opening=opening, level=level, msg=msg, closing=closing
     ), file=sys.stderr)
 
@@ -993,7 +993,7 @@ def error(msg):
     Error in red if colorize.
     """
 
-    message(msg, "ERROR", "\x1b[31m")
+    message(msg, 'ERROR', '\x1b[31m')
 
 
 def warning(msg):
@@ -1001,7 +1001,7 @@ def warning(msg):
     Warning in yellow if colorize
     """
 
-    message(msg, "WARNING", "\x1b[33m")
+    message(msg, 'WARNING', '\x1b[33m')
 
 
 def debugp(msg):
@@ -1013,7 +1013,7 @@ def debugp(msg):
 
     if debug:
         # Debugging messages not colorized
-        message(msg, "DEBUG")
+        message(msg, 'DEBUG')
 
 
 def printerr(msg):
@@ -1175,39 +1175,39 @@ try:
 except OSError:
     columns = 0
 
-debugp("Version %s" % _VERSION_)
+debugp('Version %s' % _VERSION_)
 
 # Construct the query URL.
-url = "/search?ie=UTF-8&oe=UTF-8&"
+url = '/search?ie=UTF-8&oe=UTF-8&'
 
-url += "start=" + str(start) + "&"
+url += 'start=' + str(start) + '&'
 if num is not None:
-    url += "num=" + str(num) + "&"
+    url += 'num=' + str(num) + '&'
 if news:
-    url += "tbm=nws&"
+    url += 'tbm=nws&'
 if lang is not None:
-    url += "hl=" + lang + "&"
+    url += 'hl=' + lang + '&'
 if duration is not None:
-    url += "tbs=qdr:" + duration + "&"
+    url += 'tbs=qdr:' + duration + '&'
 if exact:
-    url += "nfpr=1&"
+    url += 'nfpr=1&'
 
 baseurl = url
 basestart = start
 
-debugp("Base URL [%s]" % url)
+debugp('Base URL [%s]' % url)
 
 url = construct_search_url(baseurl, keywords, site=insite)
 
 # Connect to Google and request the result page.
 conn = new_connection()
 
-CONSECUTIVE_WHITESPACE = re.compile('\s+')
+CONSECUTIVE_WHITESPACE = re.compile(r'\s+')
 
 results = []
 urlindex = {}
 while True:
-    if nav == "n" or nav == "p" or nav == "f" or nav == "g":
+    if nav == 'n' or nav == 'p' or nav == 'f' or nav == 'g':
         results, urlindex = fetch_results()
 
     if noninteractive:
@@ -1221,25 +1221,25 @@ while True:
             # Two consecutive enters
             quit_program(exitcode=0)
 
-    nav = CONSECUTIVE_WHITESPACE.sub(" ", nav).strip()
-    if nav == "n":
+    nav = CONSECUTIVE_WHITESPACE.sub(' ', nav).strip()
+    if nav == 'n':
         if len(results) == 0:
-            nav = ""
+            nav = ''
             continue
         if num is not None:
             start = start + num
         else:
             start = start + 10
 
-        url = url.replace("start=%d&" % oldstart, "start=%d&" % start, 1)
-        debugp("Next URL [%s]\n" % url)
-    elif nav == "p" or nav == "f":
+        url = url.replace('start=%d&' % oldstart, 'start=%d&' % start, 1)
+        debugp('Next URL [%s]\n' % url)
+    elif nav == 'p' or nav == 'f':
         if start == 0:
-            printerr("Already at the first page.")
-            nav = "" # Unset nav so that we don't fetch result in the next iteration
+            printerr('Already at the first page.')
+            nav = '' # Unset nav so that we don't fetch result in the next iteration
             continue
 
-        if nav == "p":
+        if nav == 'p':
             if num is not None:
                 newstart = start - num
             else:
@@ -1252,34 +1252,34 @@ while True:
         else:
             start = 0
 
-        url = url.replace("start=%d&" % oldstart, "start=%d&" % start, 1)
-        debugp("Next URL [%s]\n" % url)
-    elif nav == "o":
-        open_url("https://" + server + url)
-    elif nav == "q":
+        url = url.replace('start=%d&' % oldstart, 'start=%d&' % start, 1)
+        debugp('Next URL [%s]\n' % url)
+    elif nav == 'o':
+        open_url('https://' + server + url)
+    elif nav == 'q':
         break
-    elif nav == "?":
+    elif nav == '?':
         ExtendedArgumentParser.print_omniprompt_help(sys.stderr)
-        printerr("")
-    elif nav.startswith("g "):
+        printerr('')
+    elif nav.startswith('g '):
         keywords = nav[2:].strip()
         if not keywords:
-            nav = ""
+            nav = ''
             continue
         url = construct_search_url(baseurl, keywords, site=insite)
-        nav = "g"
+        nav = 'g'
         start = basestart
     elif nav in urlindex:
         open_url(urlindex[nav])
     elif nav.isdigit() and int(nav) < 100:
-        printerr("Index out of bound. To search for the number, use g.")
+        printerr('Index out of bound. To search for the number, use g.')
     elif nav:
         keywords = nav.strip()
         if not keywords:
-            nav = ""
+            nav = ''
             continue
         url = construct_search_url(baseurl, keywords, site=insite)
-        nav = "g"
+        nav = 'g'
         start = basestart
 
 quit_program(exitcode=0)
