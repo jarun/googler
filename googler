@@ -26,6 +26,7 @@ import html.entities
 import html.parser
 import io
 import os
+import re
 import signal
 import sys
 import textwrap
@@ -917,8 +918,8 @@ def fetch_results():
     return results, urlindex
 
 
-def show_omniprompt():
-    """Show the search or navigation omniprompt."""
+def read_command():
+    """Show omniprompt and read user command."""
 
     global colorize, colors
 
@@ -1199,6 +1200,8 @@ url = construct_search_url(baseurl, keywords, site=insite)
 # Connect to Google and request the result page.
 conn = new_connection()
 
+CONSECUTIVE_WHITESPACE = re.compile('\s+')
+
 results = []
 urlindex = {}
 while True:
@@ -1210,19 +1213,20 @@ while True:
 
     oldstart = start
     try:
-        nav = show_omniprompt()
+        nav = read_command()
     except EOFError:
         break
 
     if not nav:
         try:
-            nav = show_omniprompt()
+            nav = read_command()
         except EOFError:
             break
         if not nav:
             # Two consecutive enters
             break
 
+    nav = CONSECUTIVE_WHITESPACE.sub(" ", nav).strip()
     if nav == "n":
         if len(results) == 0:
             nav = ""
@@ -1232,7 +1236,7 @@ while True:
         else:
             start = start + 10
 
-        url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
+        url = url.replace("start=%d&" % oldstart, "start=%d&" % start, 1)
         debugp("Next URL [%s]\n" % url)
     elif nav == "p" or nav == "f":
         if start == 0:
@@ -1253,7 +1257,7 @@ while True:
         else:
             start = 0
 
-        url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
+        url = url.replace("start=%d&" % oldstart, "start=%d&" % start, 1)
         debugp("Next URL [%s]\n" % url)
     elif nav == "o":
         open_url("https://" + server + url)
