@@ -925,10 +925,11 @@ def read_next_command():
     global colorize, colors
 
     message = "googler (? for help)"
-    if colorize:
-        return input(colors.prompt + message + colors.reset + ' ')
-    else:
-        return input("%s: " % message)
+    prompt = (colors.prompt + message + colors.reset + " ") if colorize else (message + ": ")
+    try:
+        return input(prompt)
+    except EOFError:
+        quit_program(exitcode=0)
 
 
 def construct_search_url(baseurl, keywords, site=None):
@@ -1210,22 +1211,15 @@ while True:
         results, urlindex = fetch_results()
 
     if noninteractive:
-        break
+        quit_program(exitcode=0)
 
     oldstart = start
-    try:
-        nav = read_next_command()
-    except EOFError:
-        break
-
+    nav = read_next_command()
     if not nav:
-        try:
-            nav = read_next_command()
-        except EOFError:
-            break
+        nav = read_next_command()
         if not nav:
             # Two consecutive enters
-            break
+            quit_program(exitcode=0)
 
     nav = CONSECUTIVE_WHITESPACE.sub(" ", nav).strip()
     if nav == "n":
@@ -1288,5 +1282,4 @@ while True:
         nav = "g"
         start = basestart
 
-
-conn.close()
+quit_program(exitcode=0)
