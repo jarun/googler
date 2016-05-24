@@ -693,7 +693,7 @@ class Result:
         # Open the URL in a web browser if option -j was specified.
         if lucky:
             self.open()
-            quit_program(conn)
+            quit_program()
 
         index_url_map[str(index)] = url
         self.print_title_and_url(index, title, url)
@@ -836,11 +836,12 @@ def new_connection(domain=None):
     return http.client.HTTPSConnection(domain if domain else server, timeout=45)
 
 
-def quit_program(conn):
-    """Closes a connection and quits the program"""
+def quit_program(exitcode=1):
+    """Close the connection and quits the program."""
 
+    global conn
     conn.close()
-    sys.exit(1)
+    sys.exit(exitcode)
 
 
 def fetch_results():
@@ -863,7 +864,7 @@ def fetch_results():
             debugp("Redirected URL [%s]" % url)
             if url.find("sorry/IndexRedirect?") >= 0:
                 error("Connection blocked due to unusual activity.")
-                quit_program(conn)
+                quit_program()
 
             conn.close()
             mark = url.find("/search")
@@ -877,17 +878,17 @@ def fetch_results():
                 resp = google_get(conn, url)
             except Exception as e:
                 debugp("Exception: %s" % e)
-                quit_program(conn)
+                quit_program()
 
             if resp.status != 200:
                 # Failed connecting to redirected server too!
                 error("First redirection failed with HTTP %d: %s" %
                       (resp.status, resp.reason))
-                quit_program(conn)
+                quit_program()
         else:
             # The server responded with an error.
             error("HTTP %d: %s" % (resp.status, resp.reason))
-            quit_program(conn)
+            quit_program()
 
     # Parse the HTML document and print the results.
     parser = GoogleParser()
