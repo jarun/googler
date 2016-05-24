@@ -26,6 +26,7 @@ import html.entities
 import html.parser
 import io
 import os
+import re
 import signal
 import sys
 import textwrap
@@ -1199,6 +1200,8 @@ url = construct_search_url(baseurl, keywords, site=insite)
 # Connect to Google and request the result page.
 conn = new_connection()
 
+CONSECUTIVE_WHITESPACE = re.compile('\s+')
+
 results = []
 urlindex = {}
 while True:
@@ -1223,6 +1226,7 @@ while True:
             # Two consecutive enters
             break
 
+    nav = CONSECUTIVE_WHITESPACE.sub(" ", nav).strip()
     if nav == "n":
         if len(results) == 0:
             nav = ""
