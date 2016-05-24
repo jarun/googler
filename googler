@@ -1236,7 +1236,7 @@ while True:
         else:
             start = start + 10
 
-        url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
+        url = url.replace("start=%d&" % oldstart, "start=%d&" % start, 1)
         debugp("Next URL [%s]\n" % url)
     elif nav == "p" or nav == "f":
         if start == 0:
@@ -1257,7 +1257,7 @@ while True:
         else:
             start = 0
 
-        url = url.replace("start=" + str(oldstart) + "&", "start=" + str(start) + "&", 1)
+        url = url.replace("start=%d&" % oldstart, "start=%d&" % start, 1)
         debugp("Next URL [%s]\n" % url)
     elif nav == "o":
         open_url("https://" + server + url)
