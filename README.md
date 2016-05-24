@@ -97,7 +97,7 @@ and uninstalled through
 
     $ sudo make uninstall.comp
 
-`DESTDIR` is supported. Please refer to your shell's manual for instructions on completion configuration.
+Again, `PREFIX` is supported. Please refer to your shell's manual for instructions on setting up your shell to use completions.
 
 ## Installing with a package manager
 
