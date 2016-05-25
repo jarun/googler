@@ -89,15 +89,7 @@ To remove `googler` and associated docs, run
 
 ### Shell completion
 
-Shell completion scripts for Bash, Fish and Zsh can be found in respective subdirectories of [`auto-completion/`](auto-completion), and can be installed through
-
-    $ sudo make install.comp
-
-and uninstalled through
-
-    $ sudo make uninstall.comp
-
-Again, `PREFIX` is supported. Please refer to your shell's manual for instructions on setting up your shell to use completions.
+Shell completion scripts for Bash, Fish and Zsh can be found in respective subdirectories of [`auto-completion/`](auto-completion). Please refer to your shell's manual for installation instructions.
 
 ## Installing with a package manager
 

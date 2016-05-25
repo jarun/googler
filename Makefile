@@ -2,11 +2,8 @@ PREFIX ?= /usr/local
 BINDIR = $(DESTDIR)$(PREFIX)/bin
 MANDIR = $(DESTDIR)$(PREFIX)/share/man/man1
 DOCDIR = $(DESTDIR)$(PREFIX)/share/doc/googler
-BASHCOMPDIR = $(DESTDIR)$(PREFIX)/etc/bash_completion.d
-FISHCOMPDIR = $(DESTDIR)$(PREFIX)/share/fish/vendor_completions.d
-ZSHCOMPDIR = $(DESTDIR)$(PREFIX)/share/zsh/site-functions
 
-.PHONY: all install install.comp uninstall uninstall.comp
+.PHONY: all install uninstall
 
 all:
 
@@ -20,16 +17,7 @@ install:
 	install -m644 README.md $(DOCDIR)
 	rm -f googler.1.gz
 
-install.comp:
-	install -m755 -d $(BASHCOMPDIR) $(FISHCOMPDIR) $(ZSHCOMPDIR)
-	install -m644 auto-completion/bash/googler-completion.bash $(BASHCOMPDIR)
-	install -m644 auto-completion/fish/googler.fish $(FISHCOMPDIR)
-	install -m644 auto-completion/zsh/_googler $(ZSHCOMPDIR)
-
 uninstall:
 	rm -f $(BINDIR)/googler
 	rm -f $(MANDIR)/googler.1.gz
 	rm -rf $(DOCDIR)
-
-uninstall.comp:
-	rm -f $(BASHCOMPDIR)/googler-completion.bash $(FISHCOMPDIR)/googler.fish $(ZSHCOMPDIR)/_googler
