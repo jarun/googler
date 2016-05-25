@@ -310,6 +310,10 @@ class GoogleParser(html.parser.HTMLParser):
     #     abstract text
     #   </div>            <!-- stop_populating_textbuf, pop to sitelink abstract -->
     #
+    # - Sometimes Google omits similar (more like duplicate) result
+    #   entries. Whenever this happens there will be a notice in p#ofr. The way
+    #   to unfilter is to simply add '&filter=0' to the query string.
+    #
     #
     # Google News
     #
@@ -362,6 +366,7 @@ class GoogleParser(html.parser.HTMLParser):
     def __init__(self):
         html.parser.HTMLParser.__init__(self)
 
+        self.filtered = False
         self.results = []
 
         self.index = 0
@@ -404,6 +409,10 @@ class GoogleParser(html.parser.HTMLParser):
 
             self.set_handlers_to('result')
             return 'result'
+
+        # Ommitted results
+        if tag == 'p' and attrs.get('id') == 'ofr':
+            self.filtered = True
 
     @retrieve_tag_annotation
     def main_end(self, tag, annotation):
@@ -909,6 +918,7 @@ def fetch_results():
         parser.feed(resp_body)
 
     results = parser.results
+    filtered = parser.filtered
     urlindex = {}
     if results and not noninteractive: # print a newline for more clarity
         printerr('')
@@ -916,11 +926,14 @@ def fetch_results():
     if output_format == 0: # Regular output
         for r in results:
             urlindex.update(r.print_entry())
+        if filtered:
+            printerr('*Google has omitted similar result entries. '
+                     'Enter "unfilter" at the prompt to show additional entries.')
     elif output_format == 1: # Json output
         results_object = [r.json_object() for r in results]
         print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
 
-    return results, urlindex
+    return results, urlindex, filtered
 
 
 def read_next_command():
@@ -1212,7 +1225,7 @@ results = []
 urlindex = {}
 while True:
     if nav == 'n' or nav == 'p' or nav == 'f' or nav == 'g':
-        results, urlindex = fetch_results()
+        results, urlindex, filtered = fetch_results()
 
     if noninteractive:
         quit_program(exitcode=0)
@@ -1277,6 +1290,9 @@ while True:
         open_url(urlindex[nav])
     elif nav.isdigit() and int(nav) < 100:
         printerr('Index out of bound. To search for the number, use g.')
+    elif filtered and nav == 'unfilter':
+        url += '&filter=0'
+        nav = 'g'
     elif nav:
         keywords = nav.strip()
         if not keywords:
