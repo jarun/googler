@@ -1043,10 +1043,8 @@ def printerr(msg):
 # Process command-line options.
 keywords = None
 
-class ExtendedArgumentParser(argparse.ArgumentParser):
-    """Custom argument parser for googler,
-    extends classic ArgumentParser
-    """
+class GooglerArgumentParser(argparse.ArgumentParser):
+    """Custom argument parser for googler."""
 
     # Print omniprompt help
     @staticmethod
@@ -1077,7 +1075,7 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
 
     # Augment print_help to print more than synopsis and options
     def print_help(self, file=None):
-        super(ExtendedArgumentParser, self).print_help(file)
+        super().print_help(file)
         self.print_omniprompt_help(file)
         self.print_general_info(file)
 
@@ -1087,41 +1085,66 @@ class ExtendedArgumentParser(argparse.ArgumentParser):
         self.print_help(sys.stderr)
         self.exit(2)
 
-def is_duration(arg):
-    """Check if a string is a valid duration accepted by Google.
+    # Type guards
+    @staticmethod
+    def positive_int(arg):
+        """Try to convert a string into a positive integer."""
+        try:
+            n = int(arg)
+            assert n > 0
+            return n
+        except (ValueError, AssertionError):
+            raise argparse.ArgumentTypeError('%s is not a positive integer' % arg)
 
-    A valid duration is of the form dNUM, where d is a single letter h
-    (hour), d (day), w (week), m (month), or y (year), and NUM is a
-    non-negative integer.
-    """
-    try:
-        if arg[0] not in ('h', 'd', 'w', 'm', 'y') or int(arg[1:]) < 0:
-            raise ValueError
-    except (TypeError, IndexError, ValueError):
-        raise argparse.ArgumentTypeError('%s is not a valid duration' % arg)
-    return arg
+    @staticmethod
+    def nonnegative_int(arg):
+        """Try to convert a string into a nonnegative integer."""
+        try:
+            n = int(arg)
+            assert n >= 0
+            return n
+        except (ValueError, AssertionError):
+            raise argparse.ArgumentTypeError('%s is not a non-negative integer' % arg)
 
-def is_colorstr(arg):
-    """Check if a string is a valid color string."""
-    try:
-        assert len(arg) == 6
-        for c in arg:
-            assert c in COLORMAP
-    except AssertionError:
-        raise argparse.ArgumentTypeError('%s is not a valid color string' % arg)
-    return arg
+    @staticmethod
+    def is_duration(arg):
+        """Check if a string is a valid duration accepted by Google.
+
+        A valid duration is of the form dNUM, where d is a single letter h
+        (hour), d (day), w (week), m (month), or y (year), and NUM is a
+        non-negative integer.
+        """
+        try:
+            if arg[0] not in ('h', 'd', 'w', 'm', 'y') or int(arg[1:]) < 0:
+                raise ValueError
+        except (TypeError, IndexError, ValueError):
+            raise argparse.ArgumentTypeError('%s is not a valid duration' % arg)
+        return arg
+
+    @staticmethod
+    def is_colorstr(arg):
+        """Check if a string is a valid color string."""
+        try:
+            assert len(arg) == 6
+            for c in arg:
+                assert c in COLORMAP
+        except AssertionError:
+            raise argparse.ArgumentTypeError('%s is not a valid color string' % arg)
+        return arg
 
 # Retrieve GOOGLER_COLORS
 colorstr_env = os.getenv('GOOGLER_COLORS')
 
-argparser = ExtendedArgumentParser(
+argparser = GooglerArgumentParser(
     add_help=False,
     description='Google from the command-line.'
 )
 addarg = argparser.add_argument
-addarg('-s', '--start', dest='start', type=int, metavar='N',
+addarg('-s', '--start', dest='start', type=GooglerArgumentParser.nonnegative_int,
+       default=0, metavar='N',
        help='start at the Nth result')
-addarg('-n', '--count', dest='num', type=int, metavar='N',
+addarg('-n', '--count', dest='num', type=GooglerArgumentParser.positive_int,
+       default=10, metavar='N',
        help='show N results (default 10)')
 addarg('-N', '--news', dest='news', action='store_true',
        help='show results from news section')
@@ -1134,12 +1157,12 @@ addarg('-x', '--exact', dest='exact', action='store_true',
        help='disable automatic spelling correction')
 addarg('-C', '--nocolor', dest='colorize', action='store_false',
        help='disable color output')
-addarg('--colors', dest='colorstr', default=colorstr_env if colorstr_env else 'GKlxxy',
-       type=is_colorstr, metavar='COLORS',
+addarg('--colors', dest='colorstr', type=GooglerArgumentParser.is_colorstr,
+       default=colorstr_env if colorstr_env else 'GKlxxy', metavar='COLORS',
        help='set output colors (see man page for details)')
 addarg('-j', '--first', '--lucky', dest='lucky', action='store_true',
        help='open the first result in a web browser')
-addarg('-t', '--time', dest='duration', type=is_duration, metavar='dN',
+addarg('-t', '--time', dest='duration', type=GooglerArgumentParser.is_duration, metavar='dN',
        help='time limit search '
        '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
 addarg('-w', '--site', dest='insite', metavar='SITE',
@@ -1275,7 +1298,7 @@ while True:
     elif nav == 'q':
         break
     elif nav == '?':
-        ExtendedArgumentParser.print_omniprompt_help(sys.stderr)
+        GooglerArgumentParser.print_omniprompt_help(sys.stderr)
         printerr('')
     elif nav.startswith('g '):
         keywords = nav[2:].strip()
