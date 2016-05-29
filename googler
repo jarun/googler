@@ -51,6 +51,8 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 # Constants
 
+_VERSION_ = '2.5'
+
 COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'a': '30', 'b': '31', 'c': '32', 'd': '33',
     'e': '34', 'f': '35', 'g': '36', 'h': '37',
@@ -63,30 +65,31 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'x': '0', 'X': '1', 'y': '7', 'Y': '7;1',
 }.items()}
 
+# Disguise as Microsoft Edge
+USER_AGENT = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+              '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
+
 
 # Global variables
 
-columns = None              # Terminal window size.
-start = 0                   # The first result to display (option -s)
-num = None                  # Number of results to display (option -n)
-lang = None                 # Language to search for (option -l)
-lucky = False               # If True, opens the first URL in browser (option -j)
-colorize = True             # If True, colorizes the output (option -C)
+# State carriers
+conn = None                 # The global connection
+google_url = None           # The URL constructor
+opts = None                 # User options
+nav = 'n'                   # User command register
+
+# Output/User interaction options
+noninteractive = False      # Non-interactive mode (option --no-prompt)
+output_format = 0           # 0: Regular (normal) output, 1: JSON output (option --json)
+lucky = False               # If True, opens the first URL in browser (option --lucky)
+
+# Cosmetic options
+columns = None              # Terminal width
+colorize = True             # If True, colorizes the output (option --nocolor)
 colors = None               # Colors object, set after reading color settings (option --colors)
-duration = None             # Time limit search (option -t) [e.g. h5, d5, w5, m5, y5]
-conn = None                 # Use a single global connection during navigation
-nav = 'n'                   # For user navigation
+
+# Debugging options
 debug = False               # Print debug logs
-news = False                # Read news
-exact = False               # If True, disable automatic spelling correction
-insite = None               # Google search a specific site
-output_format = 0           # 0: Regular (normal) output, 1: Json output
-noninteractive = False      # Non-interactive mode
-server = 'www.google.com'   # Default server to connect to
-ua = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-      '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
-                            # Set user agent as Microsoft Edge
-_VERSION_ = '2.5'           # Current version
 
 
 # Classes
@@ -363,8 +366,10 @@ class GoogleParser(html.parser.HTMLParser):
     #   descendants of the tag are ignored. When the corresponding end
     #   tag is finally reach, the former scope is restored.
 
-    def __init__(self):
+    def __init__(self, news=False):
         html.parser.HTMLParser.__init__(self)
+
+        self.news = news
 
         self.filtered = False
         self.results = []
@@ -432,8 +437,7 @@ class GoogleParser(html.parser.HTMLParser):
             self.set_handlers_to('sitelink_table')
             return 'sitelink_table'
 
-        global news
-        if news:
+        if self.news:
             if not self.metadata_registered and tag == 'div' and 'slp' in self.classes(attrs):
                 # Change metadata field separator from '-' to ', ' for better appearance
                 self.start_populating_textbuf(lambda text: ', ' if text == '-' else text)
@@ -744,14 +748,261 @@ class Result(object):
 Colors = collections.namedtuple('Colors', 'index, title, url, metadata, abstract, prompt, reset')
 
 
-# Functions
+class GoogleUrl(object):
+    """
+    This class constructs the Google Search/News URL.
 
-def server_url(tld):
-    """Data source: https://en.wikipedia.org/wiki/List_of_Google_domains
-    Scraper script: https://gist.github.com/zmwangx/b976e83c14552fe18b71
+    This class is modeled on urllib.parse.ParseResult for familiarity,
+    which means it supports reading of all six attributes -- scheme,
+    netloc, path, params, query, fragment -- of
+    urllib.parse.ParseResult, as well as the geturl() method.
+
+    However, the attributes (properties) and methods listed below should
+    be the preferred methods of access to this class.
+
+    Parameters
+    ----------
+    opts : dict or argparse.Namespace, optional
+        See the ``opts`` parameter of `update`.
+
+    Other Parameters
+    ----------------
+    See "Other Parameters" of `update`.
+
+    Attributes
+    ----------
+    hostname : str
+        Read-write property.
+    keywords : str or list of strs
+        Read-write property.
+    news : bool
+        Read-only property.
+    url : str
+        Read-only property.
+
+    Methods
+    -------
+    full()
+    relative()
+    update(opts=None, **kwargs)
+    set_queries(**kwargs)
+    unset_queries(*args)
+    next_page()
+    prev_page()
+    first_page()
+
     """
 
-    tld_to_domain_map = {
+    def __init__(self, opts=None, **kwargs):
+        self.scheme = 'https'
+        # self.netloc is a calculated property
+        self.path = '/search'
+        self.params = ''
+        # self.query is a calculated property
+        self.fragment = ''
+
+        self._tld = None
+        self._num = 10
+        self._start = 0
+        self._keywords = []
+        self._site = None
+        self._query_dict = {
+            'ie': 'UTF-8',
+            'oe': 'UTF-8',
+        }
+        self.update(opts, **kwargs)
+
+    def __str__(self):
+        return self.url
+
+    @property
+    def url(self):
+        """The full Google URL you want."""
+        return self.full()
+
+    @property
+    def hostname(self):
+        """The hostname."""
+        return self.netloc
+
+    @hostname.setter
+    def hostname(self, hostname):
+        self.netloc = hostname
+
+    @property
+    def keywords(self):
+        """The keywords, either a str or a list of strs."""
+        return self._keywords
+
+    @keywords.setter
+    def keywords(self, keywords):
+        self._keywords = keywords
+
+    @property
+    def news(self):
+        """Whether the URL is for Google News."""
+        return 'tbm' in self._query_dict and self._query_dict['tbm'] == 'nws'
+
+    def full(self):
+        """Return the full URL.
+
+        Returns
+        -------
+        str
+
+        """
+        url = (self.scheme + ':') if self.scheme else ''
+        url += '//' + self.netloc + self.relative()
+        return url
+
+    def relative(self):
+        """Return the relative URL (without scheme and authority).
+
+        Authority (see RFC 3986 section 3.2), or netloc in the
+        terminology of urllib.parse, basically means the hostname
+        here. The relative URL is good for making HTTP(S) requests to a
+        known host.
+
+        Returns
+        -------
+        str
+
+        """
+        rel = self.path
+        if self.params:
+            rel += ';' + self.params
+        if self.query:
+            rel += '?' + self.query
+        if self.fragment:
+            rel += '#' + self.fragment
+        return rel
+
+    def update(self, opts=None, **kwargs):
+        """Update the URL with the given options.
+
+        Parameters
+        ----------
+        opts : dict or argparse.Namespace, optional
+            Carries options that affect the Google Search/News URL. The
+            list of currently recognized option keys with expected value
+            types:
+
+                tld: str
+                news: bool
+                start: int
+                num: int
+                keywords: str or list of strs
+                lang: str
+                duration: str (GooglerArgumentParser.is_duration)
+                exact: bool
+
+        Other Parameters
+        ----------------
+        kwargs
+            The `kwargs` dict extends `opts`, that is, options can be
+            specified either way, in `opts` or as individual keyword
+            arguments.
+
+        """
+
+        if opts is None:
+            opts = {}
+        if hasattr(opts, '__dict__'):
+            opts = opts.__dict__
+        opts.update(kwargs)
+
+        qd = self._query_dict
+        if 'tld' in opts:
+            self._tld = opts['tld']
+        if 'news' in opts:
+            if opts['news']:
+                qd['tbm'] = 'nws'
+            else:
+                qd.pop('tbm', None)
+        if 'num' in opts:
+            self._num = opts['num']
+        if 'start' in opts:
+            self._start = opts['start']
+        if 'keywords' in opts:
+            self._keywords = opts['keywords']
+        if 'lang' in opts and opts['lang']:
+            qd['hl'] = opts['lang']
+        if 'duration' in opts and opts['duration']:
+            qd['tbs'] = 'qdr:%s' % opts['duration']
+        if 'exact' in opts:
+            if opts['exact']:
+                qd['nfpr'] = 1
+            else:
+                qd.pop('nfpr', None)
+
+    def set_queries(self, **kwargs):
+        """Forcefully set queries outside the normal `update` mechanism.
+
+        Other Parameters
+        ----------------
+        kwargs
+            Arbitrary key value pairs to be set in the query string. All
+            keys and values should be stringifiable.
+
+            Note that certain keys, e.g., ``q``, have their values
+            constructed on the fly, so setting those has no actual
+            effect.
+
+        """
+        for k, v in kwargs.items():
+            self._query_dict[k] = v
+
+    def unset_queries(self, *args):
+        """Forcefully unset queries outside the normal `update` mechanism.
+
+        Other Parameters
+        ----------------
+        args
+            Arbitrary keys to be unset. No exception is raised if a key
+            does not exist in the first place.
+
+            Note that certain keys, e.g., ``q``, are always included in
+            the resulting URL, so unsetting those has no actual effect.
+
+        """
+        for k in args:
+            self._query_dict.pop(k, None)
+
+    def next_page(self):
+        """Navigate to the next page."""
+        self._start += self._num
+
+    def prev_page(self):
+        """Navigate to the previous page.
+
+        Raises
+        ------
+        ValueError
+            If already at the first page (``start=0`` in the current
+            query string).
+
+        """
+        if self._start == 0:
+            raise ValueError('Already at the first page.')
+        self._start = (self._start - self._num) if self._start > self._num else 0
+
+    def first_page(self):
+        """Navigate to the first page.
+
+        Raises
+        ------
+        ValueError
+            If already at the first page (``start=0`` in the current
+            query string).
+
+        """
+        if self._start == 0:
+            raise ValueError('Already at the first page.')
+        self._start = 0
+
+    # Data source: https://en.wikipedia.org/wiki/List_of_Google_domains
+    # Scraper script: https://gist.github.com/zmwangx/b976e83c14552fe18b71
+    TLD_TO_DOMAIN_MAP = {
         'ac': 'google.ac',      'ad': 'google.ad',      'ae': 'google.ae',
         'af': 'google.com.af',  'ag': 'google.com.ag',  'ai': 'google.com.ai',
         'al': 'google.al',      'am': 'google.am',      'ao': 'google.co.ao',
@@ -820,33 +1071,65 @@ def server_url(tld):
         'zm': 'google.co.zm',   'zw': 'google.co.zw',
     }
 
-    try:
-        # Use www subdomain
-        return 'www.' + tld_to_domain_map[tld]
-    except KeyError:
-        return 'www.google.com'
+    @property
+    def netloc(self):
+        """The hostname."""
+        try:
+            return 'www.' + self.TLD_TO_DOMAIN_MAP[self._tld]
+        except KeyError:
+            return 'www.google.com'
 
+    @property
+    def query(self):
+        """The query string."""
+        qd = {}
+        qd.update(self._query_dict)
+        qd['num'] = self._num
+        qd['start'] = self._start
+
+        # Construct the q query
+        q = ''
+        keywords = self._keywords
+        if keywords:
+            if isinstance(keywords, list):
+                q += '+'.join([urllib.parse.quote_plus(kw) for kw in keywords])
+            else:
+                q += urllib.parse.quote_plus(keywords)
+        if self._site:
+            q += '+site:' + urllib.parse.quote_plus(self._site)
+        qd['q'] = q
+
+        return '&'.join(['%s=%s' % (k, qd[k]) for k in sorted(qd.keys())])
+
+
+# Functions
 
 def google_get(conn, url):
-    """Send a GET request to Google with the appropriate headers.
-    url can be relative (to the appropriate Google domain).
     """
+    Send a GET request to Google with the appropriate headers.
 
-    global ua
+    URL could be relative to the connection's host.
+    """
+    debugp('Fetching URL [%s]' % url)
     conn.request('GET', url, None, {
         'Accept-encoding': 'gzip',
-        'User-Agent': ua,
+        'User-Agent': USER_AGENT,
     })
     return conn.getresponse()
 
 
-def new_connection(domain=None):
-    """Returns a new connection to the given domain with appropriate options.
-    When the given domain is absent, the global variable server is used instead.
+def new_connection(host=None):
     """
+    Returns a new connection to the given host with appropriate options.
 
-    global server
-    return http.client.HTTPSConnection(domain if domain else server, timeout=45)
+    When host is not supplied or empty, we extract it from the global
+    variable google_url.
+    """
+    if not host:
+        global google_url
+        host = google_url.hostname
+    debugp('Connecting to new host [%s]' % host)
+    return http.client.HTTPSConnection(host, timeout=45)
 
 
 def quit_program(exitcode=1):
@@ -861,15 +1144,16 @@ def fetch_results():
     """Connect to server and fetch results"""
 
     global conn
-    global url
+    global google_url
 
+    relurl = google_url.relative()
     try:
-        resp = google_get(conn, url)
+        resp = google_get(conn, relurl)
     except Exception as e:
         debugp('Exception: %s' % e)
         conn.close()
         conn = new_connection()
-        resp = google_get(conn, url)
+        resp = google_get(conn, relurl)
 
     if resp.status != 200:
         if resp.status in (301, 302,):
@@ -881,14 +1165,13 @@ def fetch_results():
 
             conn.close()
             mark = url.find('/search')
-            next_server = url[(url.find('//') + 2):mark]
-            debugp('Next Server [%s]' % next_server)
-            conn = new_connection(next_server)
-            url = url[mark:]
-            debugp('Next GET [%s]' % url)
+            new_host = url[(url.find('//') + 2):mark]
+            conn = new_connection(new_host)
+            google_url.hostname = new_host
+            relurl = url[mark:]
 
             try:
-                resp = google_get(conn, url)
+                resp = google_get(conn, relurl)
             except Exception as e:
                 debugp('Exception: %s' % e)
                 quit_program()
@@ -904,7 +1187,7 @@ def fetch_results():
             quit_program()
 
     # Parse the HTML document and print the results.
-    parser = GoogleParser()
+    parser = GoogleParser(news=google_url.news)
 
     if not debug:
         parser.feed(gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8'))
@@ -914,7 +1197,7 @@ def fetch_results():
         os.close(fd)
         with open(tmpfile, 'wb') as fp:
             fp.write(resp_body.encode('utf-8'))
-        debugp("Response body written to '%s'.\n" % tmpfile)
+        debugp("Response body written to '%s'." % tmpfile)
         parser.feed(resp_body)
 
     results = parser.results
@@ -946,26 +1229,6 @@ def read_next_command():
         return input(prompt)
     except EOFError:
         quit_program(exitcode=0)
-
-
-def construct_search_url(baseurl, keywords, site=None):
-    """Construct the search URL with keywords and optionally a site.
-
-    baseurl should already contain queries such as start and num. This
-    function only adds the q query.
-
-    keywords should either be a list of keywords, or a single
-    space-delimited string of keywords.
-    """
-    url = baseurl
-    if isinstance(keywords, list):
-        url += 'q=' + '+'.join([urllib.parse.quote_plus(kw) for kw in keywords])
-    else:
-        url += 'q=' + urllib.parse.quote_plus(keywords)
-    if site:
-        url += '+site:' + urllib.parse.quote_plus(site)
-    debugp('Search URL [%s : %s]' % (server, url))
-    return url
 
 
 def open_url(url):
@@ -1039,9 +1302,6 @@ def printerr(msg):
 
 
 # Program Main
-
-# Process command-line options.
-keywords = None
 
 class GooglerArgumentParser(argparse.ArgumentParser):
     """Custom argument parser for googler."""
@@ -1181,32 +1441,19 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 # Set global variables
-args = argparser.parse_args()
-if args.start:
-    if args.start > 0:
-        start = args.start
-if args.num:
-    if args.num > 0:
-        num = args.num
-news = args.news
-if args.tld:
-    server = server_url(args.tld)
-lang = args.lang
-exact = args.exact
-colorize = args.colorize
-colors = Colors(*[COLORMAP[c] for c in args.colorstr], reset=COLORMAP['x'])
-lucky = args.lucky
-duration = args.duration
-if args.debug:
-    debug = args.debug
+opts = argparser.parse_args()
+colorize = opts.colorize
+colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
+lucky = opts.lucky
+if opts.debug:
+    debug = True
     import tempfile
-keywords = args.keywords
-insite = args.insite
-noninteractive = args.noninteractive
-if args.json:
+noninteractive = opts.noninteractive
+if opts.json:
     output_format = 1
     noninteractive = True
     import json
+google_url = GoogleUrl(opts)
 
 # Get terminal width
 try:
@@ -1216,41 +1463,18 @@ except OSError:
 
 debugp('Version %s' % _VERSION_)
 
-# Construct the query URL.
-url = '/search?ie=UTF-8&oe=UTF-8&'
-
-url += 'start=' + str(start) + '&'
-if num is not None:
-    url += 'num=' + str(num) + '&'
-if news:
-    url += 'tbm=nws&'
-if lang is not None:
-    url += 'hl=' + lang + '&'
-if duration is not None:
-    url += 'tbs=qdr:' + duration + '&'
-if exact:
-    url += 'nfpr=1&'
-
-baseurl = url
-basestart = start
-
-debugp('Base URL [%s]' % url)
-
-url = construct_search_url(baseurl, keywords, site=insite)
-
 # Connect to Google and request the result page.
 conn = new_connection()
 
 results = []
 urlindex = {}
 while True:
-    if nav == 'n' or nav == 'p' or nav == 'f' or nav == 'g':
+    if nav in {'n', 'p', 'f', 'g'}:
         results, urlindex, filtered = fetch_results()
 
     if noninteractive:
         quit_program(exitcode=0)
 
-    oldstart = start
     nav = read_next_command()
     if not nav:
         nav = read_next_command()
@@ -1260,39 +1484,27 @@ while True:
 
     nav = re.sub(r'\s+', ' ', nav).strip()
     if nav == 'n':
-        if len(results) == 0:
+        if not results:
+            # No results, probably at the last page already
             nav = ''
-            continue
-        if num is not None:
-            start = start + num
         else:
-            start = start + 10
-
-        url = url.replace('start=%d&' % oldstart, 'start=%d&' % start, 1)
-        debugp('Next URL [%s]\n' % url)
-    elif nav == 'p' or nav == 'f':
-        if start == 0:
-            printerr('Already at the first page.')
-            nav = '' # Unset nav so that we don't fetch result in the next iteration
-            continue
-
-        if nav == 'p':
-            if num is not None:
-                newstart = start - num
-            else:
-                newstart = start - 10
-
-            if newstart >= 0:
-                start = newstart
-            else:
-                start = 0
-        else:
-            start = 0
-
-        url = url.replace('start=%d&' % oldstart, 'start=%d&' % start, 1)
-        debugp('Next URL [%s]\n' % url)
+            google_url.next_page()
+    elif nav == 'p':
+        try:
+            google_url.prev_page()
+        except ValueError as e:
+            # Already at the first page
+            printerr(e)
+            nav = ''
+    elif nav == 'f':
+        try:
+            google_url.first_page()
+        except ValueError as e:
+            # Already at the first page
+            printerr(e)
+            nav = ''
     elif nav == 'o':
-        open_url('https://' + server + url)
+        open_url(google_url.full())
     elif nav == 'q':
         break
     elif nav == '?':
@@ -1303,23 +1515,25 @@ while True:
         if not keywords:
             nav = ''
             continue
-        url = construct_search_url(baseurl, keywords, site=insite)
+        # Replace keywords in opts and reconstruct URL from scratch
+        opts.keywords = keywords
+        google_url = GoogleUrl(opts)
         nav = 'g'
-        start = basestart
     elif nav in urlindex:
         open_url(urlindex[nav])
     elif nav.isdigit() and int(nav) < 100:
         printerr('Index out of bound. To search for the number, use g.')
     elif filtered and nav == 'unfilter':
-        url += '&filter=0'
+        google_url.set_queries(filter=0)
         nav = 'g'
     elif nav:
         keywords = nav.strip()
         if not keywords:
             nav = ''
             continue
-        url = construct_search_url(baseurl, keywords, site=insite)
+        # Replace keywords in opts and reconstruct URL from scratch
+        opts.keywords = keywords
+        google_url = GoogleUrl(opts)
         nav = 'g'
-        start = basestart
 
 quit_program(exitcode=0)
