@@ -1241,8 +1241,6 @@ url = construct_search_url(baseurl, keywords, site=insite)
 # Connect to Google and request the result page.
 conn = new_connection()
 
-CONSECUTIVE_WHITESPACE = re.compile(r'\s+')
-
 results = []
 urlindex = {}
 while True:
@@ -1260,7 +1258,7 @@ while True:
             # Two consecutive enters
             quit_program(exitcode=0)
 
-    nav = CONSECUTIVE_WHITESPACE.sub(' ', nav).strip()
+    nav = re.sub(r'\s+', ' ', nav).strip()
     if nav == 'n':
         if len(results) == 0:
             nav = ''
