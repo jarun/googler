@@ -627,7 +627,7 @@ class GoogleParser(html.parser.HTMLParser):
         return attrs.get('class', '').split()
 
 
-class Sitelink:
+class Sitelink(object):
     """Container for a sitelink's title, URL and abstract."""
 
     def __init__(self, title, url, abstract):
@@ -636,7 +636,7 @@ class Sitelink:
         self.abstract = abstract
 
 
-class Result:
+class Result(object):
     """Encapsulates a search result's index, title, URL and abstract
     (and optionally metadata for Google News).
     """
