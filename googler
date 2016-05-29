@@ -94,6 +94,360 @@ debug = False               # Print debug logs
 
 # Classes
 
+class GoogleUrl(object):
+    """
+    This class constructs the Google Search/News URL.
+
+    This class is modeled on urllib.parse.ParseResult for familiarity,
+    which means it supports reading of all six attributes -- scheme,
+    netloc, path, params, query, fragment -- of
+    urllib.parse.ParseResult, as well as the geturl() method.
+
+    However, the attributes (properties) and methods listed below should
+    be the preferred methods of access to this class.
+
+    Parameters
+    ----------
+    opts : dict or argparse.Namespace, optional
+        See the ``opts`` parameter of `update`.
+
+    Other Parameters
+    ----------------
+    See "Other Parameters" of `update`.
+
+    Attributes
+    ----------
+    hostname : str
+        Read-write property.
+    keywords : str or list of strs
+        Read-write property.
+    news : bool
+        Read-only property.
+    url : str
+        Read-only property.
+
+    Methods
+    -------
+    full()
+    relative()
+    update(opts=None, **kwargs)
+    set_queries(**kwargs)
+    unset_queries(*args)
+    next_page()
+    prev_page()
+    first_page()
+
+    """
+
+    def __init__(self, opts=None, **kwargs):
+        self.scheme = 'https'
+        # self.netloc is a calculated property
+        self.path = '/search'
+        self.params = ''
+        # self.query is a calculated property
+        self.fragment = ''
+
+        self._tld = None
+        self._num = 10
+        self._start = 0
+        self._keywords = []
+        self._site = None
+        self._query_dict = {
+            'ie': 'UTF-8',
+            'oe': 'UTF-8',
+        }
+        self.update(opts, **kwargs)
+
+    def __str__(self):
+        return self.url
+
+    @property
+    def url(self):
+        """The full Google URL you want."""
+        return self.full()
+
+    @property
+    def hostname(self):
+        """The hostname."""
+        return self.netloc
+
+    @hostname.setter
+    def hostname(self, hostname):
+        self.netloc = hostname
+
+    @property
+    def keywords(self):
+        """The keywords, either a str or a list of strs."""
+        return self._keywords
+
+    @keywords.setter
+    def keywords(self, keywords):
+        self._keywords = keywords
+
+    @property
+    def news(self):
+        """Whether the URL is for Google News."""
+        return 'tbm' in self._query_dict and self._query_dict['tbm'] == 'nws'
+
+    def full(self):
+        """Return the full URL.
+
+        Returns
+        -------
+        str
+
+        """
+        url = (self.scheme + ':') if self.scheme else ''
+        url += '//' + self.netloc + self.relative()
+        return url
+
+    def relative(self):
+        """Return the relative URL (without scheme and authority).
+
+        Authority (see RFC 3986 section 3.2), or netloc in the
+        terminology of urllib.parse, basically means the hostname
+        here. The relative URL is good for making HTTP(S) requests to a
+        known host.
+
+        Returns
+        -------
+        str
+
+        """
+        rel = self.path
+        if self.params:
+            rel += ';' + self.params
+        if self.query:
+            rel += '?' + self.query
+        if self.fragment:
+            rel += '#' + self.fragment
+        return rel
+
+    def update(self, opts=None, **kwargs):
+        """Update the URL with the given options.
+
+        Parameters
+        ----------
+        opts : dict or argparse.Namespace, optional
+            Carries options that affect the Google Search/News URL. The
+            list of currently recognized option keys with expected value
+            types:
+
+                tld: str
+                news: bool
+                start: int
+                num: int
+                keywords: str or list of strs
+                lang: str
+                duration: str (GooglerArgumentParser.is_duration)
+                exact: bool
+
+        Other Parameters
+        ----------------
+        kwargs
+            The `kwargs` dict extends `opts`, that is, options can be
+            specified either way, in `opts` or as individual keyword
+            arguments.
+
+        """
+
+        if opts is None:
+            opts = {}
+        if hasattr(opts, '__dict__'):
+            opts = opts.__dict__
+        opts.update(kwargs)
+
+        qd = self._query_dict
+        if 'tld' in opts:
+            self._tld = opts['tld']
+        if 'news' in opts:
+            if opts['news']:
+                qd['tbm'] = 'nws'
+            else:
+                qd.pop('tbm', None)
+        if 'num' in opts:
+            self._num = opts['num']
+        if 'start' in opts:
+            self._start = opts['start']
+        if 'keywords' in opts:
+            self._keywords = opts['keywords']
+        if 'lang' in opts and opts['lang']:
+            qd['hl'] = opts['lang']
+        if 'duration' in opts and opts['duration']:
+            qd['tbs'] = 'qdr:%s' % opts['duration']
+        if 'exact' in opts:
+            if opts['exact']:
+                qd['nfpr'] = 1
+            else:
+                qd.pop('nfpr', None)
+
+    def set_queries(self, **kwargs):
+        """Forcefully set queries outside the normal `update` mechanism.
+
+        Other Parameters
+        ----------------
+        kwargs
+            Arbitrary key value pairs to be set in the query string. All
+            keys and values should be stringifiable.
+
+            Note that certain keys, e.g., ``q``, have their values
+            constructed on the fly, so setting those has no actual
+            effect.
+
+        """
+        for k, v in kwargs.items():
+            self._query_dict[k] = v
+
+    def unset_queries(self, *args):
+        """Forcefully unset queries outside the normal `update` mechanism.
+
+        Other Parameters
+        ----------------
+        args
+            Arbitrary keys to be unset. No exception is raised if a key
+            does not exist in the first place.
+
+            Note that certain keys, e.g., ``q``, are always included in
+            the resulting URL, so unsetting those has no actual effect.
+
+        """
+        for k in args:
+            self._query_dict.pop(k, None)
+
+    def next_page(self):
+        """Navigate to the next page."""
+        self._start += self._num
+
+    def prev_page(self):
+        """Navigate to the previous page.
+
+        Raises
+        ------
+        ValueError
+            If already at the first page (``start=0`` in the current
+            query string).
+
+        """
+        if self._start == 0:
+            raise ValueError('Already at the first page.')
+        self._start = (self._start - self._num) if self._start > self._num else 0
+
+    def first_page(self):
+        """Navigate to the first page.
+
+        Raises
+        ------
+        ValueError
+            If already at the first page (``start=0`` in the current
+            query string).
+
+        """
+        if self._start == 0:
+            raise ValueError('Already at the first page.')
+        self._start = 0
+
+    # Data source: https://en.wikipedia.org/wiki/List_of_Google_domains
+    # Scraper script: https://gist.github.com/zmwangx/b976e83c14552fe18b71
+    TLD_TO_DOMAIN_MAP = {
+        'ac': 'google.ac',      'ad': 'google.ad',      'ae': 'google.ae',
+        'af': 'google.com.af',  'ag': 'google.com.ag',  'ai': 'google.com.ai',
+        'al': 'google.al',      'am': 'google.am',      'ao': 'google.co.ao',
+        'ar': 'google.com.ar',  'as': 'google.as',      'at': 'google.at',
+        'au': 'google.com.au',  'az': 'google.az',      'ba': 'google.ba',
+        'bd': 'google.com.bd',  'be': 'google.be',      'bf': 'google.bf',
+        'bg': 'google.bg',      'bh': 'google.com.bh',  'bi': 'google.bi',
+        'bj': 'google.bj',      'bn': 'google.com.bn',  'bo': 'google.com.bo',
+        'br': 'google.com.br',  'bs': 'google.bs',      'bt': 'google.bt',
+        'bw': 'google.co.bw',   'by': 'google.by',      'bz': 'google.com.bz',
+        'ca': 'google.ca',      'cat': 'google.cat',    'cc': 'google.cc',
+        'cd': 'google.cd',      'cf': 'google.cf',      'cg': 'google.cg',
+        'ch': 'google.ch',      'ci': 'google.ci',      'ck': 'google.co.ck',
+        'cl': 'google.cl',      'cm': 'google.cm',      'cn': 'google.cn',
+        'co': 'google.com.co',  'cr': 'google.co.cr',   'cu': 'google.com.cu',
+        'cv': 'google.cv',      'cy': 'google.com.cy',  'cz': 'google.cz',
+        'de': 'google.de',      'dj': 'google.dj',      'dk': 'google.dk',
+        'dm': 'google.dm',      'do': 'google.com.do',  'dz': 'google.dz',
+        'ec': 'google.com.ec',  'ee': 'google.ee',      'eg': 'google.com.eg',
+        'es': 'google.es',      'et': 'google.com.et',  'fi': 'google.fi',
+        'fj': 'google.com.fj',  'fm': 'google.fm',      'fr': 'google.fr',
+        'ga': 'google.ga',      'ge': 'google.ge',      'gf': 'google.gf',
+        'gg': 'google.gg',      'gh': 'google.com.gh',  'gi': 'google.com.gi',
+        'gl': 'google.gl',      'gm': 'google.gm',      'gp': 'google.gp',
+        'gr': 'google.gr',      'gt': 'google.com.gt',  'gy': 'google.gy',
+        'hk': 'google.com.hk',  'hn': 'google.hn',      'hr': 'google.hr',
+        'ht': 'google.ht',      'hu': 'google.hu',      'id': 'google.co.id',
+        'ie': 'google.ie',      'il': 'google.co.il',   'im': 'google.im',
+        'in': 'google.co.in',   'io': 'google.io',      'iq': 'google.iq',
+        'is': 'google.is',      'it': 'google.it',      'je': 'google.je',
+        'jm': 'google.com.jm',  'jo': 'google.jo',      'jp': 'google.co.jp',
+        'ke': 'google.co.ke',   'kg': 'google.kg',      'kh': 'google.com.kh',
+        'ki': 'google.ki',      'kr': 'google.co.kr',   'kw': 'google.com.kw',
+        'kz': 'google.kz',      'la': 'google.la',      'lb': 'google.com.lb',
+        'lc': 'google.com.lc',  'li': 'google.li',      'lk': 'google.lk',
+        'ls': 'google.co.ls',   'lt': 'google.lt',      'lu': 'google.lu',
+        'lv': 'google.lv',      'ly': 'google.com.ly',  'ma': 'google.co.ma',
+        'md': 'google.md',      'me': 'google.me',      'mg': 'google.mg',
+        'mk': 'google.mk',      'ml': 'google.ml',      'mm': 'google.com.mm',
+        'mn': 'google.mn',      'ms': 'google.ms',      'mt': 'google.com.mt',
+        'mu': 'google.mu',      'mv': 'google.mv',      'mw': 'google.mw',
+        'mx': 'google.com.mx',  'my': 'google.com.my',  'mz': 'google.co.mz',
+        'na': 'google.com.na',  'ne': 'google.ne',      'nf': 'google.com.nf',
+        'ng': 'google.com.ng',  'ni': 'google.com.ni',  'nl': 'google.nl',
+        'no': 'google.no',      'np': 'google.com.np',  'nr': 'google.nr',
+        'nu': 'google.nu',      'nz': 'google.co.nz',   'om': 'google.com.om',
+        'pa': 'google.com.pa',  'pe': 'google.com.pe',  'pg': 'google.com.pg',
+        'ph': 'google.com.ph',  'pk': 'google.com.pk',  'pl': 'google.pl',
+        'pn': 'google.co.pn',   'pr': 'google.com.pr',  'ps': 'google.ps',
+        'pt': 'google.pt',      'py': 'google.com.py',  'qa': 'google.com.qa',
+        'ro': 'google.ro',      'rs': 'google.rs',      'ru': 'google.ru',
+        'rw': 'google.rw',      'sa': 'google.com.sa',  'sb': 'google.com.sb',
+        'sc': 'google.sc',      'se': 'google.se',      'sg': 'google.com.sg',
+        'sh': 'google.sh',      'si': 'google.si',      'sk': 'google.sk',
+        'sl': 'google.com.sl',  'sm': 'google.sm',      'sn': 'google.sn',
+        'so': 'google.so',      'sr': 'google.sr',      'st': 'google.st',
+        'sv': 'google.com.sv',  'td': 'google.td',      'tg': 'google.tg',
+        'th': 'google.co.th',   'tj': 'google.com.tj',  'tk': 'google.tk',
+        'tl': 'google.tl',      'tm': 'google.tm',      'tn': 'google.tn',
+        'to': 'google.to',      'tr': 'google.com.tr',  'tt': 'google.tt',
+        'tw': 'google.com.tw',  'tz': 'google.co.tz',   'ua': 'google.com.ua',
+        'ug': 'google.co.ug',   'uk': 'google.co.uk',   'uy': 'google.com.uy',
+        'uz': 'google.co.uz',   'vc': 'google.com.vc',  've': 'google.co.ve',
+        'vg': 'google.vg',      'vi': 'google.co.vi',   'vn': 'google.com.vn',
+        'vu': 'google.vu',      'ws': 'google.ws',      'za': 'google.co.za',
+        'zm': 'google.co.zm',   'zw': 'google.co.zw',
+    }
+
+    @property
+    def netloc(self):
+        """The hostname."""
+        try:
+            return 'www.' + self.TLD_TO_DOMAIN_MAP[self._tld]
+        except KeyError:
+            return 'www.google.com'
+
+    @property
+    def query(self):
+        """The query string."""
+        qd = {}
+        qd.update(self._query_dict)
+        qd['num'] = self._num
+        qd['start'] = self._start
+
+        # Construct the q query
+        q = ''
+        keywords = self._keywords
+        if keywords:
+            if isinstance(keywords, list):
+                q += '+'.join([urllib.parse.quote_plus(kw) for kw in keywords])
+            else:
+                q += urllib.parse.quote_plus(keywords)
+        if self._site:
+            q += '+site:' + urllib.parse.quote_plus(self._site)
+        qd['q'] = q
+
+        return '&'.join(['%s=%s' % (k, qd[k]) for k in sorted(qd.keys())])
+
+
 def annotate_tag(annotated_starttag_handler):
     # See parser logic within the GoogleParser class for documentation.
     #
@@ -748,358 +1102,94 @@ class Result(object):
 Colors = collections.namedtuple('Colors', 'index, title, url, metadata, abstract, prompt, reset')
 
 
-class GoogleUrl(object):
-    """
-    This class constructs the Google Search/News URL.
+class GooglerArgumentParser(argparse.ArgumentParser):
+    """Custom argument parser for googler."""
 
-    This class is modeled on urllib.parse.ParseResult for familiarity,
-    which means it supports reading of all six attributes -- scheme,
-    netloc, path, params, query, fragment -- of
-    urllib.parse.ParseResult, as well as the geturl() method.
+    # Print omniprompt help
+    @staticmethod
+    def print_omniprompt_help(file=None):
+        file.write(textwrap.dedent("""
+        omniprompt keys:
+          n, p                  fetch the next or previous set of search results
+          index                 open the result corresponding to index in browser
+          f                     jump to the first page
+          o                     open the current search in browser
+          g keywords            initiate a new Google search for 'keywords' with original options
+          q, ^D, double Enter   exit googler
+          ?                     show omniprompt help
+          *                     any other string initiates a new search with original options
+        """))
 
-    However, the attributes (properties) and methods listed below should
-    be the preferred methods of access to this class.
+    # Print information on googler
+    @staticmethod
+    def print_general_info(file=None):
+        file.write(textwrap.dedent("""
+        Version %s
+        Copyright (C) 2008 Henri Hakkinen
+        Copyright (C) 2015-2016 Arun Prakash Jana <engineerarun@gmail.com>
+        Zhiming Wang <zmwangx@gmail.com>
+        License: GPLv3
+        Webpage: https://github.com/jarun/googler
+        """ % _VERSION_))
 
-    Parameters
-    ----------
-    opts : dict or argparse.Namespace, optional
-        See the ``opts`` parameter of `update`.
+    # Augment print_help to print more than synopsis and options
+    def print_help(self, file=None):
+        super().print_help(file)
+        self.print_omniprompt_help(file)
+        self.print_general_info(file)
 
-    Other Parameters
-    ----------------
-    See "Other Parameters" of `update`.
+    # Automatically print full help text on error
+    def error(self, message):
+        sys.stderr.write('%s: error: %s\n\n' % (self.prog, message))
+        self.print_help(sys.stderr)
+        self.exit(2)
 
-    Attributes
-    ----------
-    hostname : str
-        Read-write property.
-    keywords : str or list of strs
-        Read-write property.
-    news : bool
-        Read-only property.
-    url : str
-        Read-only property.
-
-    Methods
-    -------
-    full()
-    relative()
-    update(opts=None, **kwargs)
-    set_queries(**kwargs)
-    unset_queries(*args)
-    next_page()
-    prev_page()
-    first_page()
-
-    """
-
-    def __init__(self, opts=None, **kwargs):
-        self.scheme = 'https'
-        # self.netloc is a calculated property
-        self.path = '/search'
-        self.params = ''
-        # self.query is a calculated property
-        self.fragment = ''
-
-        self._tld = None
-        self._num = 10
-        self._start = 0
-        self._keywords = []
-        self._site = None
-        self._query_dict = {
-            'ie': 'UTF-8',
-            'oe': 'UTF-8',
-        }
-        self.update(opts, **kwargs)
-
-    def __str__(self):
-        return self.url
-
-    @property
-    def url(self):
-        """The full Google URL you want."""
-        return self.full()
-
-    @property
-    def hostname(self):
-        """The hostname."""
-        return self.netloc
-
-    @hostname.setter
-    def hostname(self, hostname):
-        self.netloc = hostname
-
-    @property
-    def keywords(self):
-        """The keywords, either a str or a list of strs."""
-        return self._keywords
-
-    @keywords.setter
-    def keywords(self, keywords):
-        self._keywords = keywords
-
-    @property
-    def news(self):
-        """Whether the URL is for Google News."""
-        return 'tbm' in self._query_dict and self._query_dict['tbm'] == 'nws'
-
-    def full(self):
-        """Return the full URL.
-
-        Returns
-        -------
-        str
-
-        """
-        url = (self.scheme + ':') if self.scheme else ''
-        url += '//' + self.netloc + self.relative()
-        return url
-
-    def relative(self):
-        """Return the relative URL (without scheme and authority).
-
-        Authority (see RFC 3986 section 3.2), or netloc in the
-        terminology of urllib.parse, basically means the hostname
-        here. The relative URL is good for making HTTP(S) requests to a
-        known host.
-
-        Returns
-        -------
-        str
-
-        """
-        rel = self.path
-        if self.params:
-            rel += ';' + self.params
-        if self.query:
-            rel += '?' + self.query
-        if self.fragment:
-            rel += '#' + self.fragment
-        return rel
-
-    def update(self, opts=None, **kwargs):
-        """Update the URL with the given options.
-
-        Parameters
-        ----------
-        opts : dict or argparse.Namespace, optional
-            Carries options that affect the Google Search/News URL. The
-            list of currently recognized option keys with expected value
-            types:
-
-                tld: str
-                news: bool
-                start: int
-                num: int
-                keywords: str or list of strs
-                lang: str
-                duration: str (GooglerArgumentParser.is_duration)
-                exact: bool
-
-        Other Parameters
-        ----------------
-        kwargs
-            The `kwargs` dict extends `opts`, that is, options can be
-            specified either way, in `opts` or as individual keyword
-            arguments.
-
-        """
-
-        if opts is None:
-            opts = {}
-        if hasattr(opts, '__dict__'):
-            opts = opts.__dict__
-        opts.update(kwargs)
-
-        qd = self._query_dict
-        if 'tld' in opts:
-            self._tld = opts['tld']
-        if 'news' in opts:
-            if opts['news']:
-                qd['tbm'] = 'nws'
-            else:
-                qd.pop('tbm', None)
-        if 'num' in opts:
-            self._num = opts['num']
-        if 'start' in opts:
-            self._start = opts['start']
-        if 'keywords' in opts:
-            self._keywords = opts['keywords']
-        if 'lang' in opts and opts['lang']:
-            qd['hl'] = opts['lang']
-        if 'duration' in opts and opts['duration']:
-            qd['tbs'] = 'qdr:%s' % opts['duration']
-        if 'exact' in opts:
-            if opts['exact']:
-                qd['nfpr'] = 1
-            else:
-                qd.pop('nfpr', None)
-
-    def set_queries(self, **kwargs):
-        """Forcefully set queries outside the normal `update` mechanism.
-
-        Other Parameters
-        ----------------
-        kwargs
-            Arbitrary key value pairs to be set in the query string. All
-            keys and values should be stringifiable.
-
-            Note that certain keys, e.g., ``q``, have their values
-            constructed on the fly, so setting those has no actual
-            effect.
-
-        """
-        for k, v in kwargs.items():
-            self._query_dict[k] = v
-
-    def unset_queries(self, *args):
-        """Forcefully unset queries outside the normal `update` mechanism.
-
-        Other Parameters
-        ----------------
-        args
-            Arbitrary keys to be unset. No exception is raised if a key
-            does not exist in the first place.
-
-            Note that certain keys, e.g., ``q``, are always included in
-            the resulting URL, so unsetting those has no actual effect.
-
-        """
-        for k in args:
-            self._query_dict.pop(k, None)
-
-    def next_page(self):
-        """Navigate to the next page."""
-        self._start += self._num
-
-    def prev_page(self):
-        """Navigate to the previous page.
-
-        Raises
-        ------
-        ValueError
-            If already at the first page (``start=0`` in the current
-            query string).
-
-        """
-        if self._start == 0:
-            raise ValueError('Already at the first page.')
-        self._start = (self._start - self._num) if self._start > self._num else 0
-
-    def first_page(self):
-        """Navigate to the first page.
-
-        Raises
-        ------
-        ValueError
-            If already at the first page (``start=0`` in the current
-            query string).
-
-        """
-        if self._start == 0:
-            raise ValueError('Already at the first page.')
-        self._start = 0
-
-    # Data source: https://en.wikipedia.org/wiki/List_of_Google_domains
-    # Scraper script: https://gist.github.com/zmwangx/b976e83c14552fe18b71
-    TLD_TO_DOMAIN_MAP = {
-        'ac': 'google.ac',      'ad': 'google.ad',      'ae': 'google.ae',
-        'af': 'google.com.af',  'ag': 'google.com.ag',  'ai': 'google.com.ai',
-        'al': 'google.al',      'am': 'google.am',      'ao': 'google.co.ao',
-        'ar': 'google.com.ar',  'as': 'google.as',      'at': 'google.at',
-        'au': 'google.com.au',  'az': 'google.az',      'ba': 'google.ba',
-        'bd': 'google.com.bd',  'be': 'google.be',      'bf': 'google.bf',
-        'bg': 'google.bg',      'bh': 'google.com.bh',  'bi': 'google.bi',
-        'bj': 'google.bj',      'bn': 'google.com.bn',  'bo': 'google.com.bo',
-        'br': 'google.com.br',  'bs': 'google.bs',      'bt': 'google.bt',
-        'bw': 'google.co.bw',   'by': 'google.by',      'bz': 'google.com.bz',
-        'ca': 'google.ca',      'cat': 'google.cat',    'cc': 'google.cc',
-        'cd': 'google.cd',      'cf': 'google.cf',      'cg': 'google.cg',
-        'ch': 'google.ch',      'ci': 'google.ci',      'ck': 'google.co.ck',
-        'cl': 'google.cl',      'cm': 'google.cm',      'cn': 'google.cn',
-        'co': 'google.com.co',  'cr': 'google.co.cr',   'cu': 'google.com.cu',
-        'cv': 'google.cv',      'cy': 'google.com.cy',  'cz': 'google.cz',
-        'de': 'google.de',      'dj': 'google.dj',      'dk': 'google.dk',
-        'dm': 'google.dm',      'do': 'google.com.do',  'dz': 'google.dz',
-        'ec': 'google.com.ec',  'ee': 'google.ee',      'eg': 'google.com.eg',
-        'es': 'google.es',      'et': 'google.com.et',  'fi': 'google.fi',
-        'fj': 'google.com.fj',  'fm': 'google.fm',      'fr': 'google.fr',
-        'ga': 'google.ga',      'ge': 'google.ge',      'gf': 'google.gf',
-        'gg': 'google.gg',      'gh': 'google.com.gh',  'gi': 'google.com.gi',
-        'gl': 'google.gl',      'gm': 'google.gm',      'gp': 'google.gp',
-        'gr': 'google.gr',      'gt': 'google.com.gt',  'gy': 'google.gy',
-        'hk': 'google.com.hk',  'hn': 'google.hn',      'hr': 'google.hr',
-        'ht': 'google.ht',      'hu': 'google.hu',      'id': 'google.co.id',
-        'ie': 'google.ie',      'il': 'google.co.il',   'im': 'google.im',
-        'in': 'google.co.in',   'io': 'google.io',      'iq': 'google.iq',
-        'is': 'google.is',      'it': 'google.it',      'je': 'google.je',
-        'jm': 'google.com.jm',  'jo': 'google.jo',      'jp': 'google.co.jp',
-        'ke': 'google.co.ke',   'kg': 'google.kg',      'kh': 'google.com.kh',
-        'ki': 'google.ki',      'kr': 'google.co.kr',   'kw': 'google.com.kw',
-        'kz': 'google.kz',      'la': 'google.la',      'lb': 'google.com.lb',
-        'lc': 'google.com.lc',  'li': 'google.li',      'lk': 'google.lk',
-        'ls': 'google.co.ls',   'lt': 'google.lt',      'lu': 'google.lu',
-        'lv': 'google.lv',      'ly': 'google.com.ly',  'ma': 'google.co.ma',
-        'md': 'google.md',      'me': 'google.me',      'mg': 'google.mg',
-        'mk': 'google.mk',      'ml': 'google.ml',      'mm': 'google.com.mm',
-        'mn': 'google.mn',      'ms': 'google.ms',      'mt': 'google.com.mt',
-        'mu': 'google.mu',      'mv': 'google.mv',      'mw': 'google.mw',
-        'mx': 'google.com.mx',  'my': 'google.com.my',  'mz': 'google.co.mz',
-        'na': 'google.com.na',  'ne': 'google.ne',      'nf': 'google.com.nf',
-        'ng': 'google.com.ng',  'ni': 'google.com.ni',  'nl': 'google.nl',
-        'no': 'google.no',      'np': 'google.com.np',  'nr': 'google.nr',
-        'nu': 'google.nu',      'nz': 'google.co.nz',   'om': 'google.com.om',
-        'pa': 'google.com.pa',  'pe': 'google.com.pe',  'pg': 'google.com.pg',
-        'ph': 'google.com.ph',  'pk': 'google.com.pk',  'pl': 'google.pl',
-        'pn': 'google.co.pn',   'pr': 'google.com.pr',  'ps': 'google.ps',
-        'pt': 'google.pt',      'py': 'google.com.py',  'qa': 'google.com.qa',
-        'ro': 'google.ro',      'rs': 'google.rs',      'ru': 'google.ru',
-        'rw': 'google.rw',      'sa': 'google.com.sa',  'sb': 'google.com.sb',
-        'sc': 'google.sc',      'se': 'google.se',      'sg': 'google.com.sg',
-        'sh': 'google.sh',      'si': 'google.si',      'sk': 'google.sk',
-        'sl': 'google.com.sl',  'sm': 'google.sm',      'sn': 'google.sn',
-        'so': 'google.so',      'sr': 'google.sr',      'st': 'google.st',
-        'sv': 'google.com.sv',  'td': 'google.td',      'tg': 'google.tg',
-        'th': 'google.co.th',   'tj': 'google.com.tj',  'tk': 'google.tk',
-        'tl': 'google.tl',      'tm': 'google.tm',      'tn': 'google.tn',
-        'to': 'google.to',      'tr': 'google.com.tr',  'tt': 'google.tt',
-        'tw': 'google.com.tw',  'tz': 'google.co.tz',   'ua': 'google.com.ua',
-        'ug': 'google.co.ug',   'uk': 'google.co.uk',   'uy': 'google.com.uy',
-        'uz': 'google.co.uz',   'vc': 'google.com.vc',  've': 'google.co.ve',
-        'vg': 'google.vg',      'vi': 'google.co.vi',   'vn': 'google.com.vn',
-        'vu': 'google.vu',      'ws': 'google.ws',      'za': 'google.co.za',
-        'zm': 'google.co.zm',   'zw': 'google.co.zw',
-    }
-
-    @property
-    def netloc(self):
-        """The hostname."""
+    # Type guards
+    @staticmethod
+    def positive_int(arg):
+        """Try to convert a string into a positive integer."""
         try:
-            return 'www.' + self.TLD_TO_DOMAIN_MAP[self._tld]
-        except KeyError:
-            return 'www.google.com'
+            n = int(arg)
+            assert n > 0
+            return n
+        except (ValueError, AssertionError):
+            raise argparse.ArgumentTypeError('%s is not a positive integer' % arg)
 
-    @property
-    def query(self):
-        """The query string."""
-        qd = {}
-        qd.update(self._query_dict)
-        qd['num'] = self._num
-        qd['start'] = self._start
+    @staticmethod
+    def nonnegative_int(arg):
+        """Try to convert a string into a nonnegative integer."""
+        try:
+            n = int(arg)
+            assert n >= 0
+            return n
+        except (ValueError, AssertionError):
+            raise argparse.ArgumentTypeError('%s is not a non-negative integer' % arg)
 
-        # Construct the q query
-        q = ''
-        keywords = self._keywords
-        if keywords:
-            if isinstance(keywords, list):
-                q += '+'.join([urllib.parse.quote_plus(kw) for kw in keywords])
-            else:
-                q += urllib.parse.quote_plus(keywords)
-        if self._site:
-            q += '+site:' + urllib.parse.quote_plus(self._site)
-        qd['q'] = q
+    @staticmethod
+    def is_duration(arg):
+        """Check if a string is a valid duration accepted by Google.
 
-        return '&'.join(['%s=%s' % (k, qd[k]) for k in sorted(qd.keys())])
+        A valid duration is of the form dNUM, where d is a single letter h
+        (hour), d (day), w (week), m (month), or y (year), and NUM is a
+        non-negative integer.
+        """
+        try:
+            if arg[0] not in ('h', 'd', 'w', 'm', 'y') or int(arg[1:]) < 0:
+                raise ValueError
+        except (TypeError, IndexError, ValueError):
+            raise argparse.ArgumentTypeError('%s is not a valid duration' % arg)
+        return arg
+
+    @staticmethod
+    def is_colorstr(arg):
+        """Check if a string is a valid color string."""
+        try:
+            assert len(arg) == 6
+            for c in arg:
+                assert c in COLORMAP
+        except AssertionError:
+            raise argparse.ArgumentTypeError('%s is not a valid color string' % arg)
+        return arg
 
 
 # Functions
@@ -1302,95 +1392,6 @@ def printerr(msg):
 
 
 # Program Main
-
-class GooglerArgumentParser(argparse.ArgumentParser):
-    """Custom argument parser for googler."""
-
-    # Print omniprompt help
-    @staticmethod
-    def print_omniprompt_help(file=None):
-        file.write(textwrap.dedent("""
-        omniprompt keys:
-          n, p                  fetch the next or previous set of search results
-          index                 open the result corresponding to index in browser
-          f                     jump to the first page
-          o                     open the current search in browser
-          g keywords            initiate a new Google search for 'keywords' with original options
-          q, ^D, double Enter   exit googler
-          ?                     show omniprompt help
-          *                     any other string initiates a new search with original options
-        """))
-
-    # Print information on googler
-    @staticmethod
-    def print_general_info(file=None):
-        file.write(textwrap.dedent("""
-        Version %s
-        Copyright (C) 2008 Henri Hakkinen
-        Copyright (C) 2015-2016 Arun Prakash Jana <engineerarun@gmail.com>
-        Zhiming Wang <zmwangx@gmail.com>
-        License: GPLv3
-        Webpage: https://github.com/jarun/googler
-        """ % _VERSION_))
-
-    # Augment print_help to print more than synopsis and options
-    def print_help(self, file=None):
-        super().print_help(file)
-        self.print_omniprompt_help(file)
-        self.print_general_info(file)
-
-    # Automatically print full help text on error
-    def error(self, message):
-        sys.stderr.write('%s: error: %s\n\n' % (self.prog, message))
-        self.print_help(sys.stderr)
-        self.exit(2)
-
-    # Type guards
-    @staticmethod
-    def positive_int(arg):
-        """Try to convert a string into a positive integer."""
-        try:
-            n = int(arg)
-            assert n > 0
-            return n
-        except (ValueError, AssertionError):
-            raise argparse.ArgumentTypeError('%s is not a positive integer' % arg)
-
-    @staticmethod
-    def nonnegative_int(arg):
-        """Try to convert a string into a nonnegative integer."""
-        try:
-            n = int(arg)
-            assert n >= 0
-            return n
-        except (ValueError, AssertionError):
-            raise argparse.ArgumentTypeError('%s is not a non-negative integer' % arg)
-
-    @staticmethod
-    def is_duration(arg):
-        """Check if a string is a valid duration accepted by Google.
-
-        A valid duration is of the form dNUM, where d is a single letter h
-        (hour), d (day), w (week), m (month), or y (year), and NUM is a
-        non-negative integer.
-        """
-        try:
-            if arg[0] not in ('h', 'd', 'w', 'm', 'y') or int(arg[1:]) < 0:
-                raise ValueError
-        except (TypeError, IndexError, ValueError):
-            raise argparse.ArgumentTypeError('%s is not a valid duration' % arg)
-        return arg
-
-    @staticmethod
-    def is_colorstr(arg):
-        """Check if a string is a valid color string."""
-        try:
-            assert len(arg) == 6
-            for c in arg:
-                assert c in COLORMAP
-        except AssertionError:
-            raise argparse.ArgumentTypeError('%s is not a valid color string' % arg)
-        return arg
 
 # Retrieve GOOGLER_COLORS
 colorstr_env = os.getenv('GOOGLER_COLORS')
