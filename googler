@@ -19,6 +19,7 @@
 
 from __future__ import print_function
 import argparse
+import atexit
 import collections
 import gzip
 import http.client
@@ -446,6 +447,197 @@ class GoogleUrl(object):
         qd['q'] = q
 
         return '&'.join(['%s=%s' % (k, qd[k]) for k in sorted(qd.keys())])
+
+
+class GoogleConnectionError(Exception):
+    pass
+
+
+class GoogleConnection(object):
+    """
+    This class facilitates connecting to and fetching from Google.
+
+    Parameters
+    ----------
+    See http.client.HTTPSConnection for documentation of the
+    parameters.
+
+    Raises
+    ------
+    GoogleConnectionError
+
+    Attributes
+    ----------
+    host : str
+        The currently connected host. Read-only property. Use
+        `new_connection` to change host.
+
+    Methods
+    -------
+    new_connection(host=None, port=None, timeout=45)
+    renew_connection(timeout=45)
+    fetch_page(url)
+    close()
+
+    """
+
+    def __init__(self, host, port=None, timeout=45):
+        self._host = None
+        self._port = None
+        self._conn = None
+        self.new_connection(host, port=port, timeout=timeout)
+
+    @property
+    def host(self):
+        """The host currently connected to."""
+        return self._host
+
+    def new_connection(self, host=None, port=None, timeout=45):
+        """Close the current connection (if any) and establish a new one.
+
+        Parameters
+        ----------
+        See http.client.HTTPSConnection for documentation of the
+        parameters. Renew the connection (i.e., reuse the current host
+        and port) if host is None or empty.
+
+        Raises
+        ------
+        GoogleConnectionError
+
+        """
+        if self._conn:
+            self._conn.close()
+        if not host:
+            host = self._host
+            port = self._port
+        self._host = host
+        self._port = port
+        debugp('Connecting to new host [%s]' % host)
+        try:
+            self._conn = http.client.HTTPSConnection(host, port=port, timeout=timeout)
+        except http.client.HTTPException as e:
+            raise GoogleConnectionError('Failed to connect to %s: %s.' % (host, e))
+
+    def renew_connection(self, timeout=45):
+        """Renew current connection.
+
+        Equivalent to ``new_connection(timeout=timeout)``.
+
+        """
+        self.new_connection(timeout=timeout)
+
+    def fetch_page(self, url):
+        """Fetch a URL.
+
+        Allows one reconnection and one redirection before failing and
+        raising GoogleConnectionError.
+
+        Parameters
+        ----------
+        url : str
+            The URL to fetch, relative to the host.
+
+        Raises
+        ------
+        GoogleConnectionError
+            When not getting HTTP 200 even after the allowed one
+            reconnection and/or one redirection, or when Google is
+            blocking query due to unsual activity.
+
+        Returns
+        -------
+        str
+            Response payload, gunzipped (if applicable) and decoded (in UTF-8).
+
+        """
+        try:
+            self._raw_get(url)
+        except http.client.HTTPException as e:
+            debugp('Got exception: %s.' % e)
+            debugp('Attempting to reconnect...')
+            self.renew_connection()
+            try:
+                self._raw_get(url)
+            except http.client.HTTPException as e:
+                debugp('Got exception: %s.' % e)
+                raise GoogleConnectionError("Failed to get '%s'." % url)
+
+        resp = self._resp
+        if resp.status in {301, 302, 303, 307, 308}:
+            redirection_url = resp.getheader('location', '')
+            if 'sorry/IndexRedirect?' in redirection_url:
+                raise GoogleConnectionError('Connection blocked due to unusual activity.')
+            self._redirect(redirection_url)
+
+        if resp.status != 200:
+            raise GoogleConnectionError('Got HTTP %d: %s' % (resp.status, resp.reason))
+
+        payload = resp.read()
+        try:
+            return gzip.GzipFile(fileobj=io.BytesIO(payload)).read().decode('utf-8')
+        except OSError:
+            # Not gzipped
+            return payload.decode('utf-8')
+
+    def _redirect(self, url):
+        """Redirect to and fetch a new URL.
+
+        Like `_raw_get`, the response is stored in ``self._resp``. A new
+        connection is made if redirecting to a different host.
+
+        Parameters
+        ----------
+        url : str
+            If absolute and points to a different host, make a new
+            connection.
+
+        Raises
+        ------
+        GoogleConnectionError
+
+        """
+        debugp('Redirecting to URL [%s]' % url)
+        segments = urllib.parse.urlparse(url)
+
+        host = segments.netloc
+        if host != self._host:
+            self.new_connection(host)
+
+        relurl = urllib.parse.urlunparse(('', '') + segments[2:])
+        try:
+            self._raw_get(relurl)
+        except http.client.HTTPException as e:
+            debugp('Got exception: %s.' % e)
+            raise GoogleConnectionError("Failed to get '%s'." % url)
+
+    def _raw_get(self, url):
+        """Make a raw HTTP GET request.
+
+        No status check (which implies no redirection). Response can be
+        accessed from ``self._resp``.
+
+        Parameters
+        ----------
+        url : str
+            URL relative to the host, used in the GET request.
+
+        Raises
+        ------
+        http.client.HTTPException
+
+        """
+        debugp('Fetching URL [%s]' % url)
+        self._conn.request('GET', url, None, {
+            'Accept-Encoding': 'gzip',
+            'User-Agent': USER_AGENT,
+        })
+        self._resp = self._conn.getresponse()
+
+    def close(self):
+        """Close the connection (if one is active)."""
+        if self._conn:
+            self._conn.close()
 
 
 def annotate_tag(annotated_starttag_handler):
@@ -1064,7 +1256,7 @@ class Result(object):
         # Open the URL in a web browser if option -j was specified.
         if lucky:
             self.open()
-            quit_program()
+            sys.exit(0)
 
         index_url_map[str(index)] = url
         self.print_title_and_url(index, title, url)
@@ -1194,101 +1386,27 @@ class GooglerArgumentParser(argparse.ArgumentParser):
 
 # Functions
 
-def google_get(conn, url):
-    """
-    Send a GET request to Google with the appropriate headers.
-
-    URL could be relative to the connection's host.
-    """
-    debugp('Fetching URL [%s]' % url)
-    conn.request('GET', url, None, {
-        'Accept-encoding': 'gzip',
-        'User-Agent': USER_AGENT,
-    })
-    return conn.getresponse()
-
-
-def new_connection(host=None):
-    """
-    Returns a new connection to the given host with appropriate options.
-
-    When host is not supplied or empty, we extract it from the global
-    variable google_url.
-    """
-    if not host:
-        global google_url
-        host = google_url.hostname
-    debugp('Connecting to new host [%s]' % host)
-    return http.client.HTTPSConnection(host, timeout=45)
-
-
-def quit_program(exitcode=1):
-    """Close the connection and quits the program."""
-
-    global conn
-    conn.close()
-    sys.exit(exitcode)
-
-
 def fetch_results():
     """Connect to server and fetch results"""
 
     global conn
     global google_url
 
-    relurl = google_url.relative()
     try:
-        resp = google_get(conn, relurl)
-    except Exception as e:
-        debugp('Exception: %s' % e)
-        conn.close()
-        conn = new_connection()
-        resp = google_get(conn, relurl)
+        page = conn.fetch_page(google_url.relative())
+    except GoogleConnectionError as e:
+        error(e)
+        sys.exit(1)
 
-    if resp.status != 200:
-        if resp.status in (301, 302,):
-            url = resp.getheader('location', '')
-            debugp('Redirected URL [%s]' % url)
-            if url.find('sorry/IndexRedirect?') >= 0:
-                error('Connection blocked due to unusual activity.')
-                quit_program()
-
-            conn.close()
-            mark = url.find('/search')
-            new_host = url[(url.find('//') + 2):mark]
-            conn = new_connection(new_host)
-            google_url.hostname = new_host
-            relurl = url[mark:]
-
-            try:
-                resp = google_get(conn, relurl)
-            except Exception as e:
-                debugp('Exception: %s' % e)
-                quit_program()
-
-            if resp.status != 200:
-                # Failed connecting to redirected server too!
-                error('First redirection failed with HTTP %d: %s' %
-                      (resp.status, resp.reason))
-                quit_program()
-        else:
-            # The server responded with an error.
-            error('HTTP %d: %s' % (resp.status, resp.reason))
-            quit_program()
-
-    # Parse the HTML document and print the results.
-    parser = GoogleParser(news=google_url.news)
-
-    if not debug:
-        parser.feed(gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8'))
-    else:
-        resp_body = gzip.GzipFile(fileobj=io.BytesIO(resp.read())).read().decode('utf-8')
+    if debug:
         fd, tmpfile = tempfile.mkstemp(prefix='googler-response-')
         os.close(fd)
-        with open(tmpfile, 'wb') as fp:
-            fp.write(resp_body.encode('utf-8'))
+        with open(tmpfile, 'w', encoding='utf-8') as fp:
+            fp.write(page)
         debugp("Response body written to '%s'." % tmpfile)
-        parser.feed(resp_body)
+
+    parser = GoogleParser(news=google_url.news)
+    parser.feed(page)
 
     results = parser.results
     filtered = parser.filtered
@@ -1318,7 +1436,7 @@ def read_next_command():
     try:
         return input(prompt)
     except EOFError:
-        quit_program(exitcode=0)
+        sys.exit(0)
 
 
 def open_url(url):
@@ -1340,13 +1458,11 @@ def open_url(url):
 # Messaging wrappers
 
 def message(msg, level='INFO', ansi=None):
-    """Print message, led with [%(level)s] where level is a string, to
-    stderr.  If ansi is not None and the global variable colorize is True,
-    then print ansi at the beginning, and close with \x1b[0m.
+    """Print a message.
+
+    ``msg`` can be any stringifiable value.
     """
-
     global colorize
-
     if ansi is not None and colorize:
         opening = ansi
         closing = '\x1b[0m'
@@ -1359,27 +1475,26 @@ def message(msg, level='INFO', ansi=None):
 
 def error(msg):
     """Print error message.
+
     Error in red if colorize.
     """
-
     message(msg, 'ERROR', '\x1b[31m')
 
 
 def warning(msg):
     """Print warning message.
-    Warning in yellow if colorize
-    """
 
+    Warning in yellow if colorize.
+    """
     message(msg, 'WARNING', '\x1b[33m')
 
 
 def debugp(msg):
     """Print debug message.
+
     debugp stands for "debug print".
     """
-
     global debug
-
     if debug:
         # Debugging messages not colorized
         message(msg, 'DEBUG')
@@ -1464,8 +1579,12 @@ except OSError:
 
 debugp('Version %s' % _VERSION_)
 
-# Connect to Google and request the result page.
-conn = new_connection()
+try:
+    conn = GoogleConnection(google_url.hostname)
+    atexit.register(conn.close)
+except GoogleConnectionError as e:
+    error(e)
+    sys.exit(1)
 
 results = []
 urlindex = {}
@@ -1474,14 +1593,14 @@ while True:
         results, urlindex, filtered = fetch_results()
 
     if noninteractive:
-        quit_program(exitcode=0)
+        sys.exit(0)
 
     nav = read_next_command()
     if not nav:
         nav = read_next_command()
         if not nav:
             # Two consecutive enters
-            quit_program(exitcode=0)
+            sys.exit(0)
 
     nav = re.sub(r'\s+', ' ', nav).strip()
     if nav == 'n':
@@ -1536,5 +1655,3 @@ while True:
         opts.keywords = keywords
         google_url = GoogleUrl(opts)
         nav = 'g'
-
-quit_program(exitcode=0)
