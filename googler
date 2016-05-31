@@ -927,8 +927,7 @@ def fetch_results():
         for r in results:
             urlindex.update(r.print_entry())
         if filtered:
-            printerr('*Google has omitted similar result entries. '
-                     'Enter "unfilter" at the prompt to show additional entries.')
+            printerr('** Enter "unfilter" to show similar results Google omitted.')
     elif output_format == 1: # Json output
         results_object = [r.json_object() for r in results]
         print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
