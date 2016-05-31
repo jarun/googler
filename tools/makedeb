@@ -13,7 +13,7 @@ setopt errexit noshwordsplit nobashrematch
 ################### SET UP ENVIRONMENT AND BASE DIRECTORIES ####################
 
 [[ -z $DEBFULLNAME ]] && DEBFULLNAME='Arun Prakash Jana'
-[[ -z $DEBEMAIL ]] && DEBEMAIL='arun@tuxdiary.com'
+[[ -z $DEBEMAIL ]] && DEBEMAIL='engineerarun@gmail.com'
 [[ -z $TZ ]] && TZ='Asia/Kolkata'
 export DEBFULLNAME DEBEMAIL TZ
 
