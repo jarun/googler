@@ -1288,11 +1288,6 @@ class Result(object):
 
         index_url_map = {}
 
-        # Open the URL in a web browser if option -j was specified.
-        if lucky:
-            self.open()
-            sys.exit(0)
-
         index_url_map[str(index)] = url
         self.print_title_and_url(index, title, url)
         self.print_metadata_and_abstract(abstract, metadata=metadata)
@@ -1423,6 +1418,7 @@ def fetch_results():
 
     global conn
     global google_url
+    global lucky
 
     try:
         page = conn.fetch_page(google_url.relative())
@@ -1447,7 +1443,16 @@ def fetch_results():
     if results and not noninteractive: # print a newline for more clarity
         printerr('')
 
+    if lucky:
+        if results:
+            results[0].open()
+        else:
+            logging.warning('No results.')
+        sys.exit(0)
+
     if output_format == 0: # Regular output
+        if not results:
+            logging.warning('No results.')
         for r in results:
             urlindex.update(r.print_entry())
         if filtered:
@@ -1526,8 +1531,10 @@ if len(sys.argv) < 2:
 opts = argparser.parse_args()
 
 # Set output/user interaction options
-lucky = opts.lucky
 noninteractive = opts.noninteractive
+if opts.lucky:
+    lucky = True
+    noninteractive = True
 if opts.json:
     output_format = 1
     noninteractive = True
