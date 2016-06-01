@@ -88,7 +88,6 @@ output_format = 0           # 0: Regular (normal) output, 1: JSON output (option
 lucky = False               # If True, opens the first URL in browser (option --lucky)
 
 # Cosmetic options
-columns = None              # Terminal width
 colors = None               # Colors object, set after reading color settings (option --colors)
 
 
@@ -1214,10 +1213,17 @@ class Sitelink(object):
         self.abstract = abstract
 
 
+Colors = collections.namedtuple('Colors', 'index, title, url, metadata, abstract, prompt, reset')
+
+
 class Result(object):
-    """Encapsulates a search result's index, title, URL and abstract
-    (and optionally metadata for Google News).
     """
+    Container for one search result, with output helpers.
+    """
+
+    # Class variables
+    colors = None
+    columns = 0
 
     def __init__(self, index, title, url, abstract, metadata=None, sitelinks=None):
         self.index = index
@@ -1227,9 +1233,9 @@ class Result(object):
         self.metadata = metadata
         self.sitelinks = [] if sitelinks is None else sitelinks
 
-    @staticmethod
-    def print_title_and_url(index, title, url, indent=0):
-        global colors
+    def print_title_and_url(self, index, title, url, indent=0):
+        colors = self.colors
+
         # Pad index and url with `indent` number of spaces
         index = ' ' * indent + str(index)
         url = ' ' * indent + url
@@ -1240,9 +1246,10 @@ class Result(object):
         else:
             print(' %s %s\n%s' % (index, title, url))
 
-    @staticmethod
-    def print_metadata_and_abstract(abstract, metadata=None, indent=0):
-        global colors, columns
+    def print_metadata_and_abstract(self, abstract, metadata=None, indent=0):
+        colors = self.colors
+        columns = self.columns
+
         if metadata:
             if colors:
                 print(colors.metadata + metadata + colors.reset)
@@ -1317,9 +1324,6 @@ class Result(object):
         if self.sitelinks:
             obj['sitelinks'] = [sitelink.__dict__ for sitelink in self.sitelinks]
         return obj
-
-
-Colors = collections.namedtuple('Colors', 'index, title, url, metadata, abstract, prompt, reset')
 
 
 class GooglerArgumentParser(argparse.ArgumentParser):
@@ -1519,26 +1523,34 @@ if len(sys.argv) < 2:
     argparser.print_help(sys.stderr)
     sys.exit(1)
 
-# Set global variables
 opts = argparser.parse_args()
-if opts.colorize:
-    colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
-else:
-    colors = None
+
+# Set output/user interaction options
 lucky = opts.lucky
-if opts.debug:
-    logger.setLevel(logging.DEBUG)
 noninteractive = opts.noninteractive
 if opts.json:
     output_format = 1
     noninteractive = True
-google_url = GoogleUrl(opts)
+
+# Set colors
+if opts.colorize:
+    colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
+else:
+    colors = None
+Result.colors = colors
 
 # Get terminal width
 try:
     columns, _ = os.get_terminal_size()
 except OSError:
     columns = 0
+Result.columns = columns
+
+# Set logging level
+if opts.debug:
+    logger.setLevel(logging.DEBUG)
+
+google_url = GoogleUrl(opts)
 
 logger.debug('Version %s', _VERSION_)
 
