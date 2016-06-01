@@ -92,6 +92,35 @@ columns = None              # Terminal width
 colors = None               # Colors object, set after reading color settings (option --colors)
 
 
+# Global helper functions
+
+def open_url(url):
+    """Open an URL in the user's default web browser."""
+    logger.debug('Opening %s', url)
+    _stderr = os.dup(2)
+    os.close(2)
+    _stdout = os.dup(1)
+    os.close(1)
+    fd = os.open(os.devnull, os.O_RDWR)
+    os.dup2(fd, 2)
+    os.dup2(fd, 1)
+    try:
+        import webbrowser
+        webbrowser.open(url)
+    finally:
+        os.close(fd)
+        os.dup2(_stderr, 2)
+        os.dup2(_stdout, 1)
+
+
+def printerr(msg):
+    """Print message, verbatim, to stderr.
+
+    ``msg`` could be any stringifiable value.
+    """
+    print(msg, file=sys.stderr)
+
+
 # Classes
 
 class GoogleUrl(object):
@@ -1438,30 +1467,6 @@ def read_next_command():
         return input(prompt)
     except EOFError:
         sys.exit(0)
-
-
-def open_url(url):
-    logger.debug('Opening %s', url)
-    _stderr = os.dup(2)
-    os.close(2)
-    _stdout = os.dup(1)
-    os.close(1)
-    fd = os.open(os.devnull, os.O_RDWR)
-    os.dup2(fd, 2)
-    os.dup2(fd, 1)
-    try:
-        import webbrowser
-        webbrowser.open(url)
-    finally:
-        os.close(fd)
-        os.dup2(_stderr, 2)
-        os.dup2(_stdout, 1)
-
-
-def printerr(msg):
-    """Print message, verbatim, to stderr."""
-
-    print(msg, file=sys.stderr)
 
 
 # Program Main
