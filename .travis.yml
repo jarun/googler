@@ -23,4 +23,4 @@ deploy:
     repo: jarun/googler
     tags: true
     # Upload from only one job (doesn't matter which one because we're packaging the same thing throughout the matrix)
-    python: "2.7"
+    python: "3.5"
