@@ -1205,12 +1205,13 @@ class GoogleParser(html.parser.HTMLParser):
 
 
 class Sitelink(object):
-    """Container for a sitelink's title, URL and abstract."""
+    """Container for a sitelink."""
 
     def __init__(self, title, url, abstract):
         self.title = title
         self.url = url
         self.abstract = abstract
+        self.index = ''
 
 
 Colors = collections.namedtuple('Colors', 'index, title, url, metadata, abstract, prompt, reset')
@@ -1219,6 +1220,34 @@ Colors = collections.namedtuple('Colors', 'index, title, url, metadata, abstract
 class Result(object):
     """
     Container for one search result, with output helpers.
+
+    Parameters
+    ----------
+    index : int or str
+    title : str
+    url : str
+    abstract : str
+    metadata : str, optional
+        Only applicable to Google News results, with publisher name and
+        publishing time.
+    sitelinks : list, optional
+        List of ``SiteLink`` objects.
+
+    Attributes
+    ----------
+    index : str
+    title : str
+    url : str
+    abstract : str
+    metadata : str or None
+    sitelinks : list
+
+    Methods
+    -------
+    print()
+    jsonizable_object()
+    urltable()
+
     """
 
     # Class variables
@@ -1226,6 +1255,7 @@ class Result(object):
     columns = 0
 
     def __init__(self, index, title, url, abstract, metadata=None, sitelinks=None):
+        index = str(index)
         self.index = index
         self.title = title
         self.url = url
@@ -1233,7 +1263,15 @@ class Result(object):
         self.metadata = metadata
         self.sitelinks = [] if sitelinks is None else sitelinks
 
-    def print_title_and_url(self, index, title, url, indent=0):
+        self._urltable = {index: url}
+        subindex = 'a'
+        for sitelink in sitelinks:
+            fullindex = index + subindex
+            sitelink.index = fullindex
+            self._urltable[fullindex] = sitelink.url
+            subindex = chr(ord(subindex) + 1)
+
+    def _print_title_and_url(self, index, title, url, indent=0):
         colors = self.colors
 
         # Pad index and url with `indent` number of spaces
@@ -1246,7 +1284,7 @@ class Result(object):
         else:
             print(' %s %s\n%s' % (index, title, url))
 
-    def print_metadata_and_abstract(self, abstract, metadata=None, indent=0):
+    def _print_metadata_and_abstract(self, abstract, metadata=None, indent=0):
         colors = self.colors
         columns = self.columns
 
@@ -1269,46 +1307,17 @@ class Result(object):
         if colors:
             print(colors.reset, end='')
 
-    def print_entry(self):
-        """Print an entry and returns an URL index.
+    def print(self):
+        """Print the result entry."""
+        self._print_title_and_url(self.index, self.title, self.url)
+        self._print_metadata_and_abstract(self.abstract, metadata=self.metadata)
 
-        The URL "index" is a dict of index: URL pairs (here index is the
-        result index, e.g., "1", "1a", etc.).
+        for sitelink in self.sitelinks:
+            self._print_title_and_url(sitelink.index, sitelink.title, sitelink.url, indent=4)
+            self._print_metadata_and_abstract(sitelink.abstract, indent=4)
 
-        The URL index usually contains a single element, but
-        occasionally there could be more due to sitelinks.
-        """
-
-        index = self.index
-        title = self.title
-        url = self.url
-        metadata = self.metadata
-        abstract = self.abstract
-        sitelinks = self.sitelinks
-
-        index_url_map = {}
-
-        index_url_map[str(index)] = url
-        self.print_title_and_url(index, title, url)
-        self.print_metadata_and_abstract(abstract, metadata=metadata)
-
-        subindex = 'a'
-        for sitelink in sitelinks:
-            fullindex = str(index) + subindex
-            self.print_title_and_url(fullindex, sitelink.title, sitelink.url, indent=4)
-            self.print_metadata_and_abstract(sitelink.abstract, indent=4)
-            index_url_map[fullindex] = sitelink.url
-            # Increment subindex
-            subindex = chr(ord(subindex) + 1)
-
-        return index_url_map
-
-    # Open the URL in browser
-    def open(self):
-        open_url(self.url)
-
-    # Returns an object (dict) good for JSON serialization
-    def json_object(self):
+    def jsonizable_object(self):
+        """Return a JSON-serializable dict representing the result entry."""
         obj = {
             'title': self.title,
             'url': self.url,
@@ -1319,6 +1328,22 @@ class Result(object):
         if self.sitelinks:
             obj['sitelinks'] = [sitelink.__dict__ for sitelink in self.sitelinks]
         return obj
+
+    def urltable(self):
+        """Return a index-to-URL table for the current result.
+
+        Normally, the table contains only a single entry, but when the result
+        contains sidelinks, all sidelinks are included in this table.
+
+        Returns
+        -------
+        dict
+            A dict mapping indices (strs) to URLs (also strs). Indices of
+            sitelinks are the original index appended by lowercase letters a,
+            b, c, etc.
+
+        """
+        return self._urltable
 
 
 class GooglerArgumentParser(argparse.ArgumentParser):
@@ -1439,13 +1464,13 @@ def fetch_results():
 
     results = parser.results
     filtered = parser.filtered
-    urlindex = {}
+    urltable = {}
     if results and not noninteractive: # print a newline for more clarity
         printerr('')
 
     if lucky:
         if results:
-            results[0].open()
+            open_url(results[0].url)
         else:
             logging.warning('No results.')
         sys.exit(0)
@@ -1454,15 +1479,16 @@ def fetch_results():
         if not results:
             logging.warning('No results.')
         for r in results:
-            urlindex.update(r.print_entry())
+            r.print()
+            urltable.update(r.urltable())
         if filtered:
             printerr('** Enter "unfilter" to show similar results Google omitted.')
-    elif output_format == 1: # Json output
+    elif output_format == 1: # JSON output
         import json
-        results_object = [r.json_object() for r in results]
+        results_object = [r.jsonizable_object() for r in results]
         print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
 
-    return results, urlindex, filtered
+    return results, urltable, filtered
 
 
 def read_next_command():
@@ -1569,10 +1595,10 @@ except GoogleConnectionError as e:
     sys.exit(1)
 
 results = []
-urlindex = {}
+urltable = {}
 while True:
     if nav in {'n', 'p', 'f', 'g'}:
-        results, urlindex, filtered = fetch_results()
+        results, urltable, filtered = fetch_results()
 
     if noninteractive:
         sys.exit(0)
@@ -1621,8 +1647,8 @@ while True:
         opts.keywords = keywords
         google_url = GoogleUrl(opts)
         nav = 'g'
-    elif nav in urlindex:
-        open_url(urlindex[nav])
+    elif nav in urltable:
+        open_url(urltable[nav])
     elif nav.isdigit() and int(nav) < 100:
         printerr('Index out of bound. To search for the number, use g.')
     elif filtered and nav == 'unfilter':
