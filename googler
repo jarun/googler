@@ -26,13 +26,13 @@ import http.client
 import html.entities
 import html.parser
 import io
+import logging
 import os
 import re
 import signal
 import sys
 import textwrap
 import urllib.parse
-import webbrowser
 
 # Python optional dependency compatibility layer
 try:
@@ -41,9 +41,12 @@ except ImportError:
     pass
 
 
-def sigint_handler(signum, frame):
-    """Install SIGINT handler"""
+# Basic setup
 
+logging.basicConfig(format='[%(levelname)s] %(message)s')
+logger = logging.getLogger()
+
+def sigint_handler(signum, frame):
     print('\nInterrupted.', file=sys.stderr)
     sys.exit(1)
 
@@ -88,9 +91,6 @@ lucky = False               # If True, opens the first URL in browser (option --
 columns = None              # Terminal width
 colorize = True             # If True, colorizes the output (option --nocolor)
 colors = None               # Colors object, set after reading color settings (option --colors)
-
-# Debugging options
-debug = False               # Print debug logs
 
 
 # Classes
@@ -513,7 +513,7 @@ class GoogleConnection(object):
             port = self._port
         self._host = host
         self._port = port
-        debugp('Connecting to new host [%s]' % host)
+        logger.debug('Connecting to new host [%s]', host)
         try:
             self._conn = http.client.HTTPSConnection(host, port=port, timeout=timeout)
         except http.client.HTTPException as e:
@@ -554,13 +554,13 @@ class GoogleConnection(object):
         try:
             self._raw_get(url)
         except http.client.HTTPException as e:
-            debugp('Got exception: %s.' % e)
-            debugp('Attempting to reconnect...')
+            logger.debug('Got exception: %s.', e)
+            logger.debug('Attempting to reconnect...')
             self.renew_connection()
             try:
                 self._raw_get(url)
             except http.client.HTTPException as e:
-                debugp('Got exception: %s.' % e)
+                logger.debug('Got exception: %s.', e)
                 raise GoogleConnectionError("Failed to get '%s'." % url)
 
         resp = self._resp
@@ -597,7 +597,7 @@ class GoogleConnection(object):
         GoogleConnectionError
 
         """
-        debugp('Redirecting to URL [%s]' % url)
+        logger.debug('Redirecting to URL [%s]', url)
         segments = urllib.parse.urlparse(url)
 
         host = segments.netloc
@@ -608,7 +608,7 @@ class GoogleConnection(object):
         try:
             self._raw_get(relurl)
         except http.client.HTTPException as e:
-            debugp('Got exception: %s.' % e)
+            logger.debug('Got exception: %s.', e)
             raise GoogleConnectionError("Failed to get '%s'." % url)
 
     def _raw_get(self, url):
@@ -627,7 +627,7 @@ class GoogleConnection(object):
         http.client.HTTPException
 
         """
-        debugp('Fetching URL [%s]' % url)
+        logger.debug('Fetching URL [%s]', url)
         self._conn.request('GET', url, None, {
             'Accept-Encoding': 'gzip',
             'User-Agent': USER_AGENT,
@@ -1395,15 +1395,16 @@ def fetch_results():
     try:
         page = conn.fetch_page(google_url.relative())
     except GoogleConnectionError as e:
-        error(e)
+        logger.error(e)
         sys.exit(1)
 
-    if debug:
+    if logger.isEnabledFor(logging.DEBUG):
+        import tempfile
         fd, tmpfile = tempfile.mkstemp(prefix='googler-response-')
         os.close(fd)
         with open(tmpfile, 'w', encoding='utf-8') as fp:
             fp.write(page)
-        debugp("Response body written to '%s'." % tmpfile)
+        logger.debug("Response body written to '%s'.", tmpfile)
 
     parser = GoogleParser(news=google_url.news)
     parser.feed(page)
@@ -1420,6 +1421,7 @@ def fetch_results():
         if filtered:
             printerr('** Enter "unfilter" to show similar results Google omitted.')
     elif output_format == 1: # Json output
+        import json
         results_object = [r.json_object() for r in results]
         print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
 
@@ -1440,6 +1442,7 @@ def read_next_command():
 
 
 def open_url(url):
+    logger.debug('Opening %s', url)
     _stderr = os.dup(2)
     os.close(2)
     _stdout = os.dup(1)
@@ -1448,56 +1451,12 @@ def open_url(url):
     os.dup2(fd, 2)
     os.dup2(fd, 1)
     try:
+        import webbrowser
         webbrowser.open(url)
     finally:
         os.close(fd)
         os.dup2(_stderr, 2)
         os.dup2(_stdout, 1)
-
-
-# Messaging wrappers
-
-def message(msg, level='INFO', ansi=None):
-    """Print a message.
-
-    ``msg`` can be any stringifiable value.
-    """
-    global colorize
-    if ansi is not None and colorize:
-        opening = ansi
-        closing = '\x1b[0m'
-    else:
-        opening = closing = ''
-    print('{opening}[{level}] {msg}{closing}'.format(
-        opening=opening, level=level, msg=msg, closing=closing
-    ), file=sys.stderr)
-
-
-def error(msg):
-    """Print error message.
-
-    Error in red if colorize.
-    """
-    message(msg, 'ERROR', '\x1b[31m')
-
-
-def warning(msg):
-    """Print warning message.
-
-    Warning in yellow if colorize.
-    """
-    message(msg, 'WARNING', '\x1b[33m')
-
-
-def debugp(msg):
-    """Print debug message.
-
-    debugp stands for "debug print".
-    """
-    global debug
-    if debug:
-        # Debugging messages not colorized
-        message(msg, 'DEBUG')
 
 
 def printerr(msg):
@@ -1562,13 +1521,11 @@ colorize = opts.colorize
 colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
 lucky = opts.lucky
 if opts.debug:
-    debug = True
-    import tempfile
+    logger.setLevel(logging.DEBUG)
 noninteractive = opts.noninteractive
 if opts.json:
     output_format = 1
     noninteractive = True
-    import json
 google_url = GoogleUrl(opts)
 
 # Get terminal width
@@ -1577,13 +1534,13 @@ try:
 except OSError:
     columns = 0
 
-debugp('Version %s' % _VERSION_)
+logger.debug('Version %s', _VERSION_)
 
 try:
     conn = GoogleConnection(google_url.hostname)
     atexit.register(conn.close)
 except GoogleConnectionError as e:
-    error(e)
+    logger.error(e)
     sys.exit(1)
 
 results = []
