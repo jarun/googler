@@ -89,7 +89,6 @@ lucky = False               # If True, opens the first URL in browser (option --
 
 # Cosmetic options
 columns = None              # Terminal width
-colorize = True             # If True, colorizes the output (option --nocolor)
 colors = None               # Colors object, set after reading color settings (option --colors)
 
 
@@ -1201,11 +1200,11 @@ class Result(object):
 
     @staticmethod
     def print_title_and_url(index, title, url, indent=0):
-        global colorize, colors
+        global colors
         # Pad index and url with `indent` number of spaces
         index = ' ' * indent + str(index)
         url = ' ' * indent + url
-        if colorize:
+        if colors:
             print(colors.index + index + colors.reset, end='')
             print(' ' + colors.title + title + colors.reset)
             print(colors.url + url + colors.reset)
@@ -1214,14 +1213,14 @@ class Result(object):
 
     @staticmethod
     def print_metadata_and_abstract(abstract, metadata=None, indent=0):
-        global colorize, colors, columns
+        global colors, columns
         if metadata:
-            if colorize:
+            if colors:
                 print(colors.metadata + metadata + colors.reset)
             else:
                 print(metadata)
 
-        if colorize:
+        if colors:
             print(colors.abstract, end='')
         if columns > indent + 1:
             # Try to fill to columns
@@ -1231,7 +1230,7 @@ class Result(object):
             print('')
         else:
             print('%s\n' % abstract.replace('\n', ' '))
-        if colorize:
+        if colors:
             print(colors.reset, end='')
 
     def print_entry(self):
@@ -1431,10 +1430,10 @@ def fetch_results():
 def read_next_command():
     """Show omniprompt and read user command."""
 
-    global colorize, colors
+    global colors
 
     message = 'googler (? for help)'
-    prompt = (colors.prompt + message + colors.reset + ' ') if colorize else (message + ': ')
+    prompt = (colors.prompt + message + colors.reset + ' ') if colors else (message + ': ')
     try:
         return input(prompt)
     except EOFError:
@@ -1517,8 +1516,10 @@ if len(sys.argv) < 2:
 
 # Set global variables
 opts = argparser.parse_args()
-colorize = opts.colorize
-colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
+if opts.colorize:
+    colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
+else:
+    colors = None
 lucky = opts.lucky
 if opts.debug:
     logger.setLevel(logging.DEBUG)
