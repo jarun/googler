@@ -245,14 +245,15 @@ class GoogleUrl(object):
             list of currently recognized option keys with expected value
             types:
 
-                tld: str
-                news: bool
-                start: int
-                num: int
-                keywords: str or list of strs
-                lang: str
                 duration: str (GooglerArgumentParser.is_duration)
                 exact: bool
+                keywords: str or list of strs
+                lang: str
+                news: bool
+                num: int
+                site: str
+                start: int
+                tld: str
 
         Other Parameters
         ----------------
@@ -270,21 +271,6 @@ class GoogleUrl(object):
         opts.update(kwargs)
 
         qd = self._query_dict
-        if 'tld' in opts:
-            self._tld = opts['tld']
-        if 'news' in opts:
-            if opts['news']:
-                qd['tbm'] = 'nws'
-            else:
-                qd.pop('tbm', None)
-        if 'num' in opts:
-            self._num = opts['num']
-        if 'start' in opts:
-            self._start = opts['start']
-        if 'keywords' in opts:
-            self._keywords = opts['keywords']
-        if 'lang' in opts and opts['lang']:
-            qd['hl'] = opts['lang']
         if 'duration' in opts and opts['duration']:
             qd['tbs'] = 'qdr:%s' % opts['duration']
         if 'exact' in opts:
@@ -292,6 +278,23 @@ class GoogleUrl(object):
                 qd['nfpr'] = 1
             else:
                 qd.pop('nfpr', None)
+        if 'keywords' in opts:
+            self._keywords = opts['keywords']
+        if 'lang' in opts and opts['lang']:
+            qd['hl'] = opts['lang']
+        if 'news' in opts:
+            if opts['news']:
+                qd['tbm'] = 'nws'
+            else:
+                qd.pop('tbm', None)
+        if 'num' in opts:
+            self._num = opts['num']
+        if 'site' in opts:
+            self._site = opts['site']
+        if 'start' in opts:
+            self._start = opts['start']
+        if 'tld' in opts:
+            self._tld = opts['tld']
 
     def set_queries(self, **kwargs):
         """Forcefully set queries outside the normal `update` mechanism.
@@ -1770,7 +1773,7 @@ def parse_args(args=None, namespace=None):
     addarg('-t', '--time', dest='duration', type=argparser.is_duration, metavar='dN',
            help='time limit search '
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
-    addarg('-w', '--site', dest='insite', metavar='SITE',
+    addarg('-w', '--site', dest='site', metavar='SITE',
            help='search a site using Google')
     addarg('--json', dest='json', action='store_true',
            help='output in JSON format; implies --noprompt')
