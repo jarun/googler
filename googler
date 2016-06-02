@@ -1242,6 +1242,10 @@ class Result(object):
     metadata : str or None
     sitelinks : list
 
+    Class Variables
+    ---------------
+    colors : str
+
     Methods
     -------
     print()
@@ -1252,7 +1256,6 @@ class Result(object):
 
     # Class variables
     colors = None
-    columns = 0
 
     def __init__(self, index, title, url, abstract, metadata=None, sitelinks=None):
         index = str(index)
@@ -1286,7 +1289,10 @@ class Result(object):
 
     def _print_metadata_and_abstract(self, abstract, metadata=None, indent=0):
         colors = self.colors
-        columns = self.columns
+        try:
+            columns, _ = os.get_terminal_size()
+        except OSError:
+            columns = 0
 
         if metadata:
             if colors:
@@ -1571,13 +1577,6 @@ if opts.colorize:
 else:
     colors = None
 Result.colors = colors
-
-# Get terminal width
-try:
-    columns, _ = os.get_terminal_size()
-except OSError:
-    columns = 0
-Result.columns = columns
 
 # Set logging level
 if opts.debug:
