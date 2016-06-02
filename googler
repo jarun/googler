@@ -21,6 +21,7 @@ from __future__ import print_function
 import argparse
 import atexit
 import collections
+import functools
 import gzip
 import http.client
 import html.entities
@@ -72,23 +73,6 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
 # Disguise as Microsoft Edge
 USER_AGENT = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
               '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
-
-
-# Global variables
-
-# State carriers
-conn = None                 # The global connection
-google_url = None           # The URL constructor
-opts = None                 # User options
-nav = 'n'                   # User command register
-
-# Output/User interaction options
-noninteractive = False      # Non-interactive mode (option --no-prompt)
-output_format = 0           # 0: Regular (normal) output, 1: JSON output (option --json)
-lucky = False               # If True, opens the first URL in browser (option --lucky)
-
-# Cosmetic options
-colors = None               # Colors object, set after reading color settings (option --colors)
 
 
 # Global helper functions
@@ -1352,6 +1336,299 @@ class Result(object):
         return self._urltable
 
 
+class GooglerCmdException(Exception):
+    pass
+
+
+class NoKeywordsException(GooglerCmdException):
+    pass
+
+
+def require_keywords(method):
+    # Require keywords to be set before we run a GooglerCmd method. If
+    # no keywords have been set, raise a NoKeywordsException.
+    @functools.wraps(method)
+    def enforced_method(self, *args, **kwargs):
+        if not self.keywords:
+            raise NoKeywordsException('No keywords.')
+        method(self, *args, **kwargs)
+
+    return enforced_method
+
+def no_argument(method):
+    # Normalize a do_* method of GooglerCmd that takes no argument to
+    # one that takes an arg, but issue a warning when an nonempty
+    # argument is given.
+    @functools.wraps(method)
+    def enforced_method(self, arg):
+        if arg:
+            method_name = arg.__name__
+            command_name = method_name[3:] if method_name.startswith('do_') else method_name
+            logger.warn("Argument to the '%s' command ignored.", command_name)
+        method(self)
+
+    return enforced_method
+
+class GooglerCmd(object):
+    """
+    Command line interpreter and executor class for googler.
+
+    Inspired by PSL cmd.Cmd.
+
+    Parameters
+    ----------
+    opts : argparse.Namespace
+        Options and/or arguments.
+
+    Attributes
+    ----------
+    options : argparse.Namespace
+        Options that are currently in effect. Read-only attribute.
+    keywords : str or list or strs
+        Current keywords. Read-only attribute
+
+    Methods
+    -------
+    fetch()
+    display_results(prelude='\n', json_output=False)
+    fetch_and_display(prelude='\n', json_output=False, interactive=True)
+    read_next_command()
+    help()
+    cmdloop()
+    """
+
+    # Class variables
+    colors = None
+
+    def __init__(self, opts):
+        super().__init__()
+
+        self._opts = opts
+
+        self._google_url = GoogleUrl(opts)
+        self._conn = GoogleConnection(self._google_url.hostname)
+        atexit.register(self._conn.close)
+
+        self.results = []
+        self._results_filtered = False
+        self._urltable = {}
+
+    @property
+    def options(self):
+        """Current options."""
+        return self._opts
+
+    @property
+    def keywords(self):
+        """Current keywords."""
+        return self._google_url.keywords
+
+    @require_keywords
+    def fetch(self):
+        """Fetch a page and parse for results.
+
+        Results are stored in ``self.results``.
+
+        Raises
+        ------
+        GoogleConnectionError
+
+        See Also
+        --------
+        fetch_and_display
+
+        """
+        # This method also sets self._results_filtered and
+        # self._urltable.
+        page = self._conn.fetch_page(self._google_url.relative())
+
+        if logger.isEnabledFor(logging.DEBUG):
+            import tempfile
+            fd, tmpfile = tempfile.mkstemp(prefix='googler-response-')
+            os.close(fd)
+            with open(tmpfile, 'w', encoding='utf-8') as fp:
+                fp.write(page)
+            logger.debug("Response body written to '%s'.", tmpfile)
+
+        parser = GoogleParser(news=self._google_url.news)
+        parser.feed(page)
+
+        self.results = parser.results
+        self._results_filtered = parser.filtered
+        self._urltable = {}
+        for r in self.results:
+            self._urltable.update(r.urltable())
+
+    @require_keywords
+    def display_results(self, prelude='\n', json_output=False):
+        """Display results stored in ``self.results``.
+
+        Parameters
+        ----------
+        See `fetch_and_display`.
+
+        """
+        sys.stderr.write(prelude)
+        if json_output:
+            # JSON output
+            import json
+            results_object = [r.jsonizable_object() for r in self.results]
+            print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
+        else:
+            # Regular output
+            if not self.results:
+                logging.warning('No results.')
+            else:
+                for r in self.results:
+                    r.print()
+
+    @require_keywords
+    def fetch_and_display(self, prelude='\n', json_output=False, interactive=True):
+        """Fetch a page and display results.
+
+        Results are stored in ``self.results``.
+
+        Parameters
+        ----------
+        prelude : str, optional
+            A string that is written to stderr before showing actual results,
+            usually serving as a separator. Default is an empty line.
+        json_output : bool, optional
+            Whether to dump results in JSON format. Default is False.
+        interactive : bool, optional
+            Whether to show contextual instructions, when e.g. Google
+            has filtered the results. Default is True.
+
+        Raises
+        ------
+        GoogleConnectionError
+
+        See Also
+        --------
+        fetch
+        display_results
+
+        """
+        self.fetch()
+        self.display_results(prelude=prelude, json_output=json_output)
+        if self._results_filtered:
+            printerr('** Enter "unfilter" to show similar results Google omitted.')
+
+    def read_next_command(self):
+        """Show omniprompt and read user command line.
+
+        Command line is always stripped, and each consecutive group of
+        whitespace is replaced with a single space charater. If the
+        command line is empty after stripping, when ignore it and keep
+        reading. Exit with status 0 if we get EOF or an empty line
+        (pre-strip, that is, a raw <enter>) twice in a row.
+
+        The new command line (non-empty) is stored in ``self.cmd``.
+
+        """
+        colors = self.colors
+        message = 'googler (? for help)'
+        prompt = (colors.prompt + message + colors.reset + ' ') if colors else (message + ': ')
+        enter_count = 0
+        while True:
+            try:
+                cmd = input(prompt)
+            except EOFError:
+                sys.exit(0)
+
+            if not cmd:
+                enter_count += 1
+                if enter_count == 2:
+                    # Double <enter>
+                    sys.exit(0)
+            else:
+                enter_count = 0
+
+            cmd = re.sub(r'\s+', ' ', cmd.strip())
+            if cmd:
+                self.cmd = cmd
+                break
+
+    @staticmethod
+    def help():
+        GooglerArgumentParser.print_omniprompt_help(sys.stderr)
+        printerr('')
+
+    @require_keywords
+    @no_argument
+    def do_first(self):
+        self._google_url.first_page()
+        self.fetch_and_display()
+
+    def do_google(self, arg):
+        # Update keywords and reconstruct URL
+        self._opts.keywords = arg
+        self._google_url = GoogleUrl(self._opts)
+        self.fetch_and_display()
+
+    @require_keywords
+    @no_argument
+    def do_next(self):
+        self._google_url.next_page()
+        self.fetch_and_display()
+
+    @require_keywords
+    @no_argument
+    def do_open(self):
+        open_url(self._google_url.full())
+
+    @require_keywords
+    @no_argument
+    def do_previous(self):
+        self._google_url.prev_page()
+        self.fetch_and_display()
+
+    @require_keywords
+    @no_argument
+    def do_unfilter(self):
+        self._google_url.set_queries(filter=0)
+        self.fetch_and_display()
+
+    def cmdloop(self):
+        """Run REPL."""
+        if self.keywords:
+            self.fetch_and_display()
+        while True:
+            self.read_next_command()
+            # TODO: Automatic dispatcher
+            #
+            # We can't write a dispatcher for now because that could
+            # change behaviors of the prompt. However, we have already
+            # laid a lot of ground work for the dispatcher, e.g., the
+            # `no_argument' decorator.
+            try:
+                cmd = self.cmd
+                if cmd == 'f':
+                    self.do_first('')
+                elif cmd.startswith('g '):
+                    self.do_google(cmd[2:])
+                elif cmd == 'n':
+                    self.do_next('')
+                elif cmd == 'o':
+                    self.do_open('')
+                elif cmd == 'p':
+                    self.do_previous('')
+                elif cmd == 'q':
+                    break
+                elif cmd == 'unfilter':
+                    self.do_unfilter('')
+                elif cmd == '?':
+                    self.help()
+                elif cmd in self._urltable:
+                    open_url(self._urltable[cmd])
+                elif cmd.isdigit() and int(cmd) < 100:
+                    printerr('Index out of bound. To search for the number, use g.')
+                else:
+                    self.do_google(cmd)
+            except NoKeywordsException:
+                printerr('Initiate a query first.')
+
+
 class GooglerArgumentParser(argparse.ArgumentParser):
     """Custom argument parser for googler."""
 
@@ -1442,223 +1719,116 @@ class GooglerArgumentParser(argparse.ArgumentParser):
         return arg
 
 
-# Functions
+# Miscellaneous functions
 
-def fetch_results():
-    """Connect to server and fetch results"""
+def parse_args(args=None, namespace=None):
+    """Parse googler arguments/options.
 
-    global conn
-    global google_url
-    global lucky
+    Parameters
+    ----------
+    args : list, optional
+        Arguments to parse. Default is ``sys.argv``.
+    namespace : argparse.Namespace
+        Namespace to write to. Default is a new namespace.
 
-    try:
-        page = conn.fetch_page(google_url.relative())
-    except GoogleConnectionError as e:
-        logger.error(e)
+    Returns
+    -------
+    argparse.Namespace
+        Namespace with parsed arguments / options.
+
+    """
+
+    colorstr_env = os.getenv('GOOGLER_COLORS')
+
+    argparser = GooglerArgumentParser(
+        add_help=False,
+        description='Google from the command-line.'
+    )
+    addarg = argparser.add_argument
+    addarg('-s', '--start', dest='start', type=argparser.nonnegative_int,
+           default=0, metavar='N',
+           help='start at the Nth result')
+    addarg('-n', '--count', dest='num', type=argparser.positive_int,
+           default=10, metavar='N',
+           help='show N results (default 10)')
+    addarg('-N', '--news', dest='news', action='store_true',
+           help='show results from news section')
+    addarg('-c', '--tld', dest='tld', metavar='TLD',
+           help="""country-specific search with top-level domain .TLD, e.g., 'in'
+           for India. Ref: https://en.wikipedia.org/wiki/List_of_Google_domains""")
+    addarg('-l', '--lang', dest='lang', metavar='LANG',
+           help='display in language LANG')
+    addarg('-x', '--exact', dest='exact', action='store_true',
+           help='disable automatic spelling correction')
+    addarg('-C', '--nocolor', dest='colorize', action='store_false',
+           help='disable color output')
+    addarg('--colors', dest='colorstr', type=argparser.is_colorstr,
+           default=colorstr_env if colorstr_env else 'GKlxxy', metavar='COLORS',
+           help='set output colors (see man page for details)')
+    addarg('-j', '--first', '--lucky', dest='lucky', action='store_true',
+           help='open the first result in a web browser; implies --noprompt')
+    addarg('-t', '--time', dest='duration', type=argparser.is_duration, metavar='dN',
+           help='time limit search '
+           '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
+    addarg('-w', '--site', dest='insite', metavar='SITE',
+           help='search a site using Google')
+    addarg('--json', dest='json', action='store_true',
+           help='output in JSON format; implies --noprompt')
+    addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
+           help='perform search and exit, do not prompt for further interactions')
+    addarg('-d', '--debug', dest='debug', action='store_true',
+           help='enable debugging')
+    addarg('keywords', nargs='+', metavar='KEYWORD',
+           help='search keywords')
+    return argparser.parse_args(args, namespace)
+
+
+def main():
+    if len(sys.argv) < 2:
+        GooglerArgumentParser.print_help(sys.stderr)
         sys.exit(1)
 
-    if logger.isEnabledFor(logging.DEBUG):
-        import tempfile
-        fd, tmpfile = tempfile.mkstemp(prefix='googler-response-')
-        os.close(fd)
-        with open(tmpfile, 'w', encoding='utf-8') as fp:
-            fp.write(page)
-        logger.debug("Response body written to '%s'.", tmpfile)
+    logger.debug('Version %s', _VERSION_)
 
-    parser = GoogleParser(news=google_url.news)
-    parser.feed(page)
+    opts = parse_args()
 
-    results = parser.results
-    filtered = parser.filtered
-    urltable = {}
-    if results and not noninteractive: # print a newline for more clarity
-        printerr('')
+    # Set logging level
+    if opts.debug:
+        logger.setLevel(logging.DEBUG)
 
-    if lucky:
-        if results:
-            open_url(results[0].url)
-        else:
-            logging.warning('No results.')
-        sys.exit(0)
+    # Set colors
+    if opts.colorize:
+        colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
+    else:
+        colors = None
+    Result.colors = colors
+    GooglerCmd.colors = colors
 
-    if output_format == 0: # Regular output
-        if not results:
-            logging.warning('No results.')
-        for r in results:
-            r.print()
-            urltable.update(r.urltable())
-        if filtered:
-            printerr('** Enter "unfilter" to show similar results Google omitted.')
-    elif output_format == 1: # JSON output
-        import json
-        results_object = [r.jsonizable_object() for r in results]
-        print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
-
-    return results, urltable, filtered
-
-
-def read_next_command():
-    """Show omniprompt and read user command."""
-
-    global colors
-
-    message = 'googler (? for help)'
-    prompt = (colors.prompt + message + colors.reset + ' ') if colors else (message + ': ')
     try:
-        return input(prompt)
-    except EOFError:
-        sys.exit(0)
+        repl = GooglerCmd(opts)
 
-
-# Program Main
-
-# Retrieve GOOGLER_COLORS
-colorstr_env = os.getenv('GOOGLER_COLORS')
-
-argparser = GooglerArgumentParser(
-    add_help=False,
-    description='Google from the command-line.'
-)
-addarg = argparser.add_argument
-addarg('-s', '--start', dest='start', type=GooglerArgumentParser.nonnegative_int,
-       default=0, metavar='N',
-       help='start at the Nth result')
-addarg('-n', '--count', dest='num', type=GooglerArgumentParser.positive_int,
-       default=10, metavar='N',
-       help='show N results (default 10)')
-addarg('-N', '--news', dest='news', action='store_true',
-       help='show results from news section')
-addarg('-c', '--tld', dest='tld', metavar='TLD',
-       help="""country-specific search with top-level domain .TLD, e.g., 'in'
-       for India. Ref: https://en.wikipedia.org/wiki/List_of_Google_domains""")
-addarg('-l', '--lang', dest='lang', metavar='LANG',
-       help='display in language LANG')
-addarg('-x', '--exact', dest='exact', action='store_true',
-       help='disable automatic spelling correction')
-addarg('-C', '--nocolor', dest='colorize', action='store_false',
-       help='disable color output')
-addarg('--colors', dest='colorstr', type=GooglerArgumentParser.is_colorstr,
-       default=colorstr_env if colorstr_env else 'GKlxxy', metavar='COLORS',
-       help='set output colors (see man page for details)')
-addarg('-j', '--first', '--lucky', dest='lucky', action='store_true',
-       help='open the first result in a web browser')
-addarg('-t', '--time', dest='duration', type=GooglerArgumentParser.is_duration, metavar='dN',
-       help='time limit search '
-       '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
-addarg('-w', '--site', dest='insite', metavar='SITE',
-       help='search a site using Google')
-addarg('--json', dest='json', action='store_true',
-       help='output in JSON format; implies --noprompt')
-addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
-       help='perform search and exit, do not prompt for further interactions')
-addarg('-d', '--debug', dest='debug', action='store_true',
-       help='enable debugging')
-addarg('keywords', nargs='+', metavar='KEYWORD',
-       help='search keywords')
-
-if len(sys.argv) < 2:
-    argparser.print_help(sys.stderr)
-    sys.exit(1)
-
-opts = argparser.parse_args()
-
-# Set output/user interaction options
-noninteractive = opts.noninteractive
-if opts.lucky:
-    lucky = True
-    noninteractive = True
-if opts.json:
-    output_format = 1
-    noninteractive = True
-
-# Set colors
-if opts.colorize:
-    colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
-else:
-    colors = None
-Result.colors = colors
-
-# Set logging level
-if opts.debug:
-    logger.setLevel(logging.DEBUG)
-
-google_url = GoogleUrl(opts)
-
-logger.debug('Version %s', _VERSION_)
-
-try:
-    conn = GoogleConnection(google_url.hostname)
-    atexit.register(conn.close)
-except GoogleConnectionError as e:
-    logger.error(e)
-    sys.exit(1)
-
-results = []
-urltable = {}
-while True:
-    if nav in {'n', 'p', 'f', 'g'}:
-        results, urltable, filtered = fetch_results()
-
-    if noninteractive:
-        sys.exit(0)
-
-    nav = read_next_command()
-    if not nav:
-        nav = read_next_command()
-        if not nav:
-            # Two consecutive enters
+        if opts.json or opts.lucky or opts.noninteractive:
+            # Non-interactive mode
+            repl.fetch()
+            if opts.lucky:
+                if repl.results:
+                    open_url(repl.results[0].url)
+                else:
+                    logging.warning('No results.')
+            else:
+                repl.display_results(prelude='', json_output=opts.json)
             sys.exit(0)
-
-    nav = re.sub(r'\s+', ' ', nav).strip()
-    if nav == 'n':
-        if not results:
-            # No results, probably at the last page already
-            nav = ''
         else:
-            google_url.next_page()
-    elif nav == 'p':
-        try:
-            google_url.prev_page()
-        except ValueError as e:
-            # Already at the first page
-            printerr(e)
-            nav = ''
-    elif nav == 'f':
-        try:
-            google_url.first_page()
-        except ValueError as e:
-            # Already at the first page
-            printerr(e)
-            nav = ''
-    elif nav == 'o':
-        open_url(google_url.full())
-    elif nav == 'q':
-        break
-    elif nav == '?':
-        GooglerArgumentParser.print_omniprompt_help(sys.stderr)
-        printerr('')
-    elif nav.startswith('g '):
-        keywords = nav[2:].strip()
-        if not keywords:
-            nav = ''
-            continue
-        # Replace keywords in opts and reconstruct URL from scratch
-        opts.keywords = keywords
-        google_url = GoogleUrl(opts)
-        nav = 'g'
-    elif nav in urltable:
-        open_url(urltable[nav])
-    elif nav.isdigit() and int(nav) < 100:
-        printerr('Index out of bound. To search for the number, use g.')
-    elif filtered and nav == 'unfilter':
-        google_url.set_queries(filter=0)
-        nav = 'g'
-    elif nav:
-        keywords = nav.strip()
-        if not keywords:
-            nav = ''
-            continue
-        # Replace keywords in opts and reconstruct URL from scratch
-        opts.keywords = keywords
-        google_url = GoogleUrl(opts)
-        nav = 'g'
+            # Interactive mode
+            repl.cmdloop()
+    except Exception as e:
+        # If debugging mode is enabled, let the exception through for a traceback;
+        # otherwise, only print the exception error message.
+        if logger.isEnabledFor(logging.DEBUG):
+            raise
+        else:
+            logger.error(e)
+            sys.exit(1)
+
+if __name__ == '__main__':
+    main()
