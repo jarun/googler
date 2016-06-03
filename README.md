@@ -205,12 +205,12 @@ X      | bold
 y      | reverse video
 Y      | bold reverse video
 
-The default colors string is `GKlxxy`, which stands for
+The default colors string is `GKlgxy`, which stands for
 
 - bold bright cyan indices
 - bold bright green titles
 - bright yellow URLs
-- normal metadata/publishing info
+- cyan metadata/publishing info
 - normal abstracts
 - reverse video prompts
 

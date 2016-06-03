@@ -1134,7 +1134,7 @@ addarg('-x', '--exact', dest='exact', action='store_true',
        help='disable automatic spelling correction')
 addarg('-C', '--nocolor', dest='colorize', action='store_false',
        help='disable color output')
-addarg('--colors', dest='colorstr', default=colorstr_env if colorstr_env else 'GKlxxy',
+addarg('--colors', dest='colorstr', default=colorstr_env if colorstr_env else 'GKlgxy',
        type=is_colorstr, metavar='COLORS',
        help='set output colors (see man page for details)')
 addarg('-j', '--first', '--lucky', dest='lucky', action='store_true',
