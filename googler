@@ -233,14 +233,14 @@ class GoogleParser(html.parser.HTMLParser):
     #   - pop_textbuf(self) -> str
     #   - stop_populating_textbuf(self) -> None
     #
-    # - Outermost starttag and endtag handler methods: main_*. The whole
+    # - Outermost starttag and endtag handler methods: root_*. The whole
     #   parser starts and ends in this state.
     #
     # - Each result is wrapped in a <div> tag with class "g".
     #
-    #   <!-- within the scope of main_* -->
+    #   <!-- within the scope of root_* -->
     #   <div class="g">  <!-- annotate as 'result', hand over to result_* -->
-    #   </div>           <!-- hand back to main_*, register result -->
+    #   </div>           <!-- hand back to root_*, register result -->
     #
     # - For each result, the first <h3> tag with class "r" contains the
     #   hyperlinked title, and the (optional) first <div> tag with class
@@ -358,7 +358,7 @@ class GoogleParser(html.parser.HTMLParser):
     #   attributes to be considered a match for the selector.
     #
     #   When a match is found, the tag is annotated as SCOPE_ignored,
-    #   where SCOPE is the current handler scope (e.g., main, result,
+    #   where SCOPE is the current handler scope (e.g., root, result,
     #   title, etc.), and the scope is switched to 'ignore'. All
     #   descendants of the tag are ignored. When the corresponding end
     #   tag is finally reach, the former scope is restored.
@@ -373,7 +373,7 @@ class GoogleParser(html.parser.HTMLParser):
         self.textbuf = ''
         self.tag_annotations = {}
 
-        self.set_handlers_to('main')
+        self.set_handlers_to('root')
 
     ### Ignore list ###
     IGNORE_LIST = [
@@ -389,7 +389,7 @@ class GoogleParser(html.parser.HTMLParser):
     ### Tag handlers ###
 
     @annotate_tag
-    def main_start(self, tag, attrs):
+    def root_start(self, tag, attrs):
         # We omit "card" results which usually have a class list along
         # the line of "g mnr-c g-blk".
         if tag == 'div' and attrs.get('class') == 'g':
@@ -415,7 +415,7 @@ class GoogleParser(html.parser.HTMLParser):
             self.filtered = True
 
     @retrieve_tag_annotation
-    def main_end(self, tag, annotation):
+    def root_end(self, tag, annotation):
         pass
 
     @annotate_tag
@@ -452,7 +452,7 @@ class GoogleParser(html.parser.HTMLParser):
                                 metadata=self.metadata if self.metadata else None,
                                 sitelinks=self.sitelinks)
                 self.results.append(result)
-            self.set_handlers_to('main')
+            self.set_handlers_to('root')
         elif annotation == 'news_metadata':
             self.stop_populating_textbuf()
             self.metadata = self.pop_textbuf()
