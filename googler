@@ -495,9 +495,10 @@ class GoogleConnection(object):
 
     """
 
-    def __init__(self, host, port=None, timeout=45):
+    def __init__(self, host, port=None, timeout=45, proxy=None):
         self._host = None
         self._port = None
+        self._proxy = proxy
         self._conn = None
         self.new_connection(host, port=port, timeout=timeout)
 
@@ -522,16 +523,35 @@ class GoogleConnection(object):
         """
         if self._conn:
             self._conn.close()
+
         if not host:
             host = self._host
             port = self._port
         self._host = host
         self._port = port
-        logger.debug('Connecting to new host [%s]', host)
-        try:
+        host_display = host + (':%d' % port if port else '')
+
+        proxy = self._proxy
+        if proxy:
+            logger.debug('Connecting to proxy server %s', proxy)
+            self._conn = http.client.HTTPSConnection(proxy, timeout=timeout)
+
+            logger.debug('Tunneling to host %s' % host_display)
+            self._conn.set_tunnel(host, port=port)
+
+            try:
+                self._conn.connect()
+            except Exception as e:
+                msg = 'Failed to connect to proxy server %s: %s.' % (proxy, e)
+                raise GoogleConnectionError(msg)
+        else:
+            logger.debug('Connecting to new host %s', host_display)
             self._conn = http.client.HTTPSConnection(host, port=port, timeout=timeout)
-        except http.client.HTTPException as e:
-            raise GoogleConnectionError('Failed to connect to %s: %s.' % (host, e))
+            try:
+                self._conn.connect()
+            except Exception as e:
+                msg = 'Failed to connect to %s: %s.' % (host_display, e)
+                raise GoogleConnectionError(msg)
 
     def renew_connection(self, timeout=45):
         """Renew current connection.
@@ -611,7 +631,7 @@ class GoogleConnection(object):
         GoogleConnectionError
 
         """
-        logger.debug('Redirecting to URL [%s]', url)
+        logger.debug('Redirecting to URL %s', url)
         segments = urllib.parse.urlparse(url)
 
         host = segments.netloc
@@ -641,7 +661,7 @@ class GoogleConnection(object):
         http.client.HTTPException
 
         """
-        logger.debug('Fetching URL [%s]', url)
+        logger.debug('Fetching URL %s', url)
         self._conn.request('GET', url, None, {
             'Accept-Encoding': 'gzip',
             'User-Agent': USER_AGENT,
@@ -1409,7 +1429,8 @@ class GooglerCmd(object):
         self._opts = opts
 
         self._google_url = GoogleUrl(opts)
-        self._conn = GoogleConnection(self._google_url.hostname)
+        proxy = opts.proxy if hasattr(opts, 'proxy') else None
+        self._conn = GoogleConnection(self._google_url.hostname, proxy=proxy)
         atexit.register(self._conn.close)
 
         self.results = []
@@ -1775,6 +1796,8 @@ def parse_args(args=None, namespace=None):
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
     addarg('-w', '--site', dest='site', metavar='SITE',
            help='search a site using Google')
+    addarg('-p', '--proxy', dest='proxy',
+           help='tunnel traffic through an HTTPS proxy (HOST:PORT)')
     addarg('--json', dest='json', action='store_true',
            help='output in JSON format; implies --noprompt')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
