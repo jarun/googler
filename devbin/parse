@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+
+"""Parse saved responses with GoogleParser."""
+
+import argparse
+import json
+
+import googler
+
+def main():
+    argparser = argparse.ArgumentParser(description='Parse Google responses.')
+    argparser.add_argument('-N', '--news', action='store_true',
+                           help='parse as Google News responses')
+    argparser.add_argument('files', nargs='+', metavar='FILE',
+                           help="HTML file with Google's response body")
+    args = argparser.parse_args()
+    for fn in args.files:
+        with open(fn, encoding='utf-8') as fp:
+            htmlparser = googler.GoogleParser(news=args.news)
+            htmlparser.feed(fp.read())
+            results_object = [r.jsonizable_object() for r in htmlparser.results]
+            print(json.dumps(results_object, indent=2, sort_keys=True, ensure_ascii=False))
+
+if __name__ == '__main__':
+    main()
