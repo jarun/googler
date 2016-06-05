@@ -56,14 +56,14 @@ if [[ -n $CI_SKIP_TEST ]]; then
 fi
 
 # Diff HEAD against a base commit to see if the changes are worth
-# testing. (This check is kkipped entirely if the CI_FORCE_TEST environment
+# testing. (This check is skipped entirely if the CI_FORCE_TEST environment
 # variable is set and non-nil.)
 #
 # * For a regular branch, diff against HEAD^;
 # * For a PR branch, diff against the merge base of HEAD and master.
 #
 # Currently we use $TRAVIS_PULL_REQUEST to determine whether we're building a
-# PR branch. Other criterions may be added if we ever expand to other CIs.
+# PR branch. Other criteria may be added if we ever expand to other CIs.
 
 if [[ -z $CI_FORCE_TEST ]]; then
     printf 'We are watching the following paths:\n' >&2

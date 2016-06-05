@@ -248,7 +248,7 @@ License: GPL-3
  this program.  If not, see <http://www.gnu.org/licenses/>.
  .
  On Debian systems, the full text of the GNU General Public License version 3
- can be found in the file \`/usr/share/common-licenses/GPL-3'.
+ can be found in the file '/usr/share/common-licenses/GPL-3'.
 EOF
 
 # Write debian/rules
