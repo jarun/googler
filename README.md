@@ -4,7 +4,7 @@
 <a href="https://github.com/jarun/googler/releases/latest"><img src="https://img.shields.io/github/release/jarun/googler.svg" alt="Latest release" /></a>
 <a href="https://aur.archlinux.org/packages/googler"><img src="https://img.shields.io/aur/version/googler.svg" alt="AUR" /></a>
 <a href="http://braumeister.org/formula/googler"><img src="https://img.shields.io/homebrew/v/googler.svg" alt="Homebrew" /></a>
-<a href="https://github.com/jarun/googler/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPLv3-yellow.svg?maxAge=2592000" alt="License" /></a>
+<a href="https://github.com/jarun/googler/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-yellow.svg?maxAge=2592000" alt="License" /></a>
 <a href="https://travis-ci.org/jarun/googler"><img src="https://travis-ci.org/jarun/googler.svg?branch=master" alt="Build Status" /></a>
 </p>
 
@@ -297,14 +297,13 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
 # Developers
 
-1. Copyright (C) 2008 Henri Hakkinen
-2. Copyright (C) 2015-2016 [Arun Prakash Jana](mailto:engineerarun@gmail.com)
-3. [Zhiming Wang](https://github.com/zmwangx)
+1. Copyright (C) 2015-2016 [Arun Prakash Jana](mailto:engineerarun@gmail.com)
+2. Copyright (C) 2016 [Zhiming Wang](https://github.com/zmwangx)
 
-Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https://github.com/shaggytwodope) and [Narrat](https://github.com/Narrat) for their contributions and efforts in spreading `googler`.
+Special thanks to [Henri Häkkinen](https://github.com/henux) for the original [`cli-google`](https://github.com/henux/cli-google) project (see the [Notes](#notes) section) and [all other contributors](https://github.com/jarun/googler/graphs/contributors).
 
 # Notes
 
-1. Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author [Henri Hakkinen](https://github.com/henux) in past year. I have created this independent repo for the project with the name `googler`. I retained the original copyright information.
+1. This project was originally forked from [Henri Häkkinen](https://github.com/henux)'s [`cli-google`](https://github.com/henux/cli-google). It has since been completely rewritten.
 
 2. Google provides a search API which returns the results in JSON format. However, as per my understanding from the [official docs](https://developers.google.com/custom-search/json-api/v1/overview), the API issues the queries against an existing instance of a custom search engine and is limited by 100 search queries per day for free. In addition, I have reservations in paying if they ever change their plan or restrict the API in other ways. So I refrained from coupling with Google plans & policies or exposing my trackable personal custom search API key and identifier for the public. I retained the browser-way of doing it by fetching html, which is a open and free specification.
