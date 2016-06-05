@@ -44,6 +44,9 @@ Time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 y
 .BI "-w, --site=" SITE
 Search a site using Google.
 .TP
+.BI "-p, --proxy=" PROXY
+Tunnel traffic through an HTTPS proxy. \fIPROXY\fR is of the form \fIHOST:PORT\fR. The proxy server must support HTTP CONNECT tunneling and must not block port 443 for the relevant Google hosts.
+.TP
 .BI "--json"
 Output in JSON format; implies \fB--noprompt\fR.
 .TP
@@ -286,6 +289,13 @@ Use a \fBcustom color scheme\fR, e.g., one warm color scheme designed for Solari
 .B googler --colors bjdxxy google
 .IP
 .B GOOGLER_COLORS=bjdxxy googler google
+.EE
+.IP 15. 4
+Tunnel traffic through an \fBHTTPS proxy\fR, e.g., a local Privoxy instance listening on port 8118:
+.PP
+.EX
+.IP
+.B googler --proxy localhost:8118 google
 .EE
 .PP
 .SH AUTHORS

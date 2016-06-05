@@ -52,6 +52,7 @@ Find `googler` useful? If you would like to donate, visit the
 - Supports Google search keywords like `filetype:mime`, `site:somesite.com` etc.
 - Optionally open the first result directly in browser (as in *I'm Feeling Lucky*)
 - Non-stop searches: fire new searches at omniprompt without exiting
+- Proxy support
 - Man page with examples, shell completion scripts for Bash, Zsh and Fish
 - Minimal dependencies
 
@@ -136,6 +137,8 @@ Please substitute `$version` with the appropriate package version.
       -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
                             weeks), m5 (5 months), y5 (5 years)]
       -w SITE, --site SITE  search a site using Google
+      -p PROXY, --proxy PROXY
+                            tunnel traffic through an HTTPS proxy (HOST:PORT)
       --json                output in JSON format; implies --noprompt
       --np, --noprompt      perform search and exit, do not prompt for further
                             interactions
@@ -286,7 +289,11 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
         $ googler --colors bjdxxy google
         $ GOOGLER_COLORS=bjdxxy googler google
 
-15. More **help**:
+15. Tunnel traffic through an **HTTPS proxy**, e.g., a local Privoxy instance listening on port 8118:
+
+        $ googler --proxy localhost:8118 google
+
+16. More **help**:
 
         $ googler
         $ man googler
