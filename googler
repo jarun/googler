@@ -1617,6 +1617,9 @@ class GooglerCmd(object):
         """Run REPL."""
         if self.keywords:
             self.fetch_and_display()
+        else:
+            printerr('Please initiate a query.')
+
         while True:
             self.read_next_command()
             # TODO: Automatic dispatcher
@@ -1645,7 +1648,7 @@ class GooglerCmd(object):
                     self.help()
                 elif cmd in self._urltable:
                     open_url(self._urltable[cmd])
-                elif cmd.isdigit() and int(cmd) < 100:
+                elif self.keywords and cmd.isdigit() and int(cmd) < 100:
                     printerr('Index out of bound. To search for the number, use g.')
                 else:
                     self.do_google(cmd)
@@ -1659,6 +1662,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
     # Print omniprompt help
     @staticmethod
     def print_omniprompt_help(file=None):
+        file = sys.stderr if file is None else file
         file.write(textwrap.dedent("""
         omniprompt keys:
           n, p                  fetch the next or previous set of search results
@@ -1674,6 +1678,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
     # Print information on googler
     @staticmethod
     def print_general_info(file=None):
+        file = sys.stderr if file is None else file
         file.write(textwrap.dedent("""
         Version %s
         Copyright (C) 2008 Henri Hakkinen
@@ -1764,10 +1769,7 @@ def parse_args(args=None, namespace=None):
 
     colorstr_env = os.getenv('GOOGLER_COLORS')
 
-    argparser = GooglerArgumentParser(
-        add_help=False,
-        description='Google from the command-line.'
-    )
+    argparser = GooglerArgumentParser(description='Google from the command-line.')
     addarg = argparser.add_argument
     addarg('-s', '--start', dest='start', type=argparser.nonnegative_int,
            default=0, metavar='N',
@@ -1804,16 +1806,12 @@ def parse_args(args=None, namespace=None):
            help='perform search and exit, do not prompt for further interactions')
     addarg('-d', '--debug', dest='debug', action='store_true',
            help='enable debugging')
-    addarg('keywords', nargs='+', metavar='KEYWORD',
+    addarg('keywords', nargs='*', metavar='KEYWORD',
            help='search keywords')
     return argparser.parse_args(args, namespace)
 
 
 def main():
-    if len(sys.argv) < 2:
-        GooglerArgumentParser.print_help(sys.stderr)
-        sys.exit(1)
-
     logger.debug('Version %s', _VERSION_)
 
     opts = parse_args()

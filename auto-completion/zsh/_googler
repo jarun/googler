@@ -9,6 +9,7 @@
 setopt localoptions noshwordsplit noksharrays
 local -a args
 args=(
+    '(- : *)'{-h,--help}'[show help text and exit]'
     '(-c --tld)'{-c,--tld}'[country-specific search with top-level domain]:top level domain without dot'
     '(-C --nocolor --colors)'{-C,--nocolor}'[disable color output]'
     '(-C --nocolor)--colors[set output colors]:six-letter string'

@@ -4,6 +4,7 @@
 # Author:
 #   Arun Prakash Jana <engineerarun@gmail.com>
 #
+complete -c googler -s h -l help           --description 'show help text and exit'
 complete -c googler -s s -l start  -r      --description 'start at the Nth result'
 complete -c googler -s n -l count  -r      --description 'show specified number of results (default 10)'
 complete -c googler -s N -l news           --description 'show results from news section'
