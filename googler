@@ -603,6 +603,7 @@ class GoogleConnection(object):
             if 'sorry/IndexRedirect?' in redirection_url:
                 raise GoogleConnectionError('Connection blocked due to unusual activity.')
             self._redirect(redirection_url)
+            resp = self._resp
 
         if resp.status != 200:
             raise GoogleConnectionError('Got HTTP %d: %s' % (resp.status, resp.reason))
