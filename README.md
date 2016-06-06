@@ -122,6 +122,7 @@ Please substitute `$version` with the appropriate package version.
       KEYWORD               search keywords
 
     optional arguments:
+      -h, --help            show this help message and exit
       -s N, --start N       start at the Nth result
       -n N, --count N       show N results (default 10)
       -N, --news            show results from news section
