@@ -975,9 +975,9 @@ class GoogleParser(html.parser.HTMLParser):
 
     @annotate_tag
     def root_start(self, tag, attrs):
-        # We omit "card" results which usually have a class list along
-        # the line of "g mnr-c g-blk".
-        if tag == 'div' and attrs.get('class') == 'g':
+        # We omit Google's "smart card" results (term coined by me) by
+        # guarding against the 'g-blk' class (sample response: https://git.io/voJgB)
+        if tag == 'div' and 'g' in self.classes(attrs) and 'g-blk' not in self.classes(attrs):
             # Initialize result field registers
             self.title = ''
             self.url = ''
