@@ -1622,6 +1622,7 @@ class GooglerCmd(object):
     @require_keywords
     @no_argument
     def do_unfilter(self):
+        self._google_url._start = 0
         self._google_url.set_queries(filter=0)
         self.fetch_and_display()
 
