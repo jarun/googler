@@ -1493,7 +1493,6 @@ class GooglerCmd(object):
         See `fetch_and_display`.
 
         """
-        sys.stderr.write(prelude)
         if json_output:
             # JSON output
             import json
@@ -1502,8 +1501,9 @@ class GooglerCmd(object):
         else:
             # Regular output
             if not self.results:
-                logging.warning('No results.')
+                print('No results.', file=sys.stderr)
             else:
+                sys.stderr.write(prelude)
                 for r in self.results:
                     r.print()
 
@@ -1605,7 +1605,12 @@ class GooglerCmd(object):
     @require_keywords
     @no_argument
     def do_previous(self):
-        self._google_url.prev_page()
+        try:
+            self._google_url.prev_page()
+        except ValueError as e:
+            print(e, file=sys.stderr)
+            return
+
         self.fetch_and_display()
 
     @require_keywords
@@ -1839,7 +1844,7 @@ def main():
                 if repl.results:
                     open_url(repl.results[0].url)
                 else:
-                    logging.warning('No results.')
+                    print('No results.', file=sys.stderr)
             else:
                 repl.display_results(prelude='', json_output=opts.json)
             sys.exit(0)
