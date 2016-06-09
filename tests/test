@@ -136,13 +136,14 @@ for tld in com ar au be br ca ch cz de es 'fi' fr id 'in' it jp kr mx nl ph pl p
 done >"$config_list"
 
 declare num_rand_configs
-num_rand_configs=100
+num_rand_configs=$NUM_TEST_ITERATIONS
 counter=0
 while read -r args; do
     (( counter++ )) || :
     printf '\033[32mTest %d/%d\033[0m' $counter $num_rand_configs >&2
     (( quiet && !ci )) && printf '\r' >&2 || printf '\n' >&2
     test_googler $args # explicit word splitting here, yes
+    sleep $SLEEP_DURATION
 done < <(shuf -n $num_rand_configs "$config_list")
 
 (( exitcode )) || printf '\033[K\033[32mAll passed.\033[0m\n'
