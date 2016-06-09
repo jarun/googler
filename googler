@@ -501,6 +501,7 @@ class GoogleConnection(object):
         self._proxy = proxy
         self._conn = None
         self.new_connection(host, port=port, timeout=timeout)
+        self.cookie = ''
 
     @property
     def host(self):
@@ -666,8 +667,13 @@ class GoogleConnection(object):
         self._conn.request('GET', url, None, {
             'Accept-Encoding': 'gzip',
             'User-Agent': USER_AGENT,
+            'Cookie': self.cookie,
         })
         self._resp = self._conn.getresponse()
+        if self.cookie == '':
+            complete_cookie = self._resp.getheader('Set-Cookie')
+            self.cookie = complete_cookie[:complete_cookie.find(';')]
+            logger.debug('Cookie: %s' % self.cookie)
 
     def close(self):
         """Close the connection (if one is active)."""
