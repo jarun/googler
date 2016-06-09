@@ -672,8 +672,10 @@ class GoogleConnection(object):
         self._resp = self._conn.getresponse()
         if self.cookie == '':
             complete_cookie = self._resp.getheader('Set-Cookie')
-            self.cookie = complete_cookie[:complete_cookie.find(';')]
-            logger.debug('Cookie: %s' % self.cookie)
+            # Cookie won't be available is already blocked
+            if complete_cookie is not None:
+                self.cookie = complete_cookie[:complete_cookie.find(';')]
+                logger.debug('Cookie: %s' % self.cookie)
 
     def close(self):
         """Close the connection (if one is active)."""
