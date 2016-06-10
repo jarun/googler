@@ -25,11 +25,12 @@ import functools
 import gzip
 import html.entities
 import html.parser
-import http.client
+from http.client import HTTPSConnection
+import socket
+import ssl
 import io
 import logging
 import os
-import re
 import signal
 import sys
 import textwrap
@@ -105,6 +106,32 @@ def printerr(msg):
 
 
 # Classes
+
+class TLS1_2Connection(HTTPSConnection):
+    """Overrides HTTPSConnection.connect to specify TLS version
+
+    NOTE: TLS 1.2 is supported from Python 3.4
+    """
+
+    def __init__(self, host, **kwargs):
+        HTTPSConnection.__init__(self, host, **kwargs)
+
+    def connect(self):
+        if sys.version_info >= (3,4):
+            sock = socket.create_connection((self.host, self.port),
+                    self.timeout, self.source_address)
+            sock.setsockopt(socket.SOL_TCP, socket.TCP_DEFER_ACCEPT, 1)
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
+            sock.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,524288)
+            if getattr(self, '_tunnel_host', None):
+                self.sock = sock
+                self._tunnel()
+
+            # Use TLS 1.2
+            self.sock = ssl.wrap_socket(sock, self.key_file, self.cert_file,
+                    ssl_version=ssl.PROTOCOL_TLSv1_2)
+        else:
+            HTTPSConnection.connect(self)
 
 class GoogleUrl(object):
     """
@@ -535,7 +562,7 @@ class GoogleConnection(object):
         proxy = self._proxy
         if proxy:
             logger.debug('Connecting to proxy server %s', proxy)
-            self._conn = http.client.HTTPSConnection(proxy, timeout=timeout)
+            self._conn = TLS1_2Connection(proxy, timeout=timeout)
 
             logger.debug('Tunneling to host %s' % host_display)
             self._conn.set_tunnel(host, port=port)
@@ -547,7 +574,7 @@ class GoogleConnection(object):
                 raise GoogleConnectionError(msg)
         else:
             logger.debug('Connecting to new host %s', host_display)
-            self._conn = http.client.HTTPSConnection(host, port=port, timeout=timeout)
+            self._conn = TLS1_2Connection(host, port=port, timeout=timeout)
             try:
                 self._conn.connect()
             except Exception as e:
@@ -668,6 +695,7 @@ class GoogleConnection(object):
             'Accept-Encoding': 'gzip',
             'User-Agent': USER_AGENT,
             'Cookie': self.cookie,
+            'Connection': 'keep-alive',
         })
         self._resp = self._conn.getresponse()
         if self.cookie == '':
@@ -1577,7 +1605,7 @@ class GooglerCmd(object):
             else:
                 enter_count = 0
 
-            cmd = re.sub(r'\s+', ' ', cmd.strip())
+            cmd = ' '.join(cmd.split())
             if cmd:
                 self.cmd = cmd
                 break
