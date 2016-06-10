@@ -1602,8 +1602,13 @@ class GooglerCmd(object):
     @require_keywords
     @no_argument
     def do_next(self):
-        self._google_url.next_page()
-        self.fetch_and_display()
+        # If > 5 results are being fetched each time,
+        # block next when no parsed results in current fetch
+        if not self.results and self._google_url._num > 5:
+            print('No results.', file=sys.stderr)
+        else:
+            self._google_url.next_page()
+            self.fetch_and_display()
 
     @require_keywords
     @no_argument
