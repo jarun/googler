@@ -72,8 +72,8 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
 }.items()}
 
 # Disguise as Microsoft Edge
-# USER_AGENT = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-#               '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
+USER_AGENT = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+              '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240')
 
 
 # Global helper functions
@@ -693,7 +693,7 @@ class GoogleConnection(object):
         logger.debug('Fetching URL %s', url)
         self._conn.request('GET', url, None, {
             'Accept-Encoding': 'gzip',
-            # 'User-Agent': USER_AGENT,
+            'User-Agent': USER_AGENT,
             'Cookie': self.cookie,
             'Connection': 'keep-alive',
         })
