@@ -20,6 +20,7 @@ args=(
     '(-n --count)'{-n,--count}'[show specified number of results (default 10)]:count'
     '(-N --news)'{-N,--news}'[show results from news section]'
     '(--np --noprompt)'{--np,--noprompt}'[perform search and exit, do not prompt for further interactions]'
+    '(-p --proxy)'{-p,--proxy}'[proxy in HOST:PORT format]:proxy details'
     '(-s --start)'{-s,--start}'[start at the Nth result]:result number'
     '(-t --time)'{-t,--time}'[time limit search]:period (h/d/w/m/y + number)'
     '(-w --site)'{-w,--site}'[search a site using Google]:domain'
