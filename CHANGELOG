@@ -1,3 +1,22 @@
+googler v2.5
+2016-06-12
+
+**NOTICE:**
+- Python 2.x support is discontinued.
+- googler is now available on [Debian Sid](https://packages.debian.org/unstable/main/googler)
+
+Modifications
+- Invoking `googler` without search keywords shows omniprompt
+- Introduced options -h and --help to show program help and exit
+- Support cookie
+- Use TLS 1.2 (Python 3.4 and above)
+- Omniprompt key to unfilter filtered similar results
+- HTTPS proxy support (non-TLS 1.2 supported)
+- News time shown in cyan by default
+- Tons of code, logging and debug improvements (thanks Zhiming)
+
+-------------------------------------------------------------------------------
+
 googler v2.4.1
 2016-05-22
 

@@ -52,7 +52,7 @@ Find `googler` useful? If you would like to donate, visit the
 - Supports Google search keywords like `filetype:mime`, `site:somesite.com` etc.
 - Optionally open the first result directly in browser (as in *I'm Feeling Lucky*)
 - Non-stop searches: fire new searches at omniprompt without exiting
-- Proxy support
+- HTTPS proxy support
 - Man page with examples, shell completion scripts for Bash, Zsh and Fish
 - Minimal dependencies
 
@@ -60,7 +60,7 @@ Find `googler` useful? If you would like to donate, visit the
 
 `googler` requires Python 3.3 or later to work. Only the latest patch release of each minor version is supported.
 
-Python 2.x support has been deprecated from `googler` v2.4.1.
+Python 2.x support has been discontinued from `googler` v2.5.
 
 ## Installing from this repository
 
@@ -297,7 +297,7 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
 16. More **help**:
 
-        $ googler
+        $ googler -h
         $ man googler
 
 # Troubleshooting
