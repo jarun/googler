@@ -25,6 +25,7 @@ import functools
 import gzip
 import html.entities
 import html.parser
+import http.client
 from http.client import HTTPSConnection
 import socket
 import ssl
@@ -614,7 +615,7 @@ class GoogleConnection(object):
         """
         try:
             self._raw_get(url)
-        except http.client.HTTPException as e:
+        except (http.client.HTTPException, OSError) as e:
             logger.debug('Got exception: %s.', e)
             logger.debug('Attempting to reconnect...')
             self.renew_connection()
