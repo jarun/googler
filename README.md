@@ -58,9 +58,7 @@ Find `googler` useful? If you would like to donate, visit the
 
 # Installation
 
-`googler` requires Python 3.3 or later to work. Only the latest patch release of each minor version is supported.
-
-Python 2.x support has been discontinued from `googler` v2.5.
+`googler` requires Python 3.3 or later. Only the latest patch release of each minor version is supported.
 
 ## Installing from this repository
 
