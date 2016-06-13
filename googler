@@ -698,7 +698,7 @@ class GoogleConnection(object):
         logger.debug('Fetching URL %s', url)
         self._conn.request('GET', url, None, {
             'Accept-Encoding': 'gzip',
-            'User-Agent': USER_AGENT,
+            #'User-Agent': USER_AGENT,
             'Cookie': self.cookie,
             'Connection': 'keep-alive',
             'DNT': '1',
@@ -966,7 +966,7 @@ class GoogleParser(html.parser.HTMLParser):
     #
     # Ignore List
     #
-    # - As good as our result criterions might be, sometimes results of
+    # - As good as our result criteria might be, sometimes results of
     #   dubious value (usually from Google's value-add features) slip
     #   through. The "People also ask" feature is a good example of this
     #   type (a sample query is "VPN"; see screenshot
@@ -988,6 +988,22 @@ class GoogleParser(html.parser.HTMLParser):
     #   title, etc.), and the scope is switched to 'ignore'. All
     #   descendants of the tag are ignored. When the corresponding end
     #   tag is finally reach, the former scope is restored.
+    #
+    #
+    # User Agent disabled (differences)
+    #
+    #   1. For Google News results, <div class="g"> is followed by <table> tag
+    #   <div class="g">
+    #       <table>
+    #
+    #   2. File mime type follows <div class="g">
+    #   <div class="g"><span style="float:left"><span class="mime">[PDF]</span>&nbsp;</span>
+    #
+    #   3. News metadata (source and time) comes within a single tag
+    #   <div class="slp"><span class="f">Reuters - 3 hours ago</span>
+    #
+    #   4. URLs are wrapped
+    #   <a href="/url?q=http://...&sa=...">
 
     def __init__(self, news=False):
         html.parser.HTMLParser.__init__(self)
@@ -1038,7 +1054,7 @@ class GoogleParser(html.parser.HTMLParser):
             self.set_handlers_to('result')
             return 'result'
 
-        # Ommitted results
+        # Omitted results
         if tag == 'p' and attrs.get('id') == 'ofr':
             self.filtered = True
 
@@ -1048,6 +1064,10 @@ class GoogleParser(html.parser.HTMLParser):
 
     @annotate_tag
     def result_start(self, tag, attrs):
+        if tag == 'span' and 'mime' in self.classes(attrs):
+            self.start_populating_textbuf()
+            return 'title_filetype'
+
         if not self.title_registered and tag == 'h3' and 'r' in self.classes(attrs):
             self.set_handlers_to('title')
             return 'title'
@@ -1056,14 +1076,15 @@ class GoogleParser(html.parser.HTMLParser):
             self.set_handlers_to('abstract')
             return 'abstract'
 
-        if not self.sitelinks and tag == 'table':
+        if not self.sitelinks and not self.news and tag == 'table':
             self.set_handlers_to('sitelink_table')
             return 'sitelink_table'
 
         if self.news:
             if not self.metadata_registered and tag == 'div' and 'slp' in self.classes(attrs):
                 # Change metadata field separator from '-' to ', ' for better appearance
-                self.start_populating_textbuf(lambda text: ', ' if text == '-' else text)
+                self.start_populating_textbuf(lambda text:
+                                              text.replace(' -', ',', 1) if ' - ' in text else text)
                 return 'news_metadata'
 
             if not self.abstract_registered and tag == 'div' and 'st' in self.classes(attrs):
@@ -1097,6 +1118,12 @@ class GoogleParser(html.parser.HTMLParser):
             return 'title_filetype'
         if tag == 'a' and 'href' in attrs:
             self.url = attrs['href']
+            try:
+                start = self.url.index('?q=') + len('?q=')
+                end = self.url.index('&sa=', start)
+                self.url = self.url[start:end]
+            except ValueError:
+                pass
             self.start_populating_textbuf()
             return 'title_link'
 
@@ -1355,7 +1382,7 @@ class Result(object):
         if columns > indent + 1:
             # Try to fill to columns
             fillwidth = columns - indent - 1
-            for line in textwrap.wrap(abstract, width=fillwidth):
+            for line in textwrap.wrap(abstract.replace('\n', ''), width=fillwidth):
                 print('%s%s' % (' ' * indent, line))
             print('')
         else:

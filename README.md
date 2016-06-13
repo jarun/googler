@@ -12,7 +12,7 @@
 <a href="https://asciinema.org/a/46340"><img src="https://asciinema.org/a/46340.png" alt="Asciicast" width="734"/></a>
 </p>
 
-`googler` is a power tool to Google (Web & News) and Google Site Search from the terminal. It shows the title, URL and text context for each result, which can be directly opened in a browser from the terminal. Results are fetched in pages (with page navigation). Supports sequential searches in a single `googler` instance.
+`googler` is a power tool to Google (Web & News) and Google Site Search from the terminal. It shows the title, URL and abstract for each result, which can be directly opened in a browser from the terminal. Results are fetched in pages (with page navigation). Supports sequential searches in a single `googler` instance.
 
 `googler` isn't affiliated to Google in any way.
 
