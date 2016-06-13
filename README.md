@@ -306,7 +306,6 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
 1. Copyright (C) 2008 Henri Hakkinen
 2. Copyright (C) 2015-2016 [Arun Prakash Jana](mailto:engineerarun@gmail.com)
-3. [Zhiming Wang](https://github.com/zmwangx)
 
 Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https://github.com/shaggytwodope) and [Narrat](https://github.com/Narrat) for their contributions and efforts in spreading `googler`.
 
