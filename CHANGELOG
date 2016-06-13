@@ -1,3 +1,13 @@
+googler v2.5.1
+2016-06-13
+
+Modifications
+- Enable TCP/IP optimizations only for Linux. This fails on OS X.
+
+NOTE: The optimizations do not work on Linux 2.4 and earlier either.
+
+-------------------------------------------------------------------------------
+
 googler v2.5
 2016-06-12
 
