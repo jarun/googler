@@ -1004,6 +1004,9 @@ class GoogleParser(html.parser.HTMLParser):
     #
     #   4. URLs are wrapped
     #   <a href="/url?q=http://...&sa=...">
+    #
+    #   5. URLs are quoted
+    #   'https://vk.com/doc206446660_429188746%3Fhash%3D6097a8b0a41185cb90%26dl%3D03c63c1be5c02e8620'
 
     def __init__(self, news=False):
         html.parser.HTMLParser.__init__(self)
@@ -1112,16 +1115,12 @@ class GoogleParser(html.parser.HTMLParser):
 
     @annotate_tag
     def title_start(self, tag, attrs):
-        if tag == 'span':
-            # Print a space after the filetype indicator
-            self.start_populating_textbuf(lambda text: text + ' ')
-            return 'title_filetype'
         if tag == 'a' and 'href' in attrs:
             self.url = attrs['href']
             try:
                 start = self.url.index('?q=') + len('?q=')
                 end = self.url.index('&sa=', start)
-                self.url = self.url[start:end]
+                self.url = urllib.parse.unquote_plus(self.url[start:end])
             except ValueError:
                 pass
             self.start_populating_textbuf()
@@ -1189,6 +1188,12 @@ class GoogleParser(html.parser.HTMLParser):
     def sitelink_title_start(self, tag, attrs):
         if tag == 'a' and 'href' in attrs:
             self.current_sitelink.url = attrs['href']
+            try:
+                start = self.current_sitelink.url.index('?q=') + len('?q=')
+                end = self.current_sitelink.url.index('&sa=', start)
+                self.current_sitelink.url = urllib.parse.unquote_plus(self.current_sitelink.url[start:end])
+            except ValueError:
+                pass
             self.start_populating_textbuf()
             return 'sitelink_title_link'
 
