@@ -1738,7 +1738,6 @@ class GooglerArgumentParser(argparse.ArgumentParser):
         Version %s
         Copyright (C) 2008 Henri Hakkinen
         Copyright (C) 2015-2016 Arun Prakash Jana <engineerarun@gmail.com>
-        Zhiming Wang <zmwangx@gmail.com>
         License: GPLv3
         Webpage: https://github.com/jarun/googler
         """ % _VERSION_))
