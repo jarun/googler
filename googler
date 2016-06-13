@@ -32,6 +32,7 @@ import ssl
 import io
 import logging
 import os
+import platform
 import signal
 import sys
 import textwrap
@@ -119,9 +120,13 @@ class TLS1_2Connection(HTTPSConnection):
     def connect(self):
         sock = socket.create_connection((self.host, self.port),
                 self.timeout, self.source_address)
-        sock.setsockopt(socket.SOL_TCP, socket.TCP_DEFER_ACCEPT, 1)
-        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
-        sock.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,524288)
+
+        # Optimizations not available on OS X
+        if platform.system() == 'Linux':
+            sock.setsockopt(socket.SOL_TCP, socket.TCP_DEFER_ACCEPT, 1)
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
+            sock.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,524288)
+
         if getattr(self, '_tunnel_host', None):
             self.sock = sock
             self._tunnel()
