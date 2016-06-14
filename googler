@@ -993,20 +993,26 @@ class GoogleParser(html.parser.HTMLParser):
     # User Agent disabled (differences)
     #
     #   1. For Google News results, <div class="g"> is followed by <table> tag
-    #   <div class="g">
-    #       <table>
+    #       <div class="g">
+    #           <table>
     #
     #   2. File mime type follows <div class="g">
-    #   <div class="g"><span style="float:left"><span class="mime">[PDF]</span>&nbsp;</span>
+    #       <div class="g"><span style="float:left"><span class="mime">[PDF]</span>&nbsp;</span>
     #
     #   3. News metadata (source and time) comes within a single tag
-    #   <div class="slp"><span class="f">Reuters - 3 hours ago</span>
+    #       <div class="slp"><span class="f">Reuters - 3 hours ago</span>
     #
     #   4. URLs are wrapped
-    #   <a href="/url?q=http://...&sa=...">
+    #       <a href="/url?q=http://...&sa=...">
     #
     #   5. URLs are quoted
-    #   'https://vk.com/doc206446660_429188746%3Fhash%3D6097a8b0a41185cb90%26dl%3D03c63c1be5c02e8620'
+    #       'https://vk.com/doc206446660_429188746%3Fhash%3D6097a8b0a41185cb90%26dl%3D03c63c1be5c02e8620'
+    #
+    #   6. Google Services links are returned as regular results,
+    #      start with '/search?q=' but no following 'http' or 'https'
+    #       <div class="g">
+    #           <div>
+    #               <h3 class="r"><a href="/search?q=india&...&sa=...">News for <b>india</b></a></h3>
 
     def __init__(self, news=False):
         html.parser.HTMLParser.__init__(self)
@@ -1116,6 +1122,10 @@ class GoogleParser(html.parser.HTMLParser):
     @annotate_tag
     def title_start(self, tag, attrs):
         if tag == 'a' and 'href' in attrs:
+            # Skip 'News for', 'Images for' search links
+            if attrs['href'].startswith('/search'):
+                return
+
             self.url = attrs['href']
             try:
                 start = self.url.index('?q=') + len('?q=')
