@@ -111,9 +111,10 @@ Please substitute `$version` with the appropriate package version.
 
 ## Cmdline options
 
-    usage: googler [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C] [-j] [-t dN]
-                   [-w SITE] [-d]
-                   KEYWORD [KEYWORD ...]
+    usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
+                   [--colors COLORS] [-j] [-t dN] [-w SITE] [-p PROXY] [--json]
+                   [--np] [-d]
+                   [KEYWORD [KEYWORD ...]]
 
     Google from the command-line.
 
