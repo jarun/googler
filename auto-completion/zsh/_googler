@@ -11,8 +11,8 @@ local -a args
 args=(
     '(- : *)'{-h,--help}'[show help text and exit]'
     '(-c --tld)'{-c,--tld}'[country-specific search with top-level domain]:top level domain without dot'
-    '(-C --nocolor --colors)'{-C,--nocolor}'[disable color output]'
-    '(-C --nocolor)--colors[set output colors]:six-letter string'
+    '(-C --nocolor)'{-C,--nocolor}'[disable color output]'
+    '(--colors)--colors[set output colors]:six-letter string'
     '(-d --debug)'{-d,--debug}'[enable debugging]'
     '(-j --first --lucky)'{-j,--first,--lucky}'[open the first result in a web browser]'
     '(--json --np --noprompt)--json[output in JSON format; implies --noprompt]'
