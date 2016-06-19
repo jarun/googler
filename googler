@@ -1013,6 +1013,17 @@ class GoogleParser(html.parser.HTMLParser):
     #       <div class="g">
     #           <div>
     #               <h3 class="r"><a href="/search?q=india&...&sa=...">News for <b>india</b></a></h3>
+    #
+    #   7. YouTube specific results are returned within (.e.g search - '3 hours youtube')
+    #       <table class="ts">
+    #
+    #      TODO: In addition, the text is returned within multi-level <span> tags:
+    #       <span class="st">
+    #           <span class="f"><span class="nobr">10 Jun 2014</span> - <span class="nobr">179 min</span> -
+    #               <span class="nobr">Uploaded by Meditation Relax Music</span>
+    #           </span>
+    #           <br><b>3 HOURS Best Relaxing Music</b> &#39;Romantic <b>Piano</b>&quot; Background <b>Music</b> for Stress ... 3:03 <b>...</b>
+    #       </span>
 
     def __init__(self, news=False):
         html.parser.HTMLParser.__init__(self)
@@ -1085,7 +1096,7 @@ class GoogleParser(html.parser.HTMLParser):
             self.set_handlers_to('abstract')
             return 'abstract'
 
-        if not self.sitelinks and not self.news and tag == 'table':
+        if not self.sitelinks and not self.news and tag == 'table' and 'ts' not in self.classes(attrs):
             self.set_handlers_to('sitelink_table')
             return 'sitelink_table'
 
