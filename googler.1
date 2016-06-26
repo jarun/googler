@@ -47,6 +47,9 @@ Search a site using Google.
 .BI "-p, --proxy=" PROXY
 Tunnel traffic through an HTTPS proxy. \fIPROXY\fR is of the form \fIHOST:PORT\fR. The proxy server must support HTTP CONNECT tunneling and must not block port 443 for the relevant Google hosts.
 .TP
+.BI "--noua"
+Disable user agent. Results are fetched faster. However, abstracts for some Google service (e.g. YouTube, Google Books) results don't show.
+.TP
 .BI "--json"
 Output in JSON format; implies \fB--noprompt\fR.
 .TP

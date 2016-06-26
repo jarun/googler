@@ -112,7 +112,7 @@ Please substitute `$version` with the appropriate package version.
 ## Cmdline options
 
     usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
-                   [--colors COLORS] [-j] [-t dN] [-w SITE] [-p PROXY] [--json]
+                   [--colors COLORS] [-j] [-t dN] [-w SITE] [-p PROXY] [--json] [--noua]
                    [--np] [-d]
                    [KEYWORD [KEYWORD ...]]
 
@@ -140,6 +140,7 @@ Please substitute `$version` with the appropriate package version.
       -w SITE, --site SITE  search a site using Google
       -p PROXY, --proxy PROXY
                             tunnel traffic through an HTTPS proxy (HOST:PORT)
+      --noua                disable user agent
       --json                output in JSON format; implies --noprompt
       --np, --noprompt      perform search and exit, do not prompt for further
                             interactions
@@ -302,6 +303,7 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 # Troubleshooting
 
 1. In some instances `googler` may show fewer number of results than you expect, e.g., if you fetch a single result (`-n 1`) it may not show any results. The reason is Google shows some Google service (e.g. Youtube) results, map locations etc. depending on your geographical data, which `googler` tries to omit. In some cases Google (the web-service) doesn't show exactly 10 results (default) on a search. We chose to omit these results as far as possible. While this can be fixed, it would need more processing (and more time). You can just navigate forward to fetch the next set of results.
+2. With user agent disabled, results are fetched faster (ref: PR #117). However, abstracts for some Google service (e.g. YouTube, Google Books) results don't show. This can be fixed by handling multiple inner <span> tags. User agent is enabled by default and I'll let this pass as long as I don't see an elegant pull request on this.
 
 # Developers
 

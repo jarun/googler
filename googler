@@ -697,7 +697,7 @@ class GoogleConnection(object):
         logger.debug('Fetching URL %s', url)
         self._conn.request('GET', url, None, {
             'Accept-Encoding': 'gzip',
-            #'User-Agent': USER_AGENT,
+            'User-Agent': USER_AGENT,
             'Cookie': self.cookie,
             'Connection': 'keep-alive',
             'DNT': '1',
@@ -1083,7 +1083,7 @@ class GoogleParser(html.parser.HTMLParser):
 
     @annotate_tag
     def result_start(self, tag, attrs):
-        if tag == 'span' and 'mime' in self.classes(attrs):
+        if '' == USER_AGENT and tag == 'span' and 'mime' in self.classes(attrs):
             self.start_populating_textbuf()
             return 'title_filetype'
 
@@ -1095,14 +1095,18 @@ class GoogleParser(html.parser.HTMLParser):
             self.set_handlers_to('abstract')
             return 'abstract'
 
-        if not self.sitelinks and not self.news and tag == 'table' and 'ts' not in self.classes(attrs):
-            self.set_handlers_to('sitelink_table')
-            return 'sitelink_table'
+        if not self.sitelinks and tag == 'table':
+            if '' != USER_AGENT or (not self.news and 'ts' not in self.classes(attrs)):
+                self.set_handlers_to('sitelink_table')
+                return 'sitelink_table'
 
         if self.news:
             if not self.metadata_registered and tag == 'div' and 'slp' in self.classes(attrs):
                 # Change metadata field separator from '-' to ', ' for better appearance
-                self.start_populating_textbuf(lambda text:
+                if '' != USER_AGENT:
+                    self.start_populating_textbuf(lambda text: ', ' if text == '-' else text)
+                else:
+                    self.start_populating_textbuf(lambda text:
                                               text.replace(' -', ',', 1) if ' - ' in text else text)
                 return 'news_metadata'
 
@@ -1131,6 +1135,10 @@ class GoogleParser(html.parser.HTMLParser):
 
     @annotate_tag
     def title_start(self, tag, attrs):
+        if '' != USER_AGENT and tag == 'span':
+            # Print a space after the filetype indicator
+            self.start_populating_textbuf(lambda text: text + ' ')
+            return 'title_filetype'
         if tag == 'a' and 'href' in attrs:
             # Skip 'News for', 'Images for' search links
             if attrs['href'].startswith('/search'):
@@ -1907,6 +1915,8 @@ def parse_args(args=None, namespace=None):
            help='search a site using Google')
     addarg('-p', '--proxy', dest='proxy',
            help='tunnel traffic through an HTTPS proxy (HOST:PORT)')
+    addarg('--noua', dest='noua', action='store_true',
+           help='disable user agent')
     addarg('--json', dest='json', action='store_true',
            help='output in JSON format; implies --noprompt')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
@@ -1919,6 +1929,8 @@ def parse_args(args=None, namespace=None):
 
 
 def main():
+    global USER_AGENT
+
     logger.debug('Version %s', _VERSION_)
 
     opts = parse_args()
@@ -1934,6 +1946,9 @@ def main():
         colors = None
     Result.colors = colors
     GooglerCmd.colors = colors
+
+    if opts.noua:
+        USER_AGENT = ''
 
     try:
         repl = GooglerCmd(opts)

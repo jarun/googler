@@ -19,6 +19,7 @@ args=(
     '(-l --lang)'{-l,--lang}'[display in specified language]:language code'
     '(-n --count)'{-n,--count}'[show specified number of results (default 10)]:count'
     '(-N --news)'{-N,--news}'[show results from news section]'
+    '(--noua)'{--noua}'[disable user agent]'
     '(--np --noprompt)'{--np,--noprompt}'[perform search and exit, do not prompt for further interactions]'
     '(-p --proxy)'{-p,--proxy}'[proxy in HOST:PORT format]:proxy details'
     '(-s --start)'{-s,--start}'[start at the Nth result]:result number'
