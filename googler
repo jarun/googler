@@ -1490,7 +1490,7 @@ def no_argument(method):
         if arg:
             method_name = arg.__name__
             command_name = method_name[3:] if method_name.startswith('do_') else method_name
-            logger.warn("Argument to the '%s' command ignored.", command_name)
+            logger.warning("Argument to the '%s' command ignored.", command_name)
         method(self)
 
     return enforced_method
@@ -1931,13 +1931,12 @@ def parse_args(args=None, namespace=None):
 def main():
     global USER_AGENT
 
-    logger.debug('Version %s', _VERSION_)
-
     opts = parse_args()
 
     # Set logging level
     if opts.debug:
         logger.setLevel(logging.DEBUG)
+        logger.debug('Version %s', _VERSION_)
 
     # Set colors
     if opts.colorize:
@@ -1978,3 +1977,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    atexit.register(logging.shutdown)
