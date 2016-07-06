@@ -246,7 +246,7 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 
         $ googler -c in -l en IPL cricket
 
-5. Search quoted text e.g. **it's a "beautiful world" in spring**:
+5. Search **quoted text**:
 
         $ googler it\'s a \"beautiful world\" in spring
 
