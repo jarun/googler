@@ -1013,10 +1013,9 @@ class GoogleParser(html.parser.HTMLParser):
     #           <div>
     #               <h3 class="r"><a href="/search?q=india&...&sa=...">News for <b>india</b></a></h3>
     #
-    #   7. YouTube specific results are returned within (.e.g search - '3 hours youtube')
-    #       <table class="ts">
+    #   7. YouTube specific results are returned within <table class="ts">
+    #       e.g. search - '3 hours youtube'
     #
-    #      TODO: In addition, the text is returned within multi-level <span> tags:
     #       <span class="st">
     #           <span class="f"><span class="nobr">10 Jun 2014</span> - <span class="nobr">179 min</span> -
     #               <span class="nobr">Uploaded by Meditation Relax Music</span>
@@ -1095,6 +1094,11 @@ class GoogleParser(html.parser.HTMLParser):
             self.set_handlers_to('abstract')
             return 'abstract'
 
+        if '' == USER_AGENT and not self.abstract_registered \
+                and tag == 'span' and 'st' in self.classes(attrs):
+            self.start_populating_textbuf(lambda text: text + ' ')
+            return 'abstract_gservices'
+
         if not self.sitelinks and tag == 'table':
             if '' != USER_AGENT or (not self.news and 'ts' not in self.classes(attrs)):
                 self.set_handlers_to('sitelink_table')
@@ -1132,6 +1136,10 @@ class GoogleParser(html.parser.HTMLParser):
             self.stop_populating_textbuf()
             self.abstract = self.pop_textbuf()
             self.abstract_registered = True
+        if annotation == 'abstract_gservices':
+            self.stop_populating_textbuf()
+            self.abstract = self.pop_textbuf().replace('  ', ' ')
+            self.abstract_registered = False
 
     @annotate_tag
     def title_start(self, tag, attrs):
