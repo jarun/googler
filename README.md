@@ -32,6 +32,8 @@
         - [Shell completion](#shell-completion)
     - [Installing with a package manager](#installing-with-a-package-manager)
         - [Debian package](#debian-package)
+        - [Tips for packagers](#tips-for-packagers)
+    - [Downloading a single file](#downloading-a-single-file)
 - [Usage](#usage)
     - [Cmdline options](#cmdline-options)
     - [Configuration file](#configuration-file)
@@ -108,6 +110,34 @@ If you are on a Debian based system (including Ubuntu), visit [the latest stable
 
 Please substitute `$version` with the appropriate package version.
 
+### Tips for packagers
+
+`googler` v2.7 and later ships with an in-place self-upgrade mechanism which you may want to disable. To do this, run
+
+    $ make disable-self-upgrade
+
+before installation.
+
+## Downloading a single file
+
+Googler is a single standalone script, so you could download just a single file if you'd like to.
+
+To install the latest stable version, run
+
+    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v2.6/googler && sudo chmod +x /usr/local/bin/googler
+
+You could then let googler upgrade itself by running
+
+    $ sudo googler -U
+
+Similarly, if you want to install from git master, run
+
+    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/master/googler && sudo chmod +x /usr/local/bin/googler
+
+and upgrade by running
+
+    $ sudo googler -U --include-git
+
 # Usage
 
 ## Cmdline options
@@ -146,6 +176,10 @@ Please substitute `$version` with the appropriate package version.
       --np, --noprompt      perform search and exit, do not prompt for further
                             interactions
       -d, --debug           enable debugging
+      -U, --upgrade, --update
+                            perform in-place self-upgrade
+      --include-git         when used in conjuction with --upgrade, upgrade to
+                            latest git master
 
     omniprompt keys:
       n, p                  fetch the next or previous set of search results
