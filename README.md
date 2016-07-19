@@ -31,7 +31,7 @@
         - [Running as a standalone utility](#running-as-a-standalone-utility)
         - [Shell completion](#shell-completion)
     - [Installing with a package manager](#installing-with-a-package-manager)
-    - [Debian package](#debian-package)
+        - [Debian package](#debian-package)
 - [Usage](#usage)
     - [Cmdline options](#cmdline-options)
     - [Configuration file](#configuration-file)
@@ -100,9 +100,9 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 - [Homebrew](http://braumeister.org/formula/googler) for OS X, or its Linux fork, [Linuxbrew](https://github.com/Linuxbrew/linuxbrew/blob/master/Library/Formula/googler.rb);
 - [Debian Sid](https://packages.debian.org/unstable/main/googler).
 
-## Debian package
+### Debian package
 
-If you are on a Debian (including Ubuntu) based system visit [the latest stable release](https://github.com/jarun/googler/releases/latest) and download the`.deb`package. To install, run:
+If you are on a Debian based system (including Ubuntu), visit [the latest stable release](https://github.com/jarun/googler/releases/latest) and download the`.deb` package. To install, run
 
     $ sudo dpkg -i googler-$version-all.deb
 
