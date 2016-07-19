@@ -28,7 +28,6 @@ import http.client
 from http.client import HTTPSConnection
 import socket
 import ssl
-import io
 import logging
 import os
 import platform
@@ -74,6 +73,19 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
 
 # Disguise as Firefox on Ubuntu
 USER_AGENT = ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) Gecko/20100101 Firefox/48.0')
+
+# Self-upgrade parameters
+#
+# Downstream packagers are recommended to turn off the entire self-upgrade
+# mechanism through
+#
+#     make disable-self-upgrade
+#
+# before running `make install'.
+
+ENABLE_SELF_UPGRADE_MECHANISM=True
+API_REPO_BASE = 'https://api.github.com/repos/jarun/googler'
+RAW_DOWNLOAD_REPO_BASE = 'https://raw.githubusercontent.com/jarun/googler'
 
 
 # Global helper functions
@@ -642,7 +654,7 @@ class GoogleConnection(object):
 
         payload = resp.read()
         try:
-            return gzip.GzipFile(fileobj=io.BytesIO(payload)).read().decode('utf-8')
+            return gzip.decompress(payload).decode('utf-8')
         except OSError:
             # Not gzipped
             return payload.decode('utf-8')
@@ -1871,6 +1883,133 @@ class GooglerArgumentParser(argparse.ArgumentParser):
         return arg
 
 
+# Self-upgrade mechanism
+
+def system_is_windows():
+    """Checks if the underlying system is Windows (Cygwin included)."""
+    return sys.platform in {'win32', 'cygwin'}
+
+
+def download_latest_googler(include_git=False):
+    """Download latest googler to a temp file.
+
+    By default, the latest released version is downloaded, but if
+    `include_git` is specified, then the latest git master is downloaded
+    instead.
+
+    Parameters
+    ----------
+    include_git : bool, optional
+        Download from git master. Default is False.
+
+    Returns
+    -------
+    (git_ref, path): tuple
+         A tuple containing the git reference (either name of the latest
+         tag or SHA of the latest commit) and path to the downloaded
+         file.
+
+    """
+    import urllib.request
+
+    if include_git:
+        # Get SHA of latest commit on master
+        request = urllib.request.Request('%s/commits/master' % API_REPO_BASE,
+                                         headers={'Accept': 'application/vnd.github.v3.sha'})
+        response = urllib.request.urlopen(request)
+        if response.status != 200:
+            raise http.client.HTTPException(response.reason)
+        git_ref = response.read().decode('utf-8')
+    else:
+        # Get name of latest tag
+        request = urllib.request.Request('%s/tags?per_page=1' % API_REPO_BASE,
+                                         headers={'Accept': 'application/vnd.github.v3+json'})
+        response = urllib.request.urlopen(request)
+        if response.status != 200:
+            raise http.client.HTTPException(response.reason)
+        import json
+        git_ref = json.loads(response.read().decode('utf-8'))[0]['name']
+
+    # Download googler to a tempfile
+    googler_download_url = '%s/%s/googler' % (RAW_DOWNLOAD_REPO_BASE, git_ref)
+    printerr('Downloading %s' % googler_download_url)
+    request = urllib.request.Request(googler_download_url,
+                                     headers={'Accept-Encoding': 'gzip'})
+    import tempfile
+    fd, path = tempfile.mkstemp()
+    os.close(fd)
+    with open(path, 'wb') as fp:
+        with urllib.request.urlopen(request) as response:
+            if response.status != 200:
+                raise http.client.HTTPException(response.reason)
+            payload = response.read()
+            try:
+                fp.write(gzip.decompress(payload))
+            except OSError:
+                fp.write(payload)
+    return git_ref, path
+
+
+def self_replace(path):
+    """Replace the current script with a specified file.
+
+    Both paths (the specified path and path to the current script) are
+    resolved to absolute, symlink-free paths. Upon replacement, the
+    owner and mode signatures of the current script are preserved. The
+    caller needs to have the necessary permissions.
+
+    Replacement won't happen if the specified file is the same
+    (content-wise) as the current script.
+
+    Parameters
+    ----------
+    path : str
+        Path to the replacement file.
+
+    Returns
+    -------
+    bool
+        True if replaced, False if skipped (specified file is the same
+        as the current script).
+
+    """
+    if system_is_windows():
+        raise NotImplementedError('Self upgrade not supported on Windows.')
+
+    import filecmp
+    import shutil
+
+    path = os.path.realpath(path)
+    self_path = os.path.realpath(__file__)
+
+    if filecmp.cmp(path, self_path):
+        return False
+
+    self_stat = os.stat(self_path)
+    os.chown(path, self_stat.st_uid, self_stat.st_gid)
+    os.chmod(path, self_stat.st_mode)
+
+    shutil.move(path, self_path)
+    return True
+
+
+def self_upgrade(include_git=False):
+    """Perform in-place self-upgrade.
+
+    Parameters
+    ----------
+    include_git : bool, optional
+        See `download_latest_googler`. Default is False.
+
+    """
+    git_ref, path = download_latest_googler(include_git=include_git)
+    if self_replace(path):
+        printerr('Upgraded to %s.' % git_ref)
+    else:
+        printerr('Already up to date.')
+        os.remove(path)
+
+
 # Miscellaneous functions
 
 def parse_args(args=None, namespace=None):
@@ -1933,31 +2072,43 @@ def parse_args(args=None, namespace=None):
            help='enable debugging')
     addarg('keywords', nargs='*', metavar='KEYWORD',
            help='search keywords')
+
+    if ENABLE_SELF_UPGRADE_MECHANISM and not system_is_windows():
+        addarg('-U', '--upgrade', '--update', dest='upgrade', action='store_true',
+               help='perform in-place self-upgrade')
+        addarg('--include-git', dest='include_git', action='store_true',
+               help='when used in conjuction with --upgrade, upgrade to latest git master')
+
     return argparser.parse_args(args, namespace)
 
 
 def main():
-    global USER_AGENT
-
-    opts = parse_args()
-
-    # Set logging level
-    if opts.debug:
-        logger.setLevel(logging.DEBUG)
-        logger.debug('Version %s', _VERSION_)
-
-    # Set colors
-    if opts.colorize:
-        colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
-    else:
-        colors = None
-    Result.colors = colors
-    GooglerCmd.colors = colors
-
-    if opts.noua:
-        USER_AGENT = ''
-
     try:
+        global USER_AGENT
+
+        opts = parse_args()
+
+        # Set logging level
+        if opts.debug:
+            logger.setLevel(logging.DEBUG)
+            logger.debug('Version %s', _VERSION_)
+
+        # Handle self-upgrade
+        if hasattr(opts, 'upgrade') and opts.upgrade:
+            self_upgrade(include_git=opts.include_git)
+            sys.exit(0)
+
+        # Set colors
+        if opts.colorize:
+            colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
+        else:
+            colors = None
+        Result.colors = colors
+        GooglerCmd.colors = colors
+
+        if opts.noua:
+            USER_AGENT = ''
+
         repl = GooglerCmd(opts)
 
         if opts.json or opts.lucky or opts.noninteractive:
