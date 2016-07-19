@@ -1936,27 +1936,27 @@ def parse_args(args=None, namespace=None):
 
 
 def main():
-    global USER_AGENT
-
-    opts = parse_args()
-
-    # Set logging level
-    if opts.debug:
-        logger.setLevel(logging.DEBUG)
-        logger.debug('Version %s', _VERSION_)
-
-    # Set colors
-    if opts.colorize:
-        colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
-    else:
-        colors = None
-    Result.colors = colors
-    GooglerCmd.colors = colors
-
-    if opts.noua:
-        USER_AGENT = ''
-
     try:
+        global USER_AGENT
+
+        opts = parse_args()
+
+        # Set logging level
+        if opts.debug:
+            logger.setLevel(logging.DEBUG)
+            logger.debug('Version %s', _VERSION_)
+
+        # Set colors
+        if opts.colorize:
+            colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
+        else:
+            colors = None
+        Result.colors = colors
+        GooglerCmd.colors = colors
+
+        if opts.noua:
+            USER_AGENT = ''
+
         repl = GooglerCmd(opts)
 
         if opts.json or opts.lucky or opts.noninteractive:
