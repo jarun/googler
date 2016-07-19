@@ -28,7 +28,6 @@ import http.client
 from http.client import HTTPSConnection
 import socket
 import ssl
-import io
 import logging
 import os
 import platform
@@ -642,7 +641,7 @@ class GoogleConnection(object):
 
         payload = resp.read()
         try:
-            return gzip.GzipFile(fileobj=io.BytesIO(payload)).read().decode('utf-8')
+            return gzip.decompress(payload).decode('utf-8')
         except OSError:
             # Not gzipped
             return payload.decode('utf-8')
