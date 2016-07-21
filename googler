@@ -1937,6 +1937,7 @@ def download_latest_googler(include_git=False):
                                      headers={'Accept-Encoding': 'gzip'})
     import tempfile
     fd, path = tempfile.mkstemp()
+    atexit.register(lambda: os.remove(path) if os.path.exists(path) else None)
     os.close(fd)
     with open(path, 'wb') as fp:
         with urllib.request.urlopen(request) as response:
@@ -2007,7 +2008,6 @@ def self_upgrade(include_git=False):
         printerr('Upgraded to %s.' % git_ref)
     else:
         printerr('Already up to date.')
-        os.remove(path)
 
 
 # Miscellaneous functions
