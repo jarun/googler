@@ -99,7 +99,7 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 
 - [AUR](https://aur.archlinux.org/packages/googler/) for Arch Linux;
 - [Fossies](http://fossies.org/linux/googler);
-- [Homebrew](http://braumeister.org/formula/googler) for OS X, or its Linux fork, [Linuxbrew](https://github.com/Linuxbrew/homebrew-core/blob/master/Formula/googler.rb);
+- [Homebrew](http://braumeister.org/formula/googler) for OS X / macOS;
 - [Debian Sid](https://packages.debian.org/unstable/main/googler).
 
 ### Debian package
