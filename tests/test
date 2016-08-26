@@ -32,6 +32,13 @@ Options:
         Suppress googler's output except when a test fails. Some progress info
         is still printed to stderr. Note that without this option, this script
         is rather verbose.
+
+Environment variables:
+    NUM_TEST_ITERATIONS
+        Number of random tests to run. Default is 100.
+    SLEEP_DURATION
+        Number of seconds to sleep after each query. Default is 0. You may want
+        to set this to avoid being blocked by Google for spamming.
 EOF
             exit 1
             ;;
@@ -136,14 +143,14 @@ for tld in com ar au be br ca ch cz de es 'fi' fr id 'in' it jp kr mx nl ph pl p
 done >"$config_list"
 
 declare num_rand_configs
-num_rand_configs=$NUM_TEST_ITERATIONS
+num_rand_configs="${NUM_TEST_ITERATIONS:-100}"
 counter=0
 while read -r args; do
     (( counter++ )) || :
     printf '\033[32mTest %d/%d\033[0m' $counter $num_rand_configs >&2
     (( quiet && !ci )) && printf '\r' >&2 || printf '\n' >&2
     test_googler $args # explicit word splitting here, yes
-    sleep $SLEEP_DURATION
+    sleep "${SLEEP_DURATION:-0}"
 done < <(shuf -n $num_rand_configs "$config_list")
 
 (( exitcode )) || printf '\033[K\033[32mAll passed.\033[0m\n'
