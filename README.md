@@ -22,7 +22,7 @@
 
 [![Donate Button](https://img.shields.io/badge/paypal-donate-orange.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q)
 
-# Table of contents
+## Table of contents
 
 - [Features](#features)
 - [Installation](#installation)
@@ -43,7 +43,7 @@
 - [Developers](#developers)
 - [Notes](#notes)
 
-# Features
+## Features
 
 - Google Search, Google Site Search, Google News
 - Fast and clean (no ads, stray URLs or clutter), custom color
@@ -59,11 +59,11 @@
 - Man page with examples, shell completion scripts for Bash, Zsh and Fish
 - Minimal dependencies
 
-# Installation
+## Installation
 
 `googler` requires Python 3.3 or later. Only the latest patch release of each minor version is supported.
 
-## Installing from this repository
+### Installing from this repository
 
 To download this repository, you may either clone via git:
 
@@ -71,7 +71,7 @@ To download this repository, you may either clone via git:
 
 or download a source code archive: [the latest stable release](https://github.com/jarun/googler/releases/latest) or [the development version](https://github.com/jarun/googler/archive/master.zip).
 
-### Installing to default or custom location
+#### Installing to default or custom location
 
 To install to the default location (`/usr/local`):
 
@@ -83,17 +83,17 @@ To remove `googler` and associated docs, run
 
 `PREFIX` is supported, in case you want to install to a different location.
 
-### Running as a standalone utility
+#### Running as a standalone utility
 
 `googler` is a standalone executable. From the containing directory:
 
     $ ./googler
 
-### Shell completion
+#### Shell completion
 
 Shell completion scripts for Bash, Fish and Zsh can be found in respective subdirectories of [`auto-completion/`](auto-completion). Please refer to your shell's manual for installation instructions.
 
-## Installing with a package manager
+### Installing with a package manager
 
 `googler` is also available on
 
@@ -102,7 +102,7 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 - [Homebrew](http://braumeister.org/formula/googler) for OS X / macOS;
 - [Debian Sid](https://packages.debian.org/unstable/main/googler).
 
-### Debian package
+#### Debian package
 
 If you are on a Debian based system (including Ubuntu), visit [the latest stable release](https://github.com/jarun/googler/releases/latest) and download the`.deb` package. To install, run
 
@@ -110,7 +110,7 @@ If you are on a Debian based system (including Ubuntu), visit [the latest stable
 
 Please substitute `$version` with the appropriate package version.
 
-### Tips for packagers
+#### Tips for packagers
 
 `googler` v2.7 and later ships with an in-place self-upgrade mechanism which you may want to disable. To do this, run
 
@@ -118,7 +118,7 @@ Please substitute `$version` with the appropriate package version.
 
 before installation.
 
-## Downloading a single file
+### Downloading a single file
 
 Googler is a single standalone script, so you could download just a single file if you'd like to.
 
@@ -138,9 +138,9 @@ and upgrade by running
 
     $ sudo googler -U --include-git
 
-# Usage
+## Usage
 
-## Cmdline options
+### Cmdline options
 
     usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
                    [--colors COLORS] [-j] [-t dN] [-w SITE] [-p PROXY] [--json] [--noua]
@@ -191,7 +191,7 @@ and upgrade by running
       ?                     show omniprompt help
       *                     any other string initiates a new search with original options
 
-## Configuration file
+### Configuration file
 
 `googler` doesn't have any! This is to retain the speed of the utility and avoid OS-specific differences. Users can enjoy the advantages of config files using aliases (with the exception of the color scheme, which can be additionally customized through an environment variable; see [Colors](#colors)). There's no need to memorize options.
 
@@ -206,7 +206,7 @@ The alias serves both the purposes of using config files:
 - Persistent settings: when the user invokes `g`, it expands to the preferred settings.
 - Override settings: thanks to the way Python `argparse` works, `googler` is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs `g -l de -c de -n 12 hello world`, 12 results are returned from the Google Germany server, with preference towards results in German.
 
-## Colors
+### Colors
 
 `googler` allows you to customize the color scheme via a six-letter string, reminiscent of BSD `LSCOLORS`. The six letters represent the colors of
 
@@ -263,7 +263,7 @@ Note that
 
 Please consult the manual of your terminal emulator as well as the [Wikipedia article](https://en.wikipedia.org/wiki/ANSI_escape_code) on ANSI escape sequences.
 
-# Examples
+## Examples
 
 1. Google **hello world**:
 
@@ -335,11 +335,11 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
         $ googler -h
         $ man googler
 
-# Troubleshooting
+## Troubleshooting
 
 1. In some instances `googler` may show fewer number of results than you expect, e.g., if you fetch a single result (`-n 1`) it may not show any results. The reason is Google shows some Google service (e.g. Youtube) results, map locations etc. depending on your geographical data, which `googler` tries to omit. In some cases Google (the web-service) doesn't show exactly 10 results (default) on a search. We chose to omit these results as far as possible. While this can be fixed, it would need more processing (and more time). You can just navigate forward to fetch the next set of results.
 
-# Developers
+## Developers
 
 1. Copyright (C) 2008 Henri Hakkinen
 2. Copyright (C) 2015-2016 [Arun Prakash Jana](mailto:engineerarun@gmail.com)
@@ -347,7 +347,7 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
 Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https://github.com/shaggytwodope) and [Narrat](https://github.com/Narrat) for their contributions and efforts in spreading `googler`.
 
-# Notes
+## Notes
 
 1. Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author [Henri Hakkinen](https://github.com/henux) in past year. I have created this independent repo for the project with the name `googler`. I retained the original copyright information.
 
