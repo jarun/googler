@@ -39,6 +39,7 @@
     - [Configuration file](#configuration-file)
     - [Colors](#colors)
 - [Examples](#examples)
+- [FAQ](#faq)
 - [Troubleshooting](#troubleshooting)
 - [Developers](#developers)
 - [Notes](#notes)
@@ -143,8 +144,9 @@ and upgrade by running
 ### Cmdline options
 
     usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
-                   [--colors COLORS] [-j] [-t dN] [-w SITE] [-p PROXY] [--json] [--noua]
-                   [--np] [-d]
+                   [--colors COLORS] [-j] [-t dN] [-w SITE] [-p PROXY] [--noua]
+                   [--json] [--enable-browser-output] [--np] [-d] [-U]
+                   [--include-git]
                    [KEYWORD [KEYWORD ...]]
 
     Google from the command-line.
@@ -173,6 +175,8 @@ and upgrade by running
                             tunnel traffic through an HTTPS proxy (HOST:PORT)
       --noua                disable user agent
       --json                output in JSON format; implies --noprompt
+      --enable-browser-output
+                            do not suppress browser output (stdin and stdout)
       --np, --noprompt      perform search and exit, do not prompt for further
                             interactions
       -d, --debug           enable debugging
@@ -334,6 +338,20 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
         $ googler -h
         $ man googler
+
+## FAQ
+
+1. **How do I integrate `googler` with a text-based browser, e.g., `w3m`?**
+
+   Set the `BROWSER` environment variable, for instance,
+
+        $ export BROWSER=w3m
+
+   or for one-time use,
+
+        $ BROWSER=w3m googler query
+
+   Note that due to certain graphical browsers spewing messages to the console, `googler` suppresses browser output by default unless `BROWSER` is set to one of the known text-based browsers: currently `elinks`, `links`, `lynx` or `w3m`. If you use a different text-based browser, you will need to explicitly enable browser output with the `--enable-browser-output` option. In that case, please submit an issue or pull request if you believe your browser is popular enough, and we will consider whitelisting it. See the man page for more details about `--enable-browser-output`.
 
 ## Troubleshooting
 
