@@ -14,6 +14,7 @@ args=(
     '(-C --nocolor)'{-C,--nocolor}'[disable color output]'
     '(--colors)--colors[set output colors]:six-letter string'
     '(-d --debug)'{-d,--debug}'[enable debugging]'
+    '(--enable-browser-output)--enable-browser-output[do not suppress browser output]'
     '(--include-git)--include-git[when used in conjuction with --upgrade, upgrade to git master]'
     '(-j --first --lucky)'{-j,--first,--lucky}'[open the first result in a web browser]'
     '(--json --np --noprompt)--json[output in JSON format; implies --noprompt]'
