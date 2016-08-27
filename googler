@@ -91,22 +91,34 @@ RAW_DOWNLOAD_REPO_BASE = 'https://raw.githubusercontent.com/jarun/googler'
 # Global helper functions
 
 def open_url(url):
-    """Open an URL in the user's default web browser."""
+    """Open an URL in the user's default web browser.
+
+    Whether the browser's output (both stdin and stdout) are suppressed
+    depends on the boolean attribute ``open_url.suppress_browser_output``.
+    If the attribute is not set upon a call, set it to a default value,
+    which means False if BROWSER is set to a known text-based browser --
+    elinks, links, lynx or w3m; or True otherwise.
+    """
+    if not hasattr(open_url, 'suppress_browser_output'):
+        open_url.suppress_browser_output = (os.getenv('BROWSER') not in
+                                            ['elinks', 'links', 'lynx', 'w3m'])
     logger.debug('Opening %s', url)
-    _stderr = os.dup(2)
-    os.close(2)
-    _stdout = os.dup(1)
-    os.close(1)
-    fd = os.open(os.devnull, os.O_RDWR)
-    os.dup2(fd, 2)
-    os.dup2(fd, 1)
+    if open_url.suppress_browser_output:
+        _stderr = os.dup(2)
+        os.close(2)
+        _stdout = os.dup(1)
+        os.close(1)
+        fd = os.open(os.devnull, os.O_RDWR)
+        os.dup2(fd, 2)
+        os.dup2(fd, 1)
     try:
         import webbrowser
         webbrowser.open(url)
     finally:
-        os.close(fd)
-        os.dup2(_stderr, 2)
-        os.dup2(_stdout, 1)
+        if open_url.suppress_browser_output:
+            os.close(fd)
+            os.dup2(_stderr, 2)
+            os.dup2(_stdout, 1)
 
 
 def printerr(msg):
@@ -2066,6 +2078,8 @@ def parse_args(args=None, namespace=None):
            help='disable user agent')
     addarg('--json', dest='json', action='store_true',
            help='output in JSON format; implies --noprompt')
+    addarg('--enable-browser-output', dest='enable_browser_output', action='store_true',
+           help='do not suppress browser output (stdin and stdout)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
            help='perform search and exit, do not prompt for further interactions')
     addarg('-d', '--debug', dest='debug', action='store_true',
@@ -2105,6 +2119,10 @@ def main():
             colors = None
         Result.colors = colors
         GooglerCmd.colors = colors
+
+        # Handle browser output suppression
+        if opts.enable_browser_output:
+            open_url.suppress_browser_output = False
 
         if opts.noua:
             USER_AGENT = ''
