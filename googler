@@ -45,6 +45,12 @@ except ImportError:
 
 # Basic setup
 
+try:
+    import setproctitle
+    setproctitle.setproctitle('googler')
+except Exception:
+    pass
+
 logging.basicConfig(format='[%(levelname)s] %(message)s')
 logger = logging.getLogger()
 
