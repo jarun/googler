@@ -176,7 +176,7 @@ and upgrade by running
       --noua                disable user agent
       --json                output in JSON format; implies --noprompt
       --enable-browser-output
-                            do not suppress browser output (stdin and stdout)
+                            do not suppress browser output (stdout and stderr)
       --np, --noprompt      perform search and exit, do not prompt for further
                             interactions
       -d, --debug           enable debugging

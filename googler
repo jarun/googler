@@ -99,7 +99,7 @@ RAW_DOWNLOAD_REPO_BASE = 'https://raw.githubusercontent.com/jarun/googler'
 def open_url(url):
     """Open an URL in the user's default web browser.
 
-    Whether the browser's output (both stdin and stdout) are suppressed
+    Whether the browser's output (both stdout and stderr) are suppressed
     depends on the boolean attribute ``open_url.suppress_browser_output``.
     If the attribute is not set upon a call, set it to a default value,
     which means False if BROWSER is set to a known text-based browser --
@@ -2085,7 +2085,7 @@ def parse_args(args=None, namespace=None):
     addarg('--json', dest='json', action='store_true',
            help='output in JSON format; implies --noprompt')
     addarg('--enable-browser-output', dest='enable_browser_output', action='store_true',
-           help='do not suppress browser output (stdin and stdout)')
+           help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
            help='perform search and exit, do not prompt for further interactions')
     addarg('-d', '--debug', dest='debug', action='store_true',
