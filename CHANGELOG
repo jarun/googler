@@ -1,3 +1,14 @@
+googler v2.7
+2016-08-28
+
+Modifications
+- Show google services abstract with User Agent disabled.
+- In-place self-upgrade mechanism.
+- Fix integration with text-based browsers.
+- Set process title to googler if setproctitle is installed.
+
+-------------------------------------------------------------------------------
+
 googler v2.6
 2016-07-06
 
@@ -6,6 +17,7 @@ Modifications
 - Logging and auto-completion script changes.
 
 -------------------------------------------------------------------------------
+
 googler v2.5.1
 2016-06-13
 
