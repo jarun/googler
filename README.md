@@ -18,9 +18,12 @@
 
 `googler` isn't affiliated to Google in any way.
 
-[![gitter chat](https://img.shields.io/gitter/room/jarun/googler.svg?maxAge=2592000)](https://gitter.im/jarun/googler)
-
-[![Donate Button](https://img.shields.io/badge/paypal-donate-orange.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q)
+<br>
+<p align="center">
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q"><img src="https://img.shields.io/badge/paypal-donate-orange.svg?maxAge=2592000" alt="Donate" /></a>
+&nbsp;
+<a href="https://gitter.im/jarun/googler"><img src="https://img.shields.io/gitter/room/jarun/googler.svg?maxAge=2592000" alt="gitter chat" /></a>
+</p>
 
 ## Table of contents
 
@@ -98,10 +101,10 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 
 `googler` is also available on
 
-- [AUR](https://aur.archlinux.org/packages/googler/) for Arch Linux;
-- [Fossies](http://fossies.org/linux/googler);
-- [Homebrew](http://braumeister.org/formula/googler) for OS X / macOS;
-- [Debian Sid](https://packages.debian.org/unstable/main/googler).
+- [AUR](https://aur.archlinux.org/packages/googler/) for Arch Linux
+- [Fossies](http://fossies.org/linux/googler)
+- [Homebrew](http://braumeister.org/formula/googler) for OS X / macOS
+- [Debian Sid](https://packages.debian.org/unstable/main/googler)
 
 #### Debian package
 
