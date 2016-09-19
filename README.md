@@ -177,6 +177,7 @@ and upgrade by running
       -p PROXY, --proxy PROXY
                             tunnel traffic through an HTTPS proxy (HOST:PORT)
       --noua                disable user agent
+      --notweak             disable TCP optimizations and forced TLS 1.2
       --json                output in JSON format; implies --noprompt
       --enable-browser-output
                             do not suppress browser output (stdout and stderr)
@@ -359,6 +360,8 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 ## Troubleshooting
 
 1. In some instances `googler` may show fewer number of results than you expect, e.g., if you fetch a single result (`-n 1`) it may not show any results. The reason is Google shows some Google service (e.g. Youtube) results, map locations etc. depending on your geographical data, which `googler` tries to omit. In some cases Google (the web-service) doesn't show exactly 10 results (default) on a search. We chose to omit these results as far as possible. While this can be fixed, it would need more processing (and more time). You can just navigate forward to fetch the next set of results.
+
+2. By default `googler` applies some TCP optimizations (only on Linux) and forces TLS 1.2. If you are facing connection issues, try disabling both using the `--notweak` switch.
 
 ## Developers
 

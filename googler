@@ -146,12 +146,12 @@ class TLS1_2Connection(HTTPSConnection):
     def __init__(self, host, **kwargs):
         HTTPSConnection.__init__(self, host, **kwargs)
 
-    def connect(self):
+    def connect(self, notweak=False):
         sock = socket.create_connection((self.host, self.port),
                 self.timeout, self.source_address)
 
         # Optimizations not available on OS X
-        if platform.system() == 'Linux':
+        if not notweak and platform.system() == 'Linux':
             sock.setsockopt(socket.SOL_TCP, socket.TCP_DEFER_ACCEPT, 1)
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
             sock.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,524288)
@@ -160,7 +160,7 @@ class TLS1_2Connection(HTTPSConnection):
             self.sock = sock
             self._tunnel()
             HTTPSConnection.connect(self)
-        elif sys.version_info >= (3,4):
+        elif not notweak and sys.version_info >= (3,4):
             # Use TLS 1.2
             self.sock = ssl.wrap_socket(sock, self.key_file, self.cert_file,
                     ssl_version=ssl.PROTOCOL_TLSv1_2)
@@ -556,10 +556,11 @@ class GoogleConnection(object):
 
     """
 
-    def __init__(self, host, port=None, timeout=45, proxy=None):
+    def __init__(self, host, port=None, timeout=45, proxy=None, notweak=False):
         self._host = None
         self._port = None
         self._proxy = proxy
+        self._notweak = notweak
         self._conn = None
         self.new_connection(host, port=port, timeout=timeout)
         self.cookie = ''
@@ -602,7 +603,7 @@ class GoogleConnection(object):
             self._conn.set_tunnel(host, port=port)
 
             try:
-                self._conn.connect()
+                self._conn.connect(self._notweak)
             except Exception as e:
                 msg = 'Failed to connect to proxy server %s: %s.' % (proxy, e)
                 raise GoogleConnectionError(msg)
@@ -610,7 +611,7 @@ class GoogleConnection(object):
             logger.debug('Connecting to new host %s', host_display)
             self._conn = TLS1_2Connection(host, port=port, timeout=timeout)
             try:
-                self._conn.connect()
+                self._conn.connect(self._notweak)
             except Exception as e:
                 msg = 'Failed to connect to %s: %s.' % (host_display, e)
                 raise GoogleConnectionError(msg)
@@ -1571,7 +1572,8 @@ class GooglerCmd(object):
 
         self._google_url = GoogleUrl(opts)
         proxy = opts.proxy if hasattr(opts, 'proxy') else None
-        self._conn = GoogleConnection(self._google_url.hostname, proxy=proxy)
+        self._conn = GoogleConnection(self._google_url.hostname, proxy=proxy,
+                                      notweak=opts.notweak)
         atexit.register(self._conn.close)
 
         self.results = []
@@ -2082,6 +2084,8 @@ def parse_args(args=None, namespace=None):
            help='tunnel traffic through an HTTPS proxy (HOST:PORT)')
     addarg('--noua', dest='noua', action='store_true',
            help='disable user agent')
+    addarg('--notweak', dest='notweak', action='store_true',
+           help='disable TCP optimizations and forced TLS 1.2')
     addarg('--json', dest='json', action='store_true',
            help='output in JSON format; implies --noprompt')
     addarg('--enable-browser-output', dest='enable_browser_output', action='store_true',

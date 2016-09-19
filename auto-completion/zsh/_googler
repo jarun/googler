@@ -22,6 +22,7 @@ args=(
     '(-n --count)'{-n,--count}'[show specified number of results (default 10)]:count'
     '(-N --news)'{-N,--news}'[show results from news section]'
     '(--noua)--noua[disable user agent]'
+    '(--notweak)--notweak[disable TCP optimizations, forced TLS 1.2]'
     '(--np --noprompt)'{--np,--noprompt}'[perform search and exit, do not prompt for further interactions]'
     '(-p --proxy)'{-p,--proxy}'[proxy in HOST:PORT format]:proxy details'
     '(-s --start)'{-s,--start}'[start at the Nth result]:result number'

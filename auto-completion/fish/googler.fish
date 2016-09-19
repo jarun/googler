@@ -11,6 +11,7 @@ complete -c googler -s N -l news              --description 'show results from n
 complete -c googler -s c -l tld    -r         --description 'country-specific search with top-level domain'
 complete -c googler -s l -l lang   -r         --description 'display in specified language'
 complete -c googler -l noua                   --description 'disable user agent'
+complete -c googler -l notweak                --description 'disable TCP optimizations, forced TLS 1.2'
 complete -c googler -s p -l proxy  -r         --description 'proxy in HOST:PORT format'
 complete -c googler -s x -l exact             --description 'disable automatic spelling correction'
 complete -c googler -s C -l nocolor           --description 'disable color output'
