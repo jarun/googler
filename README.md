@@ -169,8 +169,7 @@ and upgrade by running
       -x, --exact           disable automatic spelling correction
       -C, --nocolor         disable color output
       --colors COLORS       set output colors (see man page for details)
-      -j, --first, --lucky  open the first result in a web browser; implies
-                            --noprompt
+      -j, --first, --lucky  open the first result in web browser and exit
       -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
                             weeks), m5 (5 months), y5 (5 years)]
       -w SITE, --site SITE  search a site using Google
@@ -181,8 +180,7 @@ and upgrade by running
       --json                output in JSON format; implies --noprompt
       --enable-browser-output
                             do not suppress browser output (stdout and stderr)
-      --np, --noprompt      perform search and exit, do not prompt for further
-                            interactions
+      --np, --noprompt      search and exit, do not prompt
       -d, --debug           enable debugging
       -U, --upgrade, --update
                             perform in-place self-upgrade
@@ -194,7 +192,7 @@ and upgrade by running
       index                 open the result corresponding to index in browser
       f                     jump to the first page
       o                     open the current search in browser
-      g keywords            initiate a new Google search for 'keywords' with original options
+      g keywords            new Google search for 'keywords' with original options
       q, ^D, double Enter   exit googler
       ?                     show omniprompt help
       *                     any other string initiates a new search with original options

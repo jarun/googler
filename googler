@@ -1824,7 +1824,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
           index                 open the result corresponding to index in browser
           f                     jump to the first page
           o                     open the current search in browser
-          g keywords            initiate a new Google search for 'keywords' with original options
+          g keywords            new Google search for 'keywords' with original options
           q, ^D, double Enter   exit googler
           ?                     show omniprompt help
           *                     any other string initiates a new search with original options
@@ -2074,7 +2074,7 @@ def parse_args(args=None, namespace=None):
            default=colorstr_env if colorstr_env else 'GKlgxy', metavar='COLORS',
            help='set output colors (see man page for details)')
     addarg('-j', '--first', '--lucky', dest='lucky', action='store_true',
-           help='open the first result in a web browser; implies --noprompt')
+           help='open the first result in web browser and exit')
     addarg('-t', '--time', dest='duration', type=argparser.is_duration, metavar='dN',
            help='time limit search '
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
@@ -2091,7 +2091,7 @@ def parse_args(args=None, namespace=None):
     addarg('--enable-browser-output', dest='enable_browser_output', action='store_true',
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
-           help='perform search and exit, do not prompt for further interactions')
+           help='search and exit, do not prompt')
     addarg('-d', '--debug', dest='debug', action='store_true',
            help='enable debugging')
     addarg('keywords', nargs='*', metavar='KEYWORD',
