@@ -599,7 +599,7 @@ class GoogleConnection(object):
             logger.debug('Connecting to proxy server %s', proxy)
             self._conn = TLS1_2Connection(proxy, timeout=timeout)
 
-            logger.debug('Tunneling to host %s' % host_display)
+            logger.debug('Tunnelling to host %s' % host_display)
             self._conn.set_tunnel(host, port=port)
 
             try:
@@ -2098,7 +2098,7 @@ def parse_args(args=None, namespace=None):
            help='search keywords')
 
     if ENABLE_SELF_UPGRADE_MECHANISM and not system_is_windows():
-        addarg('-U', '--upgrade', '--update', dest='upgrade', action='store_true',
+        addarg('-U', '--upgrade', dest='upgrade', action='store_true',
                help='perform in-place self-upgrade')
         addarg('--include-git', dest='include_git', action='store_true',
                help='when used in conjuction with --upgrade, upgrade to latest git master')

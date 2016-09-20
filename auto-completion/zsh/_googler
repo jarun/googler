@@ -27,7 +27,7 @@ args=(
     '(-p --proxy)'{-p,--proxy}'[proxy in HOST:PORT format]:proxy details'
     '(-s --start)'{-s,--start}'[start at the Nth result]:result number'
     '(-t --time)'{-t,--time}'[time limit search]:period (h/d/w/m/y + number)'
-    '(-U --upgrade --update)'{-U,--upgrade,--update}'[perform in-place self-upgrade]'
+    '(-U --upgrade)'{-U,--upgrade}'[perform in-place self-upgrade]'
     '(-w --site)'{-w,--site}'[search a site using Google]:domain'
     '(-x --exact)'{-x,--exact}'[disable automatic spelling correction]'
     '*: :_guard "^-*" keyword'

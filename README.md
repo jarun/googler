@@ -182,8 +182,7 @@ and upgrade by running
                             do not suppress browser output (stdout and stderr)
       --np, --noprompt      search and exit, do not prompt
       -d, --debug           enable debugging
-      -U, --upgrade, --update
-                            perform in-place self-upgrade
+      -U, --upgrade         perform in-place self-upgrade
       --include-git         when used in conjuction with --upgrade, upgrade to
                             latest git master
 
@@ -359,7 +358,7 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
 1. In some instances `googler` may show fewer number of results than you expect, e.g., if you fetch a single result (`-n 1`) it may not show any results. The reason is Google shows some Google service (e.g. Youtube) results, map locations etc. depending on your geographical data, which `googler` tries to omit. In some cases Google (the web-service) doesn't show exactly 10 results (default) on a search. We chose to omit these results as far as possible. While this can be fixed, it would need more processing (and more time). You can just navigate forward to fetch the next set of results.
 
-2. By default `googler` applies some TCP optimizations (only on Linux) and forces TLS 1.2. If you are facing connection issues, try disabling both using the `--notweak` switch.
+2. By default `googler` applies some TCP optimizations and forces TLS 1.2. If you are facing connection issues, try disabling both using the `--notweak` switch.
 
 ## Developers
 
