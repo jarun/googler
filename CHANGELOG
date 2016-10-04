@@ -1,3 +1,12 @@
+googler 2.8
+2016-10-04
+
+Modifications
+- Add option --notweak to disable TCP optimizations and forced TLS 1.2.
+- Limited self-upgrade options to -U or --upgrade. Removed --update.
+
+-------------------------------------------------------------------------------
+
 googler v2.7
 2016-08-28
 

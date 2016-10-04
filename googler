@@ -63,7 +63,7 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 # Constants
 
-_VERSION_ = '2.7'
+_VERSION_ = '2.8'
 
 COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'a': '30', 'b': '31', 'c': '32', 'd': '33',
