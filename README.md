@@ -104,11 +104,12 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 - [AUR](https://aur.archlinux.org/packages/googler/) for Arch Linux
 - [Fossies](http://fossies.org/linux/googler)
 - [Homebrew](http://braumeister.org/formula/googler) for OS X / macOS
-- [Debian Sid](https://packages.debian.org/unstable/main/googler)
+- [Debian Sid](https://packages.debian.org/sid/googler)
+- [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
 
 #### Debian package
 
-If you are on a Debian based system (including Ubuntu), visit [the latest stable release](https://github.com/jarun/googler/releases/latest) and download the`.deb` package. To install, run
+If you are on a Debian based system (including Ubuntu), visit [the latest stable release](https://github.com/jarun/googler/releases/latest) and download the `.deb` package. To install, run
 
     $ sudo dpkg -i googler-$version-all.deb
 
