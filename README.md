@@ -102,10 +102,11 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 `googler` is also available on
 
 - [AUR](https://aur.archlinux.org/packages/googler/) for Arch Linux
-- [Fossies](http://fossies.org/linux/googler)
+- [Ubuntu](https://launchpad.net/ubuntu/+source/googler)
 - [Homebrew](http://braumeister.org/formula/googler) for OS X / macOS
 - [Debian Sid](https://packages.debian.org/sid/googler)
 - [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
+- [Fossies](http://fossies.org/linux/googler)
 
 #### Debian package
 
