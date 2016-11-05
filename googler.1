@@ -48,7 +48,7 @@ Search a site using Google.
 Tunnel traffic through an HTTPS proxy. \fIPROXY\fR is of the form \fIHOST:PORT\fR. The proxy server must support HTTP CONNECT tunneling and must not block port 443 for the relevant Google hosts. If a proxy is not explicitly given, the \fIhttps_proxy\fR environment variable (if available) is used instead.
 .TP
 .BI "--noua"
-Disable user agent. Results are fetched faster. However, abstracts for some Google service (e.g. YouTube, Google Books) results don't show.
+Disable user agent. Results are fetched faster.
 .TP
 .BI "--notweak"
 Disable TCP optimizations. Negotiate Transport Layer Security protocol instead of forcing TLS 1.2. Should be used only in case of connection issues.
@@ -317,7 +317,7 @@ Tunnel traffic through an \fBHTTPS proxy\fR, e.g., a local Privoxy instance list
 .EE
 .PP
 .IP "" 4
-The proxy can also be set by the environment variable \fIhttps_proxy\fR.
+By default the environment variable \fIhttps_proxy\fR is used, if defined.
 .SH AUTHORS
 Henri Hakkinen
 .br
