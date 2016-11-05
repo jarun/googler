@@ -2137,6 +2137,12 @@ def main():
         if opts.noua:
             USER_AGENT = ''
 
+        # Handle proxy environment variable
+        if 'https_proxy' in os.environ:
+            logger.debug("Proxy is set via environment variable")
+            proxy_parser = urllib.parse.urlparse(os.environ['https_proxy'])
+            opts.proxy = proxy_parser.netloc
+
         repl = GooglerCmd(opts)
 
         if opts.json or opts.lucky or opts.noninteractive:
