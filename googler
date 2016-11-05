@@ -2032,6 +2032,19 @@ def self_upgrade(include_git=False):
 
 # Miscellaneous functions
 
+def https_proxy_from_environment():
+    if 'https_proxy' not in os.environ:
+        return None
+    proxy = urllib.parse.urlparse(os.environ['https_proxy']).netloc
+    # urlparse recognizes a netloc only if it is introduced by '//'
+    # (https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urlparse).
+    # This means a bare host:port like 'localhost:8118' won't be
+    # recognized. In that case, try again with the '//' prefix.
+    if not proxy:
+        proxy = urllib.parse.urlparse('//' + os.environ['https_proxy']).netloc
+    return proxy if proxy else None
+
+
 def parse_args(args=None, namespace=None):
     """Parse googler arguments/options.
 
@@ -2080,7 +2093,7 @@ def parse_args(args=None, namespace=None):
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
     addarg('-w', '--site', dest='site', metavar='SITE',
            help='search a site using Google')
-    addarg('-p', '--proxy', dest='proxy',
+    addarg('-p', '--proxy', dest='proxy', default=https_proxy_from_environment(),
            help='tunnel traffic through an HTTPS proxy (HOST:PORT)')
     addarg('--noua', dest='noua', action='store_true',
            help='disable user agent')
@@ -2136,12 +2149,6 @@ def main():
 
         if opts.noua:
             USER_AGENT = ''
-
-        # Handle proxy environment variable
-        if 'https_proxy' in os.environ:
-            logger.debug("Proxy is set via environment variable")
-            proxy_parser = urllib.parse.urlparse(os.environ['https_proxy'])
-            opts.proxy = proxy_parser.netloc
 
         repl = GooglerCmd(opts)
 

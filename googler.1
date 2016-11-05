@@ -45,7 +45,7 @@ Time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 y
 Search a site using Google.
 .TP
 .BI "-p, --proxy=" PROXY
-Tunnel traffic through an HTTPS proxy. \fIPROXY\fR is of the form \fIHOST:PORT\fR. The proxy server must support HTTP CONNECT tunneling and must not block port 443 for the relevant Google hosts.
+Tunnel traffic through an HTTPS proxy. \fIPROXY\fR is of the form \fIHOST:PORT\fR. The proxy server must support HTTP CONNECT tunneling and must not block port 443 for the relevant Google hosts. If a proxy is not explicitly given, the \fIhttps_proxy\fR environment variable (if available) is used instead.
 .TP
 .BI "--noua"
 Disable user agent. Results are fetched faster. However, abstracts for some Google service (e.g. YouTube, Google Books) results don't show.
@@ -179,6 +179,9 @@ Overrides the default browser. Ref:
 .TP
 .BI GOOGLER_COLORS
 Refer to the \fBCOLORS\fR section.
+.TP
+.BI https_proxy
+Refer to the \fB--proxy\fR option.
 .SH EXAMPLES
 .PP
 .IP 1. 4
