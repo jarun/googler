@@ -337,8 +337,6 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
         $ googler --proxy localhost:8118 google
 
-    The proxy can also be set by the environment variable `https_proxy`.
-
 16. More **help**:
 
         $ googler -h
