@@ -337,7 +337,7 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
         $ googler --proxy localhost:8118 google
 
-    By default the environment variable `https_proxy` is used, if defined.
+    By default the environment variable `https_proxy` is used, if defined. Supports embedded username 'username:password@proxy:port'
 
 16. More **help**:
 
