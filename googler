@@ -36,6 +36,7 @@ import sys
 import textwrap
 import urllib.parse
 
+import base64
 # Python optional dependency compatibility layer
 try:
     import readline
@@ -53,6 +54,7 @@ except Exception:
 
 logging.basicConfig(format='[%(levelname)s] %(message)s')
 logger = logging.getLogger()
+
 
 def sigint_handler(signum, frame):
     print('\nInterrupted.', file=sys.stderr)
@@ -89,7 +91,7 @@ USER_AGENT = ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) Gecko/20100101 F
 #
 # before running `make install'.
 
-ENABLE_SELF_UPGRADE_MECHANISM=True
+ENABLE_SELF_UPGRADE_MECHANISM = True
 API_REPO_BASE = 'https://api.github.com/repos/jarun/googler'
 RAW_DOWNLOAD_REPO_BASE = 'https://raw.githubusercontent.com/jarun/googler'
 
@@ -148,24 +150,25 @@ class TLS1_2Connection(HTTPSConnection):
 
     def connect(self, notweak=False):
         sock = socket.create_connection((self.host, self.port),
-                self.timeout, self.source_address)
+                                        self.timeout, self.source_address)
 
         # Optimizations not available on OS X
         if not notweak and platform.system() == 'Linux':
             sock.setsockopt(socket.SOL_TCP, socket.TCP_DEFER_ACCEPT, 1)
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
-            sock.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,524288)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 524288)
 
         if getattr(self, '_tunnel_host', None):
             self.sock = sock
             self._tunnel()
             HTTPSConnection.connect(self)
-        elif not notweak and sys.version_info >= (3,4):
+        elif not notweak and sys.version_info >= (3, 4):
             # Use TLS 1.2
             self.sock = ssl.wrap_socket(sock, self.key_file, self.cert_file,
-                    ssl_version=ssl.PROTOCOL_TLSv1_2)
+                                        ssl_version=ssl.PROTOCOL_TLSv1_2)
         else:
             HTTPSConnection.connect(self)
+
 
 class GoogleUrl(object):
     """
@@ -182,7 +185,7 @@ class GoogleUrl(object):
     Parameters
     ----------
     opts : dict or argparse.Namespace, optional
-        See the ``opts`` parameter of `update`.
+                    See the ``opts`` parameter of `update`.
 
     Other Parameters
     ----------------
@@ -191,13 +194,13 @@ class GoogleUrl(object):
     Attributes
     ----------
     hostname : str
-        Read-write property.
+                    Read-write property.
     keywords : str or list of strs
-        Read-write property.
+                    Read-write property.
     news : bool
-        Read-only property.
+                    Read-only property.
     url : str
-        Read-only property.
+                    Read-only property.
 
     Methods
     -------
@@ -302,26 +305,26 @@ class GoogleUrl(object):
         Parameters
         ----------
         opts : dict or argparse.Namespace, optional
-            Carries options that affect the Google Search/News URL. The
-            list of currently recognized option keys with expected value
-            types:
+                        Carries options that affect the Google Search/News URL. The
+                        list of currently recognized option keys with expected value
+                        types:
 
-                duration: str (GooglerArgumentParser.is_duration)
-                exact: bool
-                keywords: str or list of strs
-                lang: str
-                news: bool
-                num: int
-                site: str
-                start: int
-                tld: str
+                                        duration: str (GooglerArgumentParser.is_duration)
+                                        exact: bool
+                                        keywords: str or list of strs
+                                        lang: str
+                                        news: bool
+                                        num: int
+                                        site: str
+                                        start: int
+                                        tld: str
 
         Other Parameters
         ----------------
         kwargs
-            The `kwargs` dict extends `opts`, that is, options can be
-            specified either way, in `opts` or as individual keyword
-            arguments.
+                        The `kwargs` dict extends `opts`, that is, options can be
+                        specified either way, in `opts` or as individual keyword
+                        arguments.
 
         """
 
@@ -363,12 +366,12 @@ class GoogleUrl(object):
         Other Parameters
         ----------------
         kwargs
-            Arbitrary key value pairs to be set in the query string. All
-            keys and values should be stringifiable.
+                        Arbitrary key value pairs to be set in the query string. All
+                        keys and values should be stringifiable.
 
-            Note that certain keys, e.g., ``q``, have their values
-            constructed on the fly, so setting those has no actual
-            effect.
+                        Note that certain keys, e.g., ``q``, have their values
+                        constructed on the fly, so setting those has no actual
+                        effect.
 
         """
         for k, v in kwargs.items():
@@ -380,11 +383,11 @@ class GoogleUrl(object):
         Other Parameters
         ----------------
         args
-            Arbitrary keys to be unset. No exception is raised if a key
-            does not exist in the first place.
+                        Arbitrary keys to be unset. No exception is raised if a key
+                        does not exist in the first place.
 
-            Note that certain keys, e.g., ``q``, are always included in
-            the resulting URL, so unsetting those has no actual effect.
+                        Note that certain keys, e.g., ``q``, are always included in
+                        the resulting URL, so unsetting those has no actual effect.
 
         """
         for k in args:
@@ -400,8 +403,8 @@ class GoogleUrl(object):
         Raises
         ------
         ValueError
-            If already at the first page (``start=0`` in the current
-            query string).
+                        If already at the first page (``start=0`` in the current
+                        query string).
 
         """
         if self._start == 0:
@@ -414,8 +417,8 @@ class GoogleUrl(object):
         Raises
         ------
         ValueError
-            If already at the first page (``start=0`` in the current
-            query string).
+                        If already at the first page (``start=0`` in the current
+                        query string).
 
         """
         if self._start == 0:
@@ -425,72 +428,72 @@ class GoogleUrl(object):
     # Data source: https://en.wikipedia.org/wiki/List_of_Google_domains
     # Scraper script: https://gist.github.com/zmwangx/b976e83c14552fe18b71
     TLD_TO_DOMAIN_MAP = {
-        'ac': 'google.ac',      'ad': 'google.ad',      'ae': 'google.ae',
-        'af': 'google.com.af',  'ag': 'google.com.ag',  'ai': 'google.com.ai',
-        'al': 'google.al',      'am': 'google.am',      'ao': 'google.co.ao',
-        'ar': 'google.com.ar',  'as': 'google.as',      'at': 'google.at',
-        'au': 'google.com.au',  'az': 'google.az',      'ba': 'google.ba',
-        'bd': 'google.com.bd',  'be': 'google.be',      'bf': 'google.bf',
-        'bg': 'google.bg',      'bh': 'google.com.bh',  'bi': 'google.bi',
-        'bj': 'google.bj',      'bn': 'google.com.bn',  'bo': 'google.com.bo',
-        'br': 'google.com.br',  'bs': 'google.bs',      'bt': 'google.bt',
-        'bw': 'google.co.bw',   'by': 'google.by',      'bz': 'google.com.bz',
-        'ca': 'google.ca',      'cat': 'google.cat',    'cc': 'google.cc',
-        'cd': 'google.cd',      'cf': 'google.cf',      'cg': 'google.cg',
-        'ch': 'google.ch',      'ci': 'google.ci',      'ck': 'google.co.ck',
-        'cl': 'google.cl',      'cm': 'google.cm',      'cn': 'google.cn',
-        'co': 'google.com.co',  'cr': 'google.co.cr',   'cu': 'google.com.cu',
-        'cv': 'google.cv',      'cy': 'google.com.cy',  'cz': 'google.cz',
-        'de': 'google.de',      'dj': 'google.dj',      'dk': 'google.dk',
-        'dm': 'google.dm',      'do': 'google.com.do',  'dz': 'google.dz',
-        'ec': 'google.com.ec',  'ee': 'google.ee',      'eg': 'google.com.eg',
-        'es': 'google.es',      'et': 'google.com.et',  'fi': 'google.fi',
-        'fj': 'google.com.fj',  'fm': 'google.fm',      'fr': 'google.fr',
-        'ga': 'google.ga',      'ge': 'google.ge',      'gf': 'google.gf',
-        'gg': 'google.gg',      'gh': 'google.com.gh',  'gi': 'google.com.gi',
-        'gl': 'google.gl',      'gm': 'google.gm',      'gp': 'google.gp',
-        'gr': 'google.gr',      'gt': 'google.com.gt',  'gy': 'google.gy',
-        'hk': 'google.com.hk',  'hn': 'google.hn',      'hr': 'google.hr',
-        'ht': 'google.ht',      'hu': 'google.hu',      'id': 'google.co.id',
-        'ie': 'google.ie',      'il': 'google.co.il',   'im': 'google.im',
-        'in': 'google.co.in',   'io': 'google.io',      'iq': 'google.iq',
-        'is': 'google.is',      'it': 'google.it',      'je': 'google.je',
-        'jm': 'google.com.jm',  'jo': 'google.jo',      'jp': 'google.co.jp',
-        'ke': 'google.co.ke',   'kg': 'google.kg',      'kh': 'google.com.kh',
-        'ki': 'google.ki',      'kr': 'google.co.kr',   'kw': 'google.com.kw',
-        'kz': 'google.kz',      'la': 'google.la',      'lb': 'google.com.lb',
-        'lc': 'google.com.lc',  'li': 'google.li',      'lk': 'google.lk',
-        'ls': 'google.co.ls',   'lt': 'google.lt',      'lu': 'google.lu',
-        'lv': 'google.lv',      'ly': 'google.com.ly',  'ma': 'google.co.ma',
-        'md': 'google.md',      'me': 'google.me',      'mg': 'google.mg',
-        'mk': 'google.mk',      'ml': 'google.ml',      'mm': 'google.com.mm',
-        'mn': 'google.mn',      'ms': 'google.ms',      'mt': 'google.com.mt',
-        'mu': 'google.mu',      'mv': 'google.mv',      'mw': 'google.mw',
-        'mx': 'google.com.mx',  'my': 'google.com.my',  'mz': 'google.co.mz',
-        'na': 'google.com.na',  'ne': 'google.ne',      'nf': 'google.com.nf',
-        'ng': 'google.com.ng',  'ni': 'google.com.ni',  'nl': 'google.nl',
-        'no': 'google.no',      'np': 'google.com.np',  'nr': 'google.nr',
-        'nu': 'google.nu',      'nz': 'google.co.nz',   'om': 'google.com.om',
-        'pa': 'google.com.pa',  'pe': 'google.com.pe',  'pg': 'google.com.pg',
-        'ph': 'google.com.ph',  'pk': 'google.com.pk',  'pl': 'google.pl',
-        'pn': 'google.co.pn',   'pr': 'google.com.pr',  'ps': 'google.ps',
-        'pt': 'google.pt',      'py': 'google.com.py',  'qa': 'google.com.qa',
-        'ro': 'google.ro',      'rs': 'google.rs',      'ru': 'google.ru',
-        'rw': 'google.rw',      'sa': 'google.com.sa',  'sb': 'google.com.sb',
-        'sc': 'google.sc',      'se': 'google.se',      'sg': 'google.com.sg',
-        'sh': 'google.sh',      'si': 'google.si',      'sk': 'google.sk',
-        'sl': 'google.com.sl',  'sm': 'google.sm',      'sn': 'google.sn',
-        'so': 'google.so',      'sr': 'google.sr',      'st': 'google.st',
-        'sv': 'google.com.sv',  'td': 'google.td',      'tg': 'google.tg',
-        'th': 'google.co.th',   'tj': 'google.com.tj',  'tk': 'google.tk',
-        'tl': 'google.tl',      'tm': 'google.tm',      'tn': 'google.tn',
-        'to': 'google.to',      'tr': 'google.com.tr',  'tt': 'google.tt',
-        'tw': 'google.com.tw',  'tz': 'google.co.tz',   'ua': 'google.com.ua',
-        'ug': 'google.co.ug',   'uk': 'google.co.uk',   'uy': 'google.com.uy',
-        'uz': 'google.co.uz',   'vc': 'google.com.vc',  've': 'google.co.ve',
-        'vg': 'google.vg',      'vi': 'google.co.vi',   'vn': 'google.com.vn',
-        'vu': 'google.vu',      'ws': 'google.ws',      'za': 'google.co.za',
-        'zm': 'google.co.zm',   'zw': 'google.co.zw',
+        'ac': 'google.ac', 'ad': 'google.ad', 'ae': 'google.ae',
+        'af': 'google.com.af', 'ag': 'google.com.ag', 'ai': 'google.com.ai',
+        'al': 'google.al', 'am': 'google.am', 'ao': 'google.co.ao',
+        'ar': 'google.com.ar', 'as': 'google.as', 'at': 'google.at',
+        'au': 'google.com.au', 'az': 'google.az', 'ba': 'google.ba',
+        'bd': 'google.com.bd', 'be': 'google.be', 'bf': 'google.bf',
+        'bg': 'google.bg', 'bh': 'google.com.bh', 'bi': 'google.bi',
+        'bj': 'google.bj', 'bn': 'google.com.bn', 'bo': 'google.com.bo',
+        'br': 'google.com.br', 'bs': 'google.bs', 'bt': 'google.bt',
+        'bw': 'google.co.bw', 'by': 'google.by', 'bz': 'google.com.bz',
+        'ca': 'google.ca', 'cat': 'google.cat', 'cc': 'google.cc',
+        'cd': 'google.cd', 'cf': 'google.cf', 'cg': 'google.cg',
+        'ch': 'google.ch', 'ci': 'google.ci', 'ck': 'google.co.ck',
+        'cl': 'google.cl', 'cm': 'google.cm', 'cn': 'google.cn',
+        'co': 'google.com.co', 'cr': 'google.co.cr', 'cu': 'google.com.cu',
+        'cv': 'google.cv', 'cy': 'google.com.cy', 'cz': 'google.cz',
+        'de': 'google.de', 'dj': 'google.dj', 'dk': 'google.dk',
+        'dm': 'google.dm', 'do': 'google.com.do', 'dz': 'google.dz',
+        'ec': 'google.com.ec', 'ee': 'google.ee', 'eg': 'google.com.eg',
+        'es': 'google.es', 'et': 'google.com.et', 'fi': 'google.fi',
+        'fj': 'google.com.fj', 'fm': 'google.fm', 'fr': 'google.fr',
+        'ga': 'google.ga', 'ge': 'google.ge', 'gf': 'google.gf',
+        'gg': 'google.gg', 'gh': 'google.com.gh', 'gi': 'google.com.gi',
+        'gl': 'google.gl', 'gm': 'google.gm', 'gp': 'google.gp',
+        'gr': 'google.gr', 'gt': 'google.com.gt', 'gy': 'google.gy',
+        'hk': 'google.com.hk', 'hn': 'google.hn', 'hr': 'google.hr',
+        'ht': 'google.ht', 'hu': 'google.hu', 'id': 'google.co.id',
+        'ie': 'google.ie', 'il': 'google.co.il', 'im': 'google.im',
+        'in': 'google.co.in', 'io': 'google.io', 'iq': 'google.iq',
+        'is': 'google.is', 'it': 'google.it', 'je': 'google.je',
+        'jm': 'google.com.jm', 'jo': 'google.jo', 'jp': 'google.co.jp',
+        'ke': 'google.co.ke', 'kg': 'google.kg', 'kh': 'google.com.kh',
+        'ki': 'google.ki', 'kr': 'google.co.kr', 'kw': 'google.com.kw',
+        'kz': 'google.kz', 'la': 'google.la', 'lb': 'google.com.lb',
+        'lc': 'google.com.lc', 'li': 'google.li', 'lk': 'google.lk',
+        'ls': 'google.co.ls', 'lt': 'google.lt', 'lu': 'google.lu',
+        'lv': 'google.lv', 'ly': 'google.com.ly', 'ma': 'google.co.ma',
+        'md': 'google.md', 'me': 'google.me', 'mg': 'google.mg',
+        'mk': 'google.mk', 'ml': 'google.ml', 'mm': 'google.com.mm',
+        'mn': 'google.mn', 'ms': 'google.ms', 'mt': 'google.com.mt',
+        'mu': 'google.mu', 'mv': 'google.mv', 'mw': 'google.mw',
+        'mx': 'google.com.mx', 'my': 'google.com.my', 'mz': 'google.co.mz',
+        'na': 'google.com.na', 'ne': 'google.ne', 'nf': 'google.com.nf',
+        'ng': 'google.com.ng', 'ni': 'google.com.ni', 'nl': 'google.nl',
+        'no': 'google.no', 'np': 'google.com.np', 'nr': 'google.nr',
+        'nu': 'google.nu', 'nz': 'google.co.nz', 'om': 'google.com.om',
+        'pa': 'google.com.pa', 'pe': 'google.com.pe', 'pg': 'google.com.pg',
+        'ph': 'google.com.ph', 'pk': 'google.com.pk', 'pl': 'google.pl',
+        'pn': 'google.co.pn', 'pr': 'google.com.pr', 'ps': 'google.ps',
+        'pt': 'google.pt', 'py': 'google.com.py', 'qa': 'google.com.qa',
+        'ro': 'google.ro', 'rs': 'google.rs', 'ru': 'google.ru',
+        'rw': 'google.rw', 'sa': 'google.com.sa', 'sb': 'google.com.sb',
+        'sc': 'google.sc', 'se': 'google.se', 'sg': 'google.com.sg',
+        'sh': 'google.sh', 'si': 'google.si', 'sk': 'google.sk',
+        'sl': 'google.com.sl', 'sm': 'google.sm', 'sn': 'google.sn',
+        'so': 'google.so', 'sr': 'google.sr', 'st': 'google.st',
+        'sv': 'google.com.sv', 'td': 'google.td', 'tg': 'google.tg',
+        'th': 'google.co.th', 'tj': 'google.com.tj', 'tk': 'google.tk',
+        'tl': 'google.tl', 'tm': 'google.tm', 'tn': 'google.tn',
+        'to': 'google.to', 'tr': 'google.com.tr', 'tt': 'google.tt',
+        'tw': 'google.com.tw', 'tz': 'google.co.tz', 'ua': 'google.com.ua',
+        'ug': 'google.co.ug', 'uk': 'google.co.uk', 'uy': 'google.com.uy',
+        'uz': 'google.co.uz', 'vc': 'google.com.vc', 've': 'google.co.ve',
+        'vg': 'google.vg', 'vi': 'google.co.vi', 'vn': 'google.com.vn',
+        'vu': 'google.vu', 'ws': 'google.ws', 'za': 'google.co.za',
+        'zm': 'google.co.zm', 'zw': 'google.co.zw',
     }
 
     @property
@@ -544,8 +547,8 @@ class GoogleConnection(object):
     Attributes
     ----------
     host : str
-        The currently connected host. Read-only property. Use
-        `new_connection` to change host.
+                    The currently connected host. Read-only property. Use
+                    `new_connection` to change host.
 
     Methods
     -------
@@ -593,17 +596,24 @@ class GoogleConnection(object):
         self._host = host
         self._port = port
         host_display = host + (':%d' % port if port else '')
-
         proxy = self._proxy
+
         if proxy:
+
+            url = urllib.parse.urlparse('http://' + proxy)
             logger.debug('Connecting to proxy server %s', proxy)
-            self._conn = TLS1_2Connection(proxy, timeout=timeout)
 
+            # self._conn = TLS1_2Connection(host, port=url.port, timeout=timeout)
+            self._conn = HTTPSConnection(url.hostname, url.port)
             logger.debug('Tunnelling to host %s' % host_display)
-            self._conn.set_tunnel(host, port=port)
+            headers = {}
 
+            if url.username and url.password:
+                auth = '%s:%s' % (url.username, url.password)
+                headers['Proxy-Authorization'] = 'Basic ' + base64.b64encode(auth.encode('ascii')).decode()
+            self._conn.set_tunnel(host, port, headers)
             try:
-                self._conn.connect(self._notweak)
+                self._conn.connect()
             except Exception as e:
                 msg = 'Failed to connect to proxy server %s: %s.' % (proxy, e)
                 raise GoogleConnectionError(msg)
@@ -633,19 +643,19 @@ class GoogleConnection(object):
         Parameters
         ----------
         url : str
-            The URL to fetch, relative to the host.
+                        The URL to fetch, relative to the host.
 
         Raises
         ------
         GoogleConnectionError
-            When not getting HTTP 200 even after the allowed one
-            reconnection and/or one redirection, or when Google is
-            blocking query due to unsual activity.
+                        When not getting HTTP 200 even after the allowed one
+                        reconnection and/or one redirection, or when Google is
+                        blocking query due to unsual activity.
 
         Returns
         -------
         str
-            Response payload, gunzipped (if applicable) and decoded (in UTF-8).
+                        Response payload, gunzipped (if applicable) and decoded (in UTF-8).
 
         """
         try:
@@ -687,8 +697,8 @@ class GoogleConnection(object):
         Parameters
         ----------
         url : str
-            If absolute and points to a different host, make a new
-            connection.
+                        If absolute and points to a different host, make a new
+                        connection.
 
         Raises
         ------
@@ -718,7 +728,7 @@ class GoogleConnection(object):
         Parameters
         ----------
         url : str
-            URL relative to the host, used in the GET request.
+                        URL relative to the host, used in the GET request.
 
         Raises
         ------
@@ -799,6 +809,7 @@ def annotate_tag(annotated_starttag_handler):
 
     return handler
 
+
 def retrieve_tag_annotation(annotated_endtag_handler):
     # See parser logic within the GoogleParser class for documentation.
     #
@@ -814,6 +825,7 @@ def retrieve_tag_annotation(annotated_endtag_handler):
         annotated_endtag_handler(self, tag, annotation)
 
     return handler
+
 
 class GoogleParser(html.parser.HTMLParser):
     """The members of this class parse the result
@@ -1090,7 +1102,7 @@ class GoogleParser(html.parser.HTMLParser):
             self.title = ''
             self.url = ''
             self.abstract = ''
-            self.metadata = '' # Only used for Google News
+            self.metadata = ''  # Only used for Google News
             self.sitelinks = []
 
             # Guard against sitelinks, which also have titles and
@@ -1098,7 +1110,7 @@ class GoogleParser(html.parser.HTMLParser):
             # sections" (secondary results to the same event).
             self.title_registered = False
             self.abstract_registered = False
-            self.metadata_registered = False # Only used for Google News
+            self.metadata_registered = False  # Only used for Google News
 
             self.set_handlers_to('result')
             return 'result'
@@ -1142,7 +1154,7 @@ class GoogleParser(html.parser.HTMLParser):
                     self.start_populating_textbuf(lambda text: ', ' if text == '-' else text)
                 else:
                     self.start_populating_textbuf(lambda text:
-                                              text.replace(' -', ',', 1) if ' - ' in text else text)
+                                                  text.replace(' -', ',', 1) if ' - ' in text else text)
                 return 'news_metadata'
 
             if not self.abstract_registered and tag == 'div' and 'st' in self.classes(attrs):
@@ -1377,10 +1389,10 @@ class Result(object):
     url : str
     abstract : str
     metadata : str, optional
-        Only applicable to Google News results, with publisher name and
-        publishing time.
+                    Only applicable to Google News results, with publisher name and
+                    publishing time.
     sitelinks : list, optional
-        List of ``SiteLink`` objects.
+                    List of ``SiteLink`` objects.
 
     Attributes
     ----------
@@ -1493,9 +1505,9 @@ class Result(object):
         Returns
         -------
         dict
-            A dict mapping indices (strs) to URLs (also strs). Indices of
-            sitelinks are the original index appended by lowercase letters a,
-            b, c, etc.
+                        A dict mapping indices (strs) to URLs (also strs). Indices of
+                        sitelinks are the original index appended by lowercase letters a,
+                        b, c, etc.
 
         """
         return self._urltable
@@ -1520,6 +1532,7 @@ def require_keywords(method):
 
     return enforced_method
 
+
 def no_argument(method):
     # Normalize a do_* method of GooglerCmd that takes no argument to
     # one that takes an arg, but issue a warning when an nonempty
@@ -1534,6 +1547,7 @@ def no_argument(method):
 
     return enforced_method
 
+
 class GooglerCmd(object):
     """
     Command line interpreter and executor class for googler.
@@ -1543,14 +1557,14 @@ class GooglerCmd(object):
     Parameters
     ----------
     opts : argparse.Namespace
-        Options and/or arguments.
+                    Options and/or arguments.
 
     Attributes
     ----------
     options : argparse.Namespace
-        Options that are currently in effect. Read-only attribute.
+                    Options that are currently in effect. Read-only attribute.
     keywords : str or list or strs
-        Current keywords. Read-only attribute
+                    Current keywords. Read-only attribute
 
     Methods
     -------
@@ -1658,13 +1672,13 @@ class GooglerCmd(object):
         Parameters
         ----------
         prelude : str, optional
-            A string that is written to stderr before showing actual results,
-            usually serving as a separator. Default is an empty line.
+                        A string that is written to stderr before showing actual results,
+                        usually serving as a separator. Default is an empty line.
         json_output : bool, optional
-            Whether to dump results in JSON format. Default is False.
+                        Whether to dump results in JSON format. Default is False.
         interactive : bool, optional
-            Whether to show contextual instructions, when e.g. Google
-            has filtered the results. Default is True.
+                        Whether to show contextual instructions, when e.g. Google
+                        has filtered the results. Default is True.
 
         Raises
         ------
@@ -1764,7 +1778,7 @@ class GooglerCmd(object):
     @no_argument
     def do_unfilter(self):
         # Reset start to 0 when unfilter is applied.
-        self._google_url.update(None, **{'start':0,})
+        self._google_url.update(None, **{'start': 0, })
         self._google_url.set_queries(filter=0)
         self.fetch_and_display()
 
@@ -1819,29 +1833,29 @@ class GooglerArgumentParser(argparse.ArgumentParser):
     def print_omniprompt_help(file=None):
         file = sys.stderr if file is None else file
         file.write(textwrap.dedent("""
-        omniprompt keys:
-          n, p                  fetch the next or previous set of search results
-          index                 open the result corresponding to index in browser
-          f                     jump to the first page
-          o                     open the current search in browser
-          g keywords            new Google search for 'keywords' with original options
-          q, ^D, double Enter   exit googler
-          ?                     show omniprompt help
-          *                     any other string initiates a new search with original options
-        """))
+				omniprompt keys:
+					n, p                  fetch the next or previous set of search results
+					index                 open the result corresponding to index in browser
+					f                     jump to the first page
+					o                     open the current search in browser
+					g keywords            new Google search for 'keywords' with original options
+					q, ^D, double Enter   exit googler
+					?                     show omniprompt help
+					*                     any other string initiates a new search with original options
+				"""))
 
     # Print information on googler
     @staticmethod
     def print_general_info(file=None):
         file = sys.stderr if file is None else file
         file.write(textwrap.dedent("""
-        Version %s
-        Copyright (C) 2008 Henri Hakkinen
-        Copyright (C) 2015-2016 Arun Prakash Jana <engineerarun@gmail.com>
-        Zhiming Wang <zmwangx@gmail.com>
-        License: GPLv3
-        Webpage: https://github.com/jarun/googler
-        """ % _VERSION_))
+				Version %s
+				Copyright (C) 2008 Henri Hakkinen
+				Copyright (C) 2015-2016 Arun Prakash Jana <engineerarun@gmail.com>
+				Zhiming Wang <zmwangx@gmail.com>
+				License: GPLv3
+				Webpage: https://github.com/jarun/googler
+				""" % _VERSION_))
 
     # Augment print_help to print more than synopsis and options
     def print_help(self, file=None):
@@ -1920,14 +1934,14 @@ def download_latest_googler(include_git=False):
     Parameters
     ----------
     include_git : bool, optional
-        Download from git master. Default is False.
+                    Download from git master. Default is False.
 
     Returns
     -------
     (git_ref, path): tuple
-         A tuple containing the git reference (either name of the latest
-         tag or SHA of the latest commit) and path to the downloaded
-         file.
+                     A tuple containing the git reference (either name of the latest
+                     tag or SHA of the latest commit) and path to the downloaded
+                     file.
 
     """
     import urllib.request
@@ -1985,13 +1999,13 @@ def self_replace(path):
     Parameters
     ----------
     path : str
-        Path to the replacement file.
+                    Path to the replacement file.
 
     Returns
     -------
     bool
-        True if replaced, False if skipped (specified file is the same
-        as the current script).
+                    True if replaced, False if skipped (specified file is the same
+                    as the current script).
 
     """
     if system_is_windows():
@@ -2020,7 +2034,7 @@ def self_upgrade(include_git=False):
     Parameters
     ----------
     include_git : bool, optional
-        See `download_latest_googler`. Default is False.
+                    See `download_latest_googler`. Default is False.
 
     """
     git_ref, path = download_latest_googler(include_git=include_git)
@@ -2051,14 +2065,14 @@ def parse_args(args=None, namespace=None):
     Parameters
     ----------
     args : list, optional
-        Arguments to parse. Default is ``sys.argv``.
+                    Arguments to parse. Default is ``sys.argv``.
     namespace : argparse.Namespace
-        Namespace to write to. Default is a new namespace.
+                    Namespace to write to. Default is a new namespace.
 
     Returns
     -------
     argparse.Namespace
-        Namespace with parsed arguments / options.
+                    Namespace with parsed arguments / options.
 
     """
 
@@ -2076,7 +2090,7 @@ def parse_args(args=None, namespace=None):
            help='show results from news section')
     addarg('-c', '--tld', dest='tld', metavar='TLD',
            help="""country-specific search with top-level domain .TLD, e.g., 'in'
-           for India. Ref: https://en.wikipedia.org/wiki/List_of_Google_domains""")
+					 for India. Ref: https://en.wikipedia.org/wiki/List_of_Google_domains""")
     addarg('-l', '--lang', dest='lang', metavar='LANG',
            help='display in language LANG')
     addarg('-x', '--exact', dest='exact', action='store_true',
@@ -2098,7 +2112,7 @@ def parse_args(args=None, namespace=None):
     addarg('--noua', dest='noua', action='store_true',
            help='disable user agent')
     addarg('--notweak', dest='notweak', action='store_true',
-           help='disable TCP optimizations and forced TLS 1.2')
+                             help='disable TCP optimizations and forced TLS 1.2')
     addarg('--json', dest='json', action='store_true',
            help='output in JSON format; implies --noprompt')
     addarg('--enable-browser-output', dest='enable_browser_output', action='store_true',
@@ -2108,7 +2122,7 @@ def parse_args(args=None, namespace=None):
     addarg('-d', '--debug', dest='debug', action='store_true',
            help='enable debugging')
     addarg('keywords', nargs='*', metavar='KEYWORD',
-           help='search keywords')
+                             help='search keywords')
 
     if ENABLE_SELF_UPGRADE_MECHANISM and not system_is_windows():
         addarg('-U', '--upgrade', dest='upgrade', action='store_true',
