@@ -627,8 +627,8 @@ class GoogleConnection(object):
     def fetch_page(self, url):
         """Fetch a URL.
 
-        Allows one reconnection and one redirection before failing and
-        raising GoogleConnectionError.
+        Allows one reconnection and multiple redirections before failing
+        and raising GoogleConnectionError.
 
         Parameters
         ----------
@@ -661,12 +661,17 @@ class GoogleConnection(object):
                 raise GoogleConnectionError("Failed to get '%s'." % url)
 
         resp = self._resp
-        if resp.status in {301, 302, 303, 307, 308}:
-            redirection_url = resp.getheader('location', '')
-            if 'sorry/IndexRedirect?' in redirection_url:
-                raise GoogleConnectionError('Connection blocked due to unusual activity.')
-            self._redirect(redirection_url)
-            resp = self._resp
+        redirect_counter = 0
+        while resp.status != 200 and redirect_counter < 3:
+            if resp.status in {301, 302, 303, 307, 308}:
+                redirection_url = resp.getheader('location', '')
+                if 'sorry/IndexRedirect?' in redirection_url:
+                    raise GoogleConnectionError('Connection blocked due to unusual activity.')
+                self._redirect(redirection_url)
+                resp = self._resp
+                redirect_counter += 1
+            else:
+                break
 
         if resp.status != 200:
             raise GoogleConnectionError('Got HTTP %d: %s' % (resp.status, resp.reason))
