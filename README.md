@@ -44,8 +44,8 @@
 - [Examples](#examples)
 - [FAQ](#faq)
 - [Troubleshooting](#troubleshooting)
-- [Developers](#developers)
 - [Notes](#notes)
+- [Developers](#developers)
 
 ## Features
 
@@ -362,15 +362,7 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
 1. In some instances `googler` may show fewer number of results than you expect, e.g., if you fetch a single result (`-n 1`) it may not show any results. The reason is Google shows some Google service (e.g. Youtube) results, map locations etc. depending on your geographical data, which `googler` tries to omit. In some cases Google (the web-service) doesn't show exactly 10 results (default) on a search. We chose to omit these results as far as possible. While this can be fixed, it would need more processing (and more time). You can just navigate forward to fetch the next set of results.
 
-2. By default `googler` applies some TCP optimizations and forces TLS 1.2. If you are facing connection issues, try disabling both using the `--notweak` switch.
-
-## Developers
-
-1. Copyright (C) 2008 Henri Hakkinen
-2. Copyright (C) 2015-2016 [Arun Prakash Jana](mailto:engineerarun@gmail.com)
-3. [Zhiming Wang](https://github.com/zmwangx)
-
-Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https://github.com/shaggytwodope) and [Narrat](https://github.com/Narrat) for their contributions and efforts in spreading `googler`.
+2. By default `googler` applies some TCP optimizations and forces TLS 1.2 (on Python 3.4 and above). If you are facing connection issues, try disabling both using the `--notweak` switch.
 
 ## Notes
 
@@ -379,3 +371,11 @@ Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https
 2. Google provides a search API which returns the results in JSON format. However, as per my understanding from the [official docs](https://developers.google.com/custom-search/json-api/v1/overview), the API issues the queries against an existing instance of a custom search engine and is limited by 100 search queries per day for free. In addition, I have reservations in paying if they ever change their plan or restrict the API in other ways. So I refrained from coupling with Google plans & policies or exposing my trackable personal custom search API key and identifier for the public. I retained the browser-way of doing it by fetching html, which is a open and free specification.
 
 3. You can find a rofi script for `googler` [here](http://hastebin.com/fonowacija.bash). Written by an anonymous user, untested and we don't maintain it.
+
+## Developers
+
+1. Copyright (C) 2008 Henri Hakkinen
+2. Copyright (C) 2015-2016 [Arun Prakash Jana](mailto:engineerarun@gmail.com)
+3. [Zhiming Wang](https://github.com/zmwangx)
+
+Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https://github.com/shaggytwodope) and [Narrat](https://github.com/Narrat) for their contributions and efforts in spreading `googler`.
