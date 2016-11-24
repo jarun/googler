@@ -158,7 +158,6 @@ class TLS1_2Connection(HTTPSConnection):
 
         if getattr(self, '_tunnel_host', None):
             self.sock = sock
-            self._tunnel()
             HTTPSConnection.connect(self)
         elif not notweak and sys.version_info >= (3,4):
             # Use TLS 1.2
