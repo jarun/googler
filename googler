@@ -26,6 +26,7 @@ import html.entities
 import html.parser
 import http.client
 from http.client import HTTPSConnection
+import webbrowser
 import socket
 import ssl
 import logging
@@ -118,7 +119,6 @@ def open_url(url):
         os.dup2(fd, 2)
         os.dup2(fd, 1)
     try:
-        import webbrowser
         webbrowser.open(url)
     finally:
         if open_url.suppress_browser_output:
