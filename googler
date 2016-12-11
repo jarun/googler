@@ -81,6 +81,7 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
 
 # Disguise as Firefox on Ubuntu
 USER_AGENT = ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) Gecko/20100101 Firefox/48.0')
+ua = True  # User Agent is enabled by default
 
 # Self-upgrade parameters
 #
@@ -211,7 +212,7 @@ class TLS1_2Connection(HTTPSConnection):
         if not notweak and sys.platform.startswith('linux'):
             sock.setsockopt(socket.SOL_TCP, socket.TCP_DEFER_ACCEPT, 1)
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
-            sock.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,524288)
+            sock.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF, 524288)
 
         if getattr(self, '_tunnel_host', None):
             self.sock = sock
@@ -799,7 +800,7 @@ class GoogleConnection(object):
         logger.debug('Fetching URL %s', url)
         self._conn.request('GET', url, None, {
             'Accept-Encoding': 'gzip',
-            'User-Agent': USER_AGENT,
+            'User-Agent': USER_AGENT if ua else '',
             'Cookie': self.cookie,
             'Connection': 'keep-alive',
             'DNT': '1',
@@ -854,7 +855,7 @@ def annotate_tag(annotated_starttag_handler):
                     if attrs[attr] != selector[attr]:
                         break
             else:
-                # Passed all criterions of the selector
+                # Passed all criteria of the selector
                 ignored = True
                 break
 
@@ -1184,7 +1185,7 @@ class GoogleParser(html.parser.HTMLParser):
 
     @annotate_tag
     def result_start(self, tag, attrs):
-        if '' == USER_AGENT and tag == 'span' and 'mime' in self.classes(attrs):
+        if not ua and tag == 'span' and 'mime' in self.classes(attrs):
             self.start_populating_textbuf()
             return 'title_filetype'
 
@@ -1196,20 +1197,20 @@ class GoogleParser(html.parser.HTMLParser):
             self.set_handlers_to('abstract')
             return 'abstract'
 
-        if '' == USER_AGENT and not self.abstract_registered \
+        if not ua and not self.abstract_registered \
                 and tag == 'span' and 'st' in self.classes(attrs):
             self.start_populating_textbuf(lambda text: text + ' ')
             return 'abstract_gservices'
 
         if not self.sitelinks and tag == 'table':
-            if '' != USER_AGENT or (not self.news and 'ts' not in self.classes(attrs)):
+            if ua or (not self.news and 'ts' not in self.classes(attrs)):
                 self.set_handlers_to('sitelink_table')
                 return 'sitelink_table'
 
         if self.news:
             if not self.metadata_registered and tag == 'div' and 'slp' in self.classes(attrs):
                 # Change metadata field separator from '-' to ', ' for better appearance
-                if '' != USER_AGENT:
+                if ua:
                     self.start_populating_textbuf(lambda text: ', ' if text == '-' else text)
                 else:
                     self.start_populating_textbuf(lambda text:
@@ -1245,7 +1246,7 @@ class GoogleParser(html.parser.HTMLParser):
 
     @annotate_tag
     def title_start(self, tag, attrs):
-        if '' != USER_AGENT and tag == 'span':
+        if ua and tag == 'span':
             # Print a space after the filetype indicator
             self.start_populating_textbuf(lambda text: text + ' ')
             return 'title_filetype'
@@ -2191,9 +2192,9 @@ def parse_args(args=None, namespace=None):
 
 
 def main():
-    try:
-        global USER_AGENT
+    global ua
 
+    try:
         opts = parse_args()
 
         # Set logging level
@@ -2221,7 +2222,7 @@ def main():
             open_url.suppress_browser_output = False
 
         if opts.noua:
-            USER_AGENT = ''
+            ua = False
 
         repl = GooglerCmd(opts)
 
