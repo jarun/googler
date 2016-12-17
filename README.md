@@ -184,6 +184,7 @@ and upgrade by running
                             do not suppress browser output (stdout and stderr)
       --np, --noprompt      search and exit, do not prompt
       -d, --debug           enable debugging
+      -V, --version         show program's version number and exit
       -U, --upgrade         perform in-place self-upgrade
       --include-git         when used in conjuction with --upgrade, upgrade to
                             latest git master

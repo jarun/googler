@@ -2248,6 +2248,7 @@ def parse_args(args=None, namespace=None):
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
            help='search and exit, do not prompt')
+    addarg('-V', '--version', action='version', version=_VERSION_)
     addarg('-d', '--debug', dest='debug', action='store_true',
            help='enable debugging')
     addarg('keywords', nargs='*', metavar='KEYWORD',
