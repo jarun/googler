@@ -28,6 +28,7 @@ args=(
     '(-s --start)'{-s,--start}'[start at the Nth result]:result number'
     '(-t --time)'{-t,--time}'[time limit search]:period (h/d/w/m/y + number)'
     '(-U --upgrade)'{-U,--upgrade}'[perform in-place self-upgrade]'
+    '(- : *)'{-V,--version}'[show version number and exit]'
     '(-w --site)'{-w,--site}'[search a site using Google]:domain'
     '(-x --exact)'{-x,--exact}'[disable automatic spelling correction]'
     '*: :_guard "^-*" keyword'

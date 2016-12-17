@@ -29,6 +29,7 @@ _googler () {
         -s --start
         -t --time
         -U --upgrade
+        -V --version
         -w --site
         -x --exact
     )
