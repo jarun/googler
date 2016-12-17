@@ -1794,8 +1794,14 @@ class GooglerCmd(object):
         self.fetch()
         colors = self.colors
         if self._autocorrected_to:
+            if colors:
+                # Underline the keywords
+                print('hi')
+                autocorrected_to = '\x1b[4m' + self._autocorrected_to + '\x1b[24m'
+            else:
+                autocorrected_to = self._autocorrected_to
             autocorrect_info = ('Showing results for %s; enter "exact" for an exact search.' %
-                                self._autocorrected_to)
+                                autocorrected_to)
             printerr('')
             if colors:
                 printerr(colors.prompt + autocorrect_info + colors.reset)
