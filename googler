@@ -1796,7 +1796,6 @@ class GooglerCmd(object):
         if self._autocorrected_to:
             if colors:
                 # Underline the keywords
-                print('hi')
                 autocorrected_to = '\x1b[4m' + self._autocorrected_to + '\x1b[24m'
             else:
                 autocorrected_to = self._autocorrected_to
