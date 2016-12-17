@@ -11,37 +11,38 @@ _googler () {
     local cur=$2 prev=$3
     local -a opts opts_with_args
     opts=(
-        -c --tld
-        -C --nocolor
-        -d --debug
-        --enable-browser-output
         -h --help
-        --include-git
-        -j --first --lucky
-        --json
-        -l --lang
+        -s --start
         -n --count
         -N --news
+        -c --tld
+        -l --lang
+        -x --exact
+        -C --nocolor
+        --colors
+        -j --first --lucky
+        -t --time
+        -w --site
+        -p --proxy
         --noua
         --notweak
+        --json
+        --enable-browser-output
         --np --noprompt
-        -p --proxy
-        -s --start
-        -t --time
-        -U --upgrade
+        -d --debug
         -V --version
-        -w --site
-        -x --exact
+        -U --upgrade
+        --include-git
     )
     opts_with_arg=(
-        -c --tld
-        --colors
-        -l --lang
-        -n --count
-        -p --proxy
         -s --start
+        -n --count
+        -c --tld
+        -l --lang
+        --colors
         -t --time
         -w --site
+        -p --proxy
     )
 
     # Do not complete non option names
