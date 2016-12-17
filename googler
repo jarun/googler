@@ -1038,6 +1038,31 @@ class GoogleParser(html.parser.HTMLParser):
     #     abstract text
     #   </div>            <!-- stop_populating_textbuf, pop to sitelink abstract -->
     #
+    # - Sometimes Google autocorrects a query. Whenever this happens
+    #   there will be a block whose English version reads "Showing
+    #   results for ... <newline> Search instead for ...", and the HTML
+    #   looks like
+    #
+    #   <span class="spell">Showing results for</span>
+    #   <a class="spell" href="/search?q=google..."><b><i>google</i></b></a>
+    #   <br>
+    #   <span class="spell_orig"></span>
+    #
+    #   We collect the text inside a.spell as the suggested spelling
+    #   (self.suggested_spelling).
+    #
+    #   Note that:
+    #
+    #   1. When npfr=1 (exact), there could still be an
+    #      a.spell, in a block that reads (English version) "Did you mean:
+    #      ...". Therefore, we only consider the query autocorrected when a
+    #      meaningful .spell_orig is also present (self.autocorrected).
+    #
+    #   2. A few garbage display:none, empty tags related to spell
+    #      appear to be always present: span#srfm.spell, a#srfl.spell,
+    #      span#sifm.spell_orig, a#sifl.spell_orig. We need to exclude
+    #      the ids srfm, srfl, sifm and sifl from our consideration.
+    #
     # - Sometimes Google omits similar (more like duplicate) result
     #   entries. Whenever this happens there will be a notice in p#ofr. The way
     #   to unfilter is to simply add '&filter=0' to the query string.
@@ -1125,12 +1150,18 @@ class GoogleParser(html.parser.HTMLParser):
     #           </span>
     #           <br><b>3 HOURS Best Relaxing Music</b> &#39;Romantic <b>Piano</b>&quot; Background <b>Music</b> for Stress ... 3:03 <b>...</b>
     #       </span>
+    #
+    #   8. There's no a.spell_orig when the query is autocorrected; the
+    #      <a> tag (linking to the exact search) is wrapped in the
+    #      span.spell_orig.
 
     def __init__(self, news=False):
         html.parser.HTMLParser.__init__(self)
 
         self.news = news
 
+        self.autocorrected = False
+        self.suggested_spelling = None
         self.filtered = False
         self.results = []
 
@@ -1175,13 +1206,23 @@ class GoogleParser(html.parser.HTMLParser):
             self.set_handlers_to('result')
             return 'result'
 
+        # Autocorrect
+        if tag == 'span' and 'spell_orig' in self.classes(attrs) and attrs.get('id') != 'sifm':
+            self.autocorrected = True
+            return
+        if tag == 'a' and 'spell' in self.classes(attrs) and attrs.get('id') != 'srfl':
+            self.start_populating_textbuf()
+            return 'spell'
+
         # Omitted results
         if tag == 'p' and attrs.get('id') == 'ofr':
             self.filtered = True
 
     @retrieve_tag_annotation
     def root_end(self, tag, annotation):
-        pass
+        if annotation == 'spell':
+            self.stop_populating_textbuf()
+            self.suggested_spelling = self.pop_textbuf()
 
     @annotate_tag
     def result_start(self, tag, attrs):
@@ -1649,6 +1690,7 @@ class GooglerCmd(object):
         atexit.register(self._conn.close)
 
         self.results = []
+        self._autocorrected_to = None
         self._results_filtered = False
         self._urltable = {}
 
@@ -1693,6 +1735,7 @@ class GooglerCmd(object):
         parser.feed(page)
 
         self.results = parser.results
+        self._autocorrected_to = parser.suggested_spelling if parser.autocorrected else None
         self._results_filtered = parser.filtered
         self._urltable = {}
         for r in self.results:
@@ -1749,9 +1792,29 @@ class GooglerCmd(object):
 
         """
         self.fetch()
+        colors = self.colors
+        if self._autocorrected_to:
+            if colors:
+                # Underline the keywords
+                print('hi')
+                autocorrected_to = '\x1b[4m' + self._autocorrected_to + '\x1b[24m'
+            else:
+                autocorrected_to = self._autocorrected_to
+            autocorrect_info = ('Showing results for %s; enter "exact" for an exact search.' %
+                                autocorrected_to)
+            printerr('')
+            if colors:
+                printerr(colors.prompt + autocorrect_info + colors.reset)
+            else:
+                printerr('** ' + autocorrect_info)
         self.display_results(prelude=prelude, json_output=json_output)
         if self._results_filtered:
-            printerr('** Enter "unfilter" to show similar results Google omitted.')
+            unfilter_info = 'Enter "unfilter" to show similar results Google omitted.'
+            if colors:
+                printerr(colors.prompt + unfilter_info + colors.reset)
+            else:
+                printerr('** ' + unfilter_info)
+            printerr('')
 
     def read_next_command(self):
         """Show omniprompt and read user command line.
@@ -1834,9 +1897,16 @@ class GooglerCmd(object):
 
     @require_keywords
     @no_argument
+    def do_exact(self):
+        # Reset start to 0 when exact is applied.
+        self._google_url.update(start=0, exact=True)
+        self.fetch_and_display()
+
+    @require_keywords
+    @no_argument
     def do_unfilter(self):
         # Reset start to 0 when unfilter is applied.
-        self._google_url.update(None, **{'start':0,})
+        self._google_url.update(start=0)
         self._google_url.set_queries(filter=0)
         self.fetch_and_display()
 
@@ -1869,6 +1939,8 @@ class GooglerCmd(object):
                     self.do_previous('')
                 elif cmd == 'q':
                     break
+                elif cmd == 'exact':
+                    self.do_exact('')
                 elif cmd == 'unfilter':
                     self.do_unfilter('')
                 elif cmd == '?':
@@ -2172,7 +2244,7 @@ def parse_args(args=None, namespace=None):
     addarg('--notweak', dest='notweak', action='store_true',
            help='disable TCP optimizations and forced TLS 1.2')
     addarg('--json', dest='json', action='store_true',
-           help='output in JSON format; implies --noprompt')
+           help='output in JSON format; implies --exact and --noprompt')
     addarg('--enable-browser-output', dest='enable_browser_output', action='store_true',
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
@@ -2196,6 +2268,10 @@ def main():
 
     try:
         opts = parse_args()
+
+        # --json implies --exact
+        if opts.json:
+            opts.exact = True
 
         # Set logging level
         if opts.debug:
