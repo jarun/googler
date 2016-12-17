@@ -1239,7 +1239,7 @@ class GoogleParser(html.parser.HTMLParser):
             self.stop_populating_textbuf()
             self.abstract = self.pop_textbuf()
             self.abstract_registered = True
-        if annotation == 'abstract_gservices':
+        elif annotation == 'abstract_gservices':
             self.stop_populating_textbuf()
             self.abstract = self.pop_textbuf().replace('  ', ' ')
             self.abstract_registered = False
