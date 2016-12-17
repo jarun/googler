@@ -1792,12 +1792,23 @@ class GooglerCmd(object):
 
         """
         self.fetch()
+        colors = self.colors
         if self._autocorrected_to:
-            printerr('\n** Showing results for %s; enter "exact" for an exact search.' %
-                     self._autocorrected_to)
+            autocorrect_info = ('Showing results for %s; enter "exact" for an exact search.' %
+                                self._autocorrected_to)
+            printerr('')
+            if colors:
+                printerr(colors.prompt + autocorrect_info + colors.reset)
+            else:
+                printerr('** ' + autocorrect_info)
         self.display_results(prelude=prelude, json_output=json_output)
         if self._results_filtered:
-            printerr('** Enter "unfilter" to show similar results Google omitted.')
+            unfilter_info = 'Enter "unfilter" to show similar results Google omitted.'
+            if colors:
+                printerr(colors.prompt + unfilter_info + colors.reset)
+            else:
+                printerr('** ' + unfilter_info)
+            printerr('')
 
     def read_next_command(self):
         """Show omniprompt and read user command line.
