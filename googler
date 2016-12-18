@@ -56,6 +56,7 @@ except Exception:
 logging.basicConfig(format='[%(levelname)s] %(message)s')
 logger = logging.getLogger()
 
+
 def sigint_handler(signum, frame):
     print('\nInterrupted.', file=sys.stderr)
     sys.exit(1)
@@ -80,7 +81,7 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
 }.items()}
 
 # Disguise as Firefox on Ubuntu
-USER_AGENT = ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) Gecko/20100101 Firefox/48.0')
+USER_AGENT = ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:50.0) Gecko/20100101 Firefox/50.0')
 ua = True  # User Agent is enabled by default
 
 # Self-upgrade parameters
@@ -92,7 +93,7 @@ ua = True  # User Agent is enabled by default
 #
 # before running `make install'.
 
-ENABLE_SELF_UPGRADE_MECHANISM=True
+ENABLE_SELF_UPGRADE_MECHANISM = True
 API_REPO_BASE = 'https://api.github.com/repos/jarun/googler'
 RAW_DOWNLOAD_REPO_BASE = 'https://raw.githubusercontent.com/jarun/googler'
 
@@ -148,7 +149,7 @@ def unwrap(text):
             result += '\n\n'
         elif lines[i + 1]:
             # Next line is not paragraph break, add space
-            result +=  ' '
+            result += ' '
     # Handle last line
     result += lines[-1] if lines[-1] else '\n'
     return result
@@ -206,13 +207,13 @@ class TLS1_2Connection(HTTPSConnection):
 
     def connect(self, notweak=False):
         sock = socket.create_connection((self.host, self.port),
-                self.timeout, self.source_address)
+                                        self.timeout, self.source_address)
 
         # Optimizations not available on OS X
         if not notweak and sys.platform.startswith('linux'):
             sock.setsockopt(socket.SOL_TCP, socket.TCP_DEFER_ACCEPT, 1)
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
-            sock.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF, 524288)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 524288)
 
         if getattr(self, '_tunnel_host', None):
             self.sock = sock
@@ -233,6 +234,7 @@ class TLS1_2Connection(HTTPSConnection):
 
         # Fallback
         HTTPSConnection.connect(self)
+
 
 class GoogleUrl(object):
     """
@@ -871,6 +873,7 @@ def annotate_tag(annotated_starttag_handler):
 
     return handler
 
+
 def retrieve_tag_annotation(annotated_endtag_handler):
     # See parser logic within the GoogleParser class for documentation.
     #
@@ -886,6 +889,7 @@ def retrieve_tag_annotation(annotated_endtag_handler):
         annotated_endtag_handler(self, tag, annotation)
 
     return handler
+
 
 class GoogleParser(html.parser.HTMLParser):
     """The members of this class parse the result
@@ -1171,7 +1175,7 @@ class GoogleParser(html.parser.HTMLParser):
 
         self.set_handlers_to('root')
 
-    ### Ignore list ###
+    # Ignore list
     IGNORE_LIST = [
         # "People also ask"
         # Sample query: VPN
@@ -1182,7 +1186,7 @@ class GoogleParser(html.parser.HTMLParser):
         }
     ]
 
-    ### Tag handlers ###
+    # Tag handlers
 
     @annotate_tag
     def root_start(self, tag, attrs):
@@ -1193,7 +1197,7 @@ class GoogleParser(html.parser.HTMLParser):
             self.title = ''
             self.url = ''
             self.abstract = ''
-            self.metadata = '' # Only used for Google News
+            self.metadata = ''  # Only used for Google News
             self.sitelinks = []
 
             # Guard against sitelinks, which also have titles and
@@ -1201,7 +1205,7 @@ class GoogleParser(html.parser.HTMLParser):
             # sections" (secondary results to the same event).
             self.title_registered = False
             self.abstract_registered = False
-            self.metadata_registered = False # Only used for Google News
+            self.metadata_registered = False  # Only used for Google News
 
             self.set_handlers_to('result')
             return 'result'
@@ -1255,7 +1259,7 @@ class GoogleParser(html.parser.HTMLParser):
                     self.start_populating_textbuf(lambda text: ', ' if text == '-' else text)
                 else:
                     self.start_populating_textbuf(lambda text:
-                                              text.replace(' -', ',', 1) if ' - ' in text else text)
+                                                  text.replace(' -', ',', 1) if ' - ' in text else text)
                 return 'news_metadata'
 
             if not self.abstract_registered and tag == 'div' and 'st' in self.classes(attrs):
@@ -1385,7 +1389,7 @@ class GoogleParser(html.parser.HTMLParser):
         elif annotation == 'sitelink_title':
             self.set_handlers_to('sitelink')
 
-    ### Generic methods ###
+    # Generic methods
 
     # Set handle_starttag to SCOPE_start, and handle_endtag to SCOPE_end.
     def set_handlers_to(self, scope):
@@ -1633,6 +1637,7 @@ def require_keywords(method):
 
     return enforced_method
 
+
 def no_argument(method):
     # Normalize a do_* method of GooglerCmd that takes no argument to
     # one that takes an arg, but issue a warning when an nonempty
@@ -1646,6 +1651,7 @@ def no_argument(method):
         method(self)
 
     return enforced_method
+
 
 class GooglerCmd(object):
     """
@@ -2209,11 +2215,12 @@ def parse_args(args=None, namespace=None):
 
     argparser = GooglerArgumentParser(description='Google from the command-line.')
     addarg = argparser.add_argument
-    addarg('-s', '--start', type=argparser.nonnegative_int, default=0, metavar='N',
-           help='start at the Nth result')
-    addarg('-n', '--count', dest='num', type=argparser.positive_int, default=10,
-           metavar='N', help='show N results (default 10)')
-    addarg('-N', '--news', action='store_true', help='show results from news section')
+    addarg('-s', '--start', type=argparser.nonnegative_int, default=0,
+           metavar='N', help='start at the Nth result')
+    addarg('-n', '--count', dest='num', type=argparser.positive_int,
+           default=10, metavar='N', help='show N results (default 10)')
+    addarg('-N', '--news', action='store_true',
+           help='show results from news section')
     addarg('-c', '--tld', metavar='TLD',
            help="""country-specific search with top-level domain .TLD, e.g., 'in'
            for India. Ref: https://en.wikipedia.org/wiki/List_of_Google_domains""")
@@ -2227,8 +2234,8 @@ def parse_args(args=None, namespace=None):
            help='set output colors (see man page for details)')
     addarg('-j', '--first', '--lucky', dest='lucky', action='store_true',
            help='open the first result in web browser and exit')
-    addarg('-t', '--time', dest='duration', type=argparser.is_duration, metavar='dN',
-           help='time limit search '
+    addarg('-t', '--time', dest='duration', type=argparser.is_duration,
+           metavar='dN', help='time limit search '
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
     addarg('-w', '--site', metavar='SITE', help='search a site using Google')
     addarg('-p', '--proxy', default=https_proxy_from_environment(),
@@ -2315,7 +2322,7 @@ def main():
             # Interactive mode
             repl.cmdloop()
     except Exception as e:
-        # If debugging mode is enabled, let the exception through for a traceback;
+        # With debugging on, let the exception through for a traceback;
         # otherwise, only print the exception error message.
         if logger.isEnabledFor(logging.DEBUG):
             raise
