@@ -1,3 +1,21 @@
+googler 2.9
+2016-12-18
+
+**NOTICE**
+- `googler` is on Debian and Ubuntu official releases now. In addition, there's
+a PPA in place to install the latest program releases from.
+
+Modifications
+- Omniprompt option to search exact keywords on auto-correction
+- Push cmdline arguments to readline history (simplifies editing the keywords)
+- Added check to ensure UTF-8 encoding
+- Support 3 HTTP redirections before failing to connect
+- Support environment variable https_proxy
+- Python 3.5.3 compliance for TLS 1.2
+- Removed deb package generation scripts
+
+-------------------------------------------------------------------------------
+
 googler 2.8
 2016-10-04
 
