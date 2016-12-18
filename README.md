@@ -100,14 +100,11 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 
 ### Installing with a package manager
 
-`googler` is also available on
-
 - [AUR](https://aur.archlinux.org/packages/googler/)
 - [Homebrew](http://braumeister.org/formula/googler)
 - [Debian](https://packages.debian.org/search?keywords=googler&searchon=names)
-- [Ubuntu](https://launchpad.net/ubuntu/+source/googler)
+- [Ubuntu](http://packages.ubuntu.com/search?keywords=googler&searchon=names)
 - [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
-- [Fossies](http://fossies.org/linux/googler)
 
 #### Tips for packagers
 
