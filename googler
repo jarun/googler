@@ -1799,7 +1799,7 @@ class GooglerCmd(object):
                 autocorrected_to = '\x1b[4m' + self._autocorrected_to + '\x1b[24m'
             else:
                 autocorrected_to = self._autocorrected_to
-            autocorrect_info = ('Showing results for %s; enter "exact" for an exact search.' %
+            autocorrect_info = ('Showing results for %s; enter "x" for an exact search.' %
                                 autocorrected_to)
             printerr('')
             if colors:
@@ -1938,7 +1938,7 @@ class GooglerCmd(object):
                     self.do_previous('')
                 elif cmd == 'q':
                     break
-                elif cmd == 'exact':
+                elif cmd == 'x':
                     self.do_exact('')
                 elif cmd == 'unfilter':
                     self.do_unfilter('')
