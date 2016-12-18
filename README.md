@@ -36,7 +36,6 @@
         - [Running as a standalone utility](#running-as-a-standalone-utility)
         - [Shell completion](#shell-completion)
     - [Installing with a package manager](#installing-with-a-package-manager)
-        - [Debian package](#debian-package)
         - [Tips for packagers](#tips-for-packagers)
     - [Downloading a single file](#downloading-a-single-file)
 - [Usage](#usage)
@@ -109,14 +108,6 @@ Shell completion scripts for Bash, Fish and Zsh can be found in respective subdi
 - [Ubuntu](https://launchpad.net/ubuntu/+source/googler)
 - [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
 - [Fossies](http://fossies.org/linux/googler)
-
-#### Debian package
-
-If you are on a Debian based system (including Ubuntu), visit [the latest stable release](https://github.com/jarun/googler/releases/latest) and download the `.deb` package. To install, run
-
-    $ sudo dpkg -i googler-$version-all.deb
-
-Please substitute `$version` with the appropriate package version.
 
 #### Tips for packagers
 
