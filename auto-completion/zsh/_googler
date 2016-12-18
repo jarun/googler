@@ -27,10 +27,10 @@ args=(
     '(--json --exact --np --noprompt)--json[output in JSON format; implies --exact and --noprompt]'
     '(--enable-browser-output)--enable-browser-output[do not suppress browser output]'
     '(--np --noprompt)'{--np,--noprompt}'[perform search and exit, do not prompt for further interactions]'
+    '(-u --upgrade)'{-u,--upgrade}'[perform in-place self-upgrade]'
+    '(--include-git)--include-git[when used with --upgrade, upgrade to git master]'
+    '(- : *)'{-v,--version}'[show version number and exit]'
     '(-d --debug)'{-d,--debug}'[enable debugging]'
-    '(- : *)'{-V,--version}'[show version number and exit]'
-    '(-U --upgrade)'{-U,--upgrade}'[perform in-place self-upgrade]'
-    '(--include-git)--include-git[when used in conjuction with --upgrade, upgrade to git master]'
     '*: :_guard "^-*" keyword'
 )
 _arguments -S -s $args

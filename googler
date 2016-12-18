@@ -2209,20 +2209,16 @@ def parse_args(args=None, namespace=None):
 
     argparser = GooglerArgumentParser(description='Google from the command-line.')
     addarg = argparser.add_argument
-    addarg('-s', '--start', dest='start', type=argparser.nonnegative_int,
-           default=0, metavar='N',
+    addarg('-s', '--start', type=argparser.nonnegative_int, default=0, metavar='N',
            help='start at the Nth result')
-    addarg('-n', '--count', dest='num', type=argparser.positive_int,
-           default=10, metavar='N',
-           help='show N results (default 10)')
-    addarg('-N', '--news', dest='news', action='store_true',
-           help='show results from news section')
-    addarg('-c', '--tld', dest='tld', metavar='TLD',
+    addarg('-n', '--count', dest='num', type=argparser.positive_int, default=10,
+           metavar='N', help='show N results (default 10)')
+    addarg('-N', '--news', action='store_true', help='show results from news section')
+    addarg('-c', '--tld', metavar='TLD',
            help="""country-specific search with top-level domain .TLD, e.g., 'in'
            for India. Ref: https://en.wikipedia.org/wiki/List_of_Google_domains""")
-    addarg('-l', '--lang', dest='lang', metavar='LANG',
-           help='display in language LANG')
-    addarg('-x', '--exact', dest='exact', action='store_true',
+    addarg('-l', '--lang', metavar='LANG', help='display in language LANG')
+    addarg('-x', '--exact', action='store_true',
            help='disable automatic spelling correction')
     addarg('-C', '--nocolor', dest='colorize', action='store_false',
            help='disable color output')
@@ -2234,31 +2230,26 @@ def parse_args(args=None, namespace=None):
     addarg('-t', '--time', dest='duration', type=argparser.is_duration, metavar='dN',
            help='time limit search '
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
-    addarg('-w', '--site', dest='site', metavar='SITE',
-           help='search a site using Google')
-    addarg('-p', '--proxy', dest='proxy', default=https_proxy_from_environment(),
+    addarg('-w', '--site', metavar='SITE', help='search a site using Google')
+    addarg('-p', '--proxy', default=https_proxy_from_environment(),
            help='tunnel traffic through an HTTPS proxy (HOST:PORT)')
-    addarg('--noua', dest='noua', action='store_true',
-           help='disable user agent')
-    addarg('--notweak', dest='notweak', action='store_true',
+    addarg('--noua', action='store_true', help='disable user agent')
+    addarg('--notweak', action='store_true',
            help='disable TCP optimizations and forced TLS 1.2')
-    addarg('--json', dest='json', action='store_true',
+    addarg('--json', action='store_true',
            help='output in JSON format; implies --exact and --noprompt')
-    addarg('--enable-browser-output', dest='enable_browser_output', action='store_true',
+    addarg('--enable-browser-output', action='store_true',
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
            help='search and exit, do not prompt')
-    addarg('-V', '--version', action='version', version=_VERSION_)
-    addarg('-d', '--debug', dest='debug', action='store_true',
-           help='enable debugging')
-    addarg('keywords', nargs='*', metavar='KEYWORD',
-           help='search keywords')
-
+    addarg('keywords', nargs='*', metavar='KEYWORD', help='search keywords')
     if ENABLE_SELF_UPGRADE_MECHANISM and not system_is_windows():
-        addarg('-U', '--upgrade', dest='upgrade', action='store_true',
+        addarg('-u', '--upgrade', action='store_true',
                help='perform in-place self-upgrade')
-        addarg('--include-git', dest='include_git', action='store_true',
-               help='when used in conjuction with --upgrade, upgrade to latest git master')
+        addarg('--include-git', action='store_true',
+               help='when used with --upgrade, upgrade to latest git master')
+    addarg('-v', '--version', action='version', version=_VERSION_)
+    addarg('-d', '--debug', action='store_true', help='enable debugging')
 
     return argparser.parse_args(args, namespace)
 

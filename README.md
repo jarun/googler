@@ -124,7 +124,7 @@ To install the latest stable version, run
 
 You could then let googler upgrade itself by running
 
-    $ sudo googler -U
+    $ sudo googler -u
 
 Similarly, if you want to install from git master, run
 
@@ -132,7 +132,7 @@ Similarly, if you want to install from git master, run
 
 and upgrade by running
 
-    $ sudo googler -U --include-git
+    $ sudo googler -u --include-git
 
 ## Usage
 
@@ -140,8 +140,8 @@ and upgrade by running
 
     usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
                    [--colors COLORS] [-j] [-t dN] [-w SITE] [-p PROXY] [--noua]
-                   [--json] [--enable-browser-output] [--np] [-d] [-U]
-                   [--include-git]
+                   [--json] [--enable-browser-output] [--np] [-u]
+                   [--include-git] [-v] [-d]
                    [KEYWORD [KEYWORD ...]]
 
     Google from the command-line.
@@ -173,11 +173,10 @@ and upgrade by running
       --enable-browser-output
                             do not suppress browser output (stdout and stderr)
       --np, --noprompt      search and exit, do not prompt
+      -u, --upgrade         perform in-place self-upgrade
+      --include-git         when used with --upgrade, upgrade to latest git master
+      -v, --version         show program's version number and exit
       -d, --debug           enable debugging
-      -V, --version         show program's version number and exit
-      -U, --upgrade         perform in-place self-upgrade
-      --include-git         when used in conjuction with --upgrade, upgrade to
-                            latest git master
 
     omniprompt keys:
       n, p                  fetch the next or previous set of search results

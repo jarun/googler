@@ -29,10 +29,10 @@ _googler () {
         --json
         --enable-browser-output
         --np --noprompt
-        -d --debug
-        -V --version
-        -U --upgrade
+        -u --upgrade
         --include-git
+        -v --version
+        -d --debug
     )
     opts_with_arg=(
         -s --start
