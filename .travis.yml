@@ -5,4 +5,3 @@ python:
   - "3.5"
 script:
   - ./tests/ci-test-wrapper --watch .travis.yml
-  - git fetch --unshallow --tags origin
