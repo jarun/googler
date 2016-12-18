@@ -27,4 +27,4 @@ uninstall:
 # We assume that sed(1) has the -i option, which is not POSIX but seems common
 # enough in modern implementations.
 disable-self-upgrade:
-	sed -i.bak 's/^ENABLE_SELF_UPGRADE_MECHANISM=True$$/ENABLE_SELF_UPGRADE_MECHANISM=False/' googler
+	sed -i.bak 's/^ENABLE_SELF_UPGRADE_MECHANISM = True$$/ENABLE_SELF_UPGRADE_MECHANISM = False/' googler
