@@ -41,9 +41,9 @@
 - [Usage](#usage)
     - [Cmdline options](#cmdline-options)
     - [Configuration file](#configuration-file)
+    - [Text-based browser integration](#text-based-browser-integration)
     - [Colors](#colors)
 - [Examples](#examples)
-- [FAQ](#faq)
 - [Troubleshooting](#troubleshooting)
 - [Notes](#notes)
 - [Developers](#developers)
@@ -203,6 +203,18 @@ The alias serves both the purposes of using config files:
 - Persistent settings: when the user invokes `g`, it expands to the preferred settings.
 - Override settings: thanks to the way Python `argparse` works, `googler` is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs `g -l de -c de -n 12 hello world`, 12 results are returned from the Google Germany server, with preference towards results in German.
 
+### Text-based browser integration
+
+`googler` works out of the box with several text-based browsers if the `BROWSER` environment variable is set. For instance,
+
+    $ export BROWSER=w3m
+
+or for one-time use,
+
+    $ BROWSER=w3m googler query
+
+Due to certain graphical browsers spewing messages to the console, `googler` suppresses browser output by default unless `BROWSER` is set to one of the known text-based browsers: currently `elinks`, `links`, `lynx` or `w3m`. If you use a different text-based browser, you will need to explicitly enable browser output with the `--enable-browser-output` option. If you believe your browser is popular enough, please submit an issue or pull request and we will consider whitelisting it. See the man page for more details on `--enable-browser-output`.
+
 ### Colors
 
 `googler` allows you to customize the color scheme via a six-letter string, reminiscent of BSD `LSCOLORS`. The six letters represent the colors of
@@ -333,20 +345,6 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 
         $ googler -h
         $ man googler
-
-## FAQ
-
-1. **How do I integrate `googler` with a text-based browser, e.g., `w3m`?**
-
-   Set the `BROWSER` environment variable, for instance,
-
-        $ export BROWSER=w3m
-
-   or for one-time use,
-
-        $ BROWSER=w3m googler query
-
-   Note that due to certain graphical browsers spewing messages to the console, `googler` suppresses browser output by default unless `BROWSER` is set to one of the known text-based browsers: currently `elinks`, `links`, `lynx` or `w3m`. If you use a different text-based browser, you will need to explicitly enable browser output with the `--enable-browser-output` option. In that case, please submit an issue or pull request if you believe your browser is popular enough, and we will consider whitelisting it. See the man page for more details about `--enable-browser-output`.
 
 ## Troubleshooting
 
