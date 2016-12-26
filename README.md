@@ -182,7 +182,8 @@ and upgrade by running
       n, p                  fetch the next or previous set of search results
       index                 open the result corresponding to index in browser
       f                     jump to the first page
-      o                     open the current search in browser
+      o [index ...]         open space-separated result indices in browser
+                            open the current search in browser, if no arguments
       g keywords            new Google search for 'keywords' with original options
       q, ^D, double Enter   exit googler
       ?                     show omniprompt help

@@ -158,7 +158,7 @@ def unwrap(text):
 def check_stdout_encoding():
     """Make sure stdout encoding is utf-8.
 
-    If not, print error message and intrustructions, then exit with
+    If not, print error message and instructions, then exit with
     status 1.
 
     This function is a no-op on win32 because encoding on win32 is
@@ -240,7 +240,7 @@ class GoogleUrl(object):
     """
     This class constructs the Google Search/News URL.
 
-    This class is modeled on urllib.parse.ParseResult for familiarity,
+    This class is modelled on urllib.parse.ParseResult for familiarity,
     which means it supports reading of all six attributes -- scheme,
     netloc, path, params, query, fragment -- of
     urllib.parse.ParseResult, as well as the geturl() method.
@@ -709,7 +709,7 @@ class GoogleConnection(object):
         GoogleConnectionError
             When not getting HTTP 200 even after the allowed one
             reconnection and/or one redirection, or when Google is
-            blocking query due to unsual activity.
+            blocking query due to unusual activity.
 
         Returns
         -------
@@ -909,11 +909,11 @@ class GoogleParser(html.parser.HTMLParser):
     #
     #   1. Tag handlers are contextual;
     #
-    #   2. Contexual starttag and endtag handlers should come in pairs
+    #   2. Contextual starttag and endtag handlers should come in pairs
     #      and have a clear hierarchy;
     #
-    #   3. Starttag handlers should only yield control to a pair of
-    #      child handlers (that is, one level down the hierachy), and
+    #   3. starttag handlers should only yield control to a pair of
+    #      child handlers (that is, one level down the hierarchy), and
     #      correspondingly, endtag handlers should only return control
     #      to the parent (that is, the pair of handlers that gave it
     #      control in the first place).
@@ -1605,7 +1605,7 @@ class Result(object):
         """Return a index-to-URL table for the current result.
 
         Normally, the table contains only a single entry, but when the result
-        contains sidelinks, all sidelinks are included in this table.
+        contains sitelinks, all sitelinks are included in this table.
 
         Returns
         -------
@@ -1825,7 +1825,7 @@ class GooglerCmd(object):
         """Show omniprompt and read user command line.
 
         Command line is always stripped, and each consecutive group of
-        whitespace is replaced with a single space charater. If the
+        whitespace is replaced with a single space character. If the
         command line is empty after stripping, when ignore it and keep
         reading. Exit with status 0 if we get EOF or an empty line
         (pre-strip, that is, a raw <enter>) twice in a row.
@@ -1879,15 +1879,22 @@ class GooglerCmd(object):
         # If > 5 results are being fetched each time,
         # block next when no parsed results in current fetch
         if not self.results and self._google_url._num > 5:
-            print('No results.', file=sys.stderr)
+            printerr('No results.')
         else:
             self._google_url.next_page()
             self.fetch_and_display()
 
     @require_keywords
-    @no_argument
-    def do_open(self):
-        open_url(self._google_url.full())
+    def do_open(self, *args):
+        if not args:
+            open_url(self._google_url.full())
+            return
+
+        for nav in args:
+            if nav in self._urltable:
+                open_url(self._urltable[nav])
+            else:
+                printerr("Invalid index %s." % nav)
 
     @require_keywords
     @no_argument
@@ -1927,7 +1934,7 @@ class GooglerCmd(object):
             # TODO: Automatic dispatcher
             #
             # We can't write a dispatcher for now because that could
-            # change behaviors of the prompt. However, we have already
+            # change behaviour of the prompt. However, we have already
             # laid a lot of ground work for the dispatcher, e.g., the
             # `no_argument' decorator.
             try:
@@ -1939,7 +1946,9 @@ class GooglerCmd(object):
                 elif cmd == 'n':
                     self.do_next('')
                 elif cmd == 'o':
-                    self.do_open('')
+                    self.do_open()
+                elif cmd.startswith('o '):
+                    self.do_open(*cmd[2:].split())
                 elif cmd == 'p':
                     self.do_previous('')
                 elif cmd == 'q':
@@ -1972,7 +1981,8 @@ class GooglerArgumentParser(argparse.ArgumentParser):
           n, p                  fetch the next or previous set of search results
           index                 open the result corresponding to index in browser
           f                     jump to the first page
-          o                     open the current search in browser
+          o [index ...]         open space-separated result indices in browser
+                                open the current search in browser, if no arguments
           g keywords            new Google search for 'keywords' with original options
           q, ^D, double Enter   exit googler
           ?                     show omniprompt help
