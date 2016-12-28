@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-#
 # Copyright (C) 2008 Henri Hakkinen
 #
 # Copyright (C) 2015-2016 Arun Prakash Jana <engineerarun@gmail.com>
@@ -38,6 +36,8 @@ import textwrap
 import urllib.parse
 import webbrowser
 
+from .version import __version__
+
 # Python optional dependency compatibility layer
 try:
     import readline
@@ -65,8 +65,6 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 
 # Constants
-
-_VERSION_ = '2.9'
 
 COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'a': '30', 'b': '31', 'c': '32', 'd': '33',
@@ -2000,7 +1998,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
         Zhiming Wang <zmwangx@gmail.com>
         License: GPLv3
         Webpage: https://github.com/jarun/googler
-        """ % _VERSION_))
+        """ % __version__))
 
     # Augment print_help to print more than synopsis and options
     def print_help(self, file=None):
@@ -2265,7 +2263,7 @@ def parse_args(args=None, namespace=None):
                help='perform in-place self-upgrade')
         addarg('--include-git', action='store_true',
                help='when used with --upgrade, upgrade to latest git master')
-    addarg('-v', '--version', action='version', version=_VERSION_)
+    addarg('-v', '--version', action='version', version=__version__)
     addarg('-d', '--debug', action='store_true', help='enable debugging')
 
     return argparser.parse_args(args, namespace)
@@ -2284,7 +2282,7 @@ def main():
         # Set logging level
         if opts.debug:
             logger.setLevel(logging.DEBUG)
-            logger.debug('Version %s', _VERSION_)
+            logger.debug('Version %s', __version__)
 
         # Handle self-upgrade
         if hasattr(opts, 'upgrade') and opts.upgrade:

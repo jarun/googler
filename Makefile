@@ -12,7 +12,7 @@ install:
 	install -m755 -d $(MANDIR)
 	install -m755 -d $(DOCDIR)
 	gzip -c googler.1 > googler.1.gz
-	install -m755 googler $(BINDIR)
+	install -m755 googler/googler.py $(BINDIR)/googler
 	install -m644 googler.1.gz $(MANDIR)
 	install -m644 README.md $(DOCDIR)
 	rm -f googler.1.gz
@@ -27,4 +27,4 @@ uninstall:
 # We assume that sed(1) has the -i option, which is not POSIX but seems common
 # enough in modern implementations.
 disable-self-upgrade:
-	sed -i.bak 's/^ENABLE_SELF_UPGRADE_MECHANISM = True$$/ENABLE_SELF_UPGRADE_MECHANISM = False/' googler
+	sed -i.bak 's/^ENABLE_SELF_UPGRADE_MECHANISM = True$$/ENABLE_SELF_UPGRADE_MECHANISM = False/' googler/googler.py

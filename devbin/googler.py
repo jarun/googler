@@ -1,1 +1,1 @@
-../googler
+../googler/googler.py
