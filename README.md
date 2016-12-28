@@ -20,11 +20,8 @@
 
 `googler` isn't affiliated to Google in any way.
 
-<br>
 <p align="center">
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q"><img src="https://img.shields.io/badge/paypal-donate-orange.svg?maxAge=2592000" alt="Donate" /></a>
-&nbsp;
-<a href="https://gitter.im/jarun/googler"><img src="https://img.shields.io/gitter/room/jarun/googler.svg?maxAge=2592000" alt="gitter chat" /></a>
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q"><img src="https://tuxtricks.files.wordpress.com/2016/12/donate.png" alt="Donate via PayPal!" title="Donate via PayPal!" /></a>
 </p>
 
 ## Table of contents
@@ -46,6 +43,7 @@
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
 - [Notes](#notes)
+- [Contributions](#contributions)
 - [Developers](#developers)
 
 ## Features
@@ -360,6 +358,12 @@ Site specific search continues at omniprompt. Use the `g` key to run a regular G
 2. Google provides a search API which returns the results in JSON format. However, as per my understanding from the [official docs](https://developers.google.com/custom-search/json-api/v1/overview), the API issues the queries against an existing instance of a custom search engine and is limited by 100 search queries per day for free. In addition, I have reservations in paying if they ever change their plan or restrict the API in other ways. So I refrained from coupling with Google plans & policies or exposing my trackable personal custom search API key and identifier for the public. I retained the browser-way of doing it by fetching html, which is a open and free specification.
 
 3. You can find a rofi script for `googler` [here](http://hastebin.com/fonowacija.bash). Written by an anonymous user, untested and we don't maintain it.
+
+## Contributions
+
+Pull requests are welcome. Please visit [#87](https://github.com/jarun/googler/issues/87) for a list of TODOs.
+<br>
+<p><a href="https://gitter.im/jarun/googler"><img src="https://img.shields.io/gitter/room/jarun/googler.svg?maxAge=2592000" alt="gitter chat" /></a></p>
 
 ## Developers
 
