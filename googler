@@ -1986,7 +1986,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
           g keywords            new Google search for 'keywords' with original options
           q, ^D, double Enter   exit googler
           ?                     show omniprompt help
-          *                     any other string initiates a new search with original options
+          *                     other inputs issue a new search with original options
         """))
 
     # Print information on googler
@@ -2255,7 +2255,7 @@ def parse_args(args=None, namespace=None):
            help='disable TCP optimizations and forced TLS 1.2')
     addarg('--json', action='store_true',
            help='output in JSON format; implies --exact and --noprompt')
-    addarg('--enable-browser-output', action='store_true',
+    addarg('--show-browser-logs', action='store_true',
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
            help='search and exit, do not prompt')
@@ -2309,7 +2309,7 @@ def main():
         GooglerCmd.colors = colors
 
         # Handle browser output suppression
-        if opts.enable_browser_output:
+        if opts.show_browser_logs:
             open_url.suppress_browser_output = False
 
         if opts.noua:

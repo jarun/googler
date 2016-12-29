@@ -25,7 +25,7 @@ args=(
     '(--noua)--noua[disable user agent]'
     '(--notweak)--notweak[disable TCP optimizations, forced TLS 1.2]'
     '(--json --exact --np --noprompt)--json[output in JSON format; implies --exact and --noprompt]'
-    '(--enable-browser-output)--enable-browser-output[do not suppress browser output]'
+    '(--show-browser-logs)--show-browser-logs[do not suppress browser output]'
     '(--np --noprompt)'{--np,--noprompt}'[perform search and exit, do not prompt for further interactions]'
     '(-u --upgrade)'{-u,--upgrade}'[perform in-place self-upgrade]'
     '(--include-git)--include-git[when used with --upgrade, upgrade to git master]'

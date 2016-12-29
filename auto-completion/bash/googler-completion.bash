@@ -27,7 +27,7 @@ _googler () {
         --noua
         --notweak
         --json
-        --enable-browser-output
+        --show-browser-logs
         --np --noprompt
         -u --upgrade
         --include-git

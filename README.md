@@ -138,7 +138,7 @@ and upgrade by running
 
     usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
                    [--colors COLORS] [-j] [-t dN] [-w SITE] [-p PROXY] [--noua]
-                   [--json] [--enable-browser-output] [--np] [-u]
+                   [--json] [--show-browser-logs] [--np] [-u]
                    [--include-git] [-v] [-d]
                    [KEYWORD [KEYWORD ...]]
 
@@ -168,8 +168,7 @@ and upgrade by running
       --noua                disable user agent
       --notweak             disable TCP optimizations and forced TLS 1.2
       --json                output in JSON format; implies --exact and --noprompt
-      --enable-browser-output
-                            do not suppress browser output (stdout and stderr)
+      --show-browser-logs   do not suppress browser output (stdout and stderr)
       --np, --noprompt      search and exit, do not prompt
       -u, --upgrade         perform in-place self-upgrade
       --include-git         when used with --upgrade, upgrade to latest git master
@@ -185,7 +184,7 @@ and upgrade by running
       g keywords            new Google search for 'keywords' with original options
       q, ^D, double Enter   exit googler
       ?                     show omniprompt help
-      *                     any other string initiates a new search with original options
+      *                     other inputs issue a new search with original options
 
 ### Configuration file
 
@@ -212,7 +211,7 @@ or for one-time use,
 
     $ BROWSER=w3m googler query
 
-Due to certain graphical browsers spewing messages to the console, `googler` suppresses browser output by default unless `BROWSER` is set to one of the known text-based browsers: currently `elinks`, `links`, `lynx` or `w3m`. If you use a different text-based browser, you will need to explicitly enable browser output with the `--enable-browser-output` option. If you believe your browser is popular enough, please submit an issue or pull request and we will consider whitelisting it. See the man page for more details on `--enable-browser-output`.
+Due to certain graphical browsers spewing messages to the console, `googler` suppresses browser output by default unless `BROWSER` is set to one of the known text-based browsers: currently `elinks`, `links`, `lynx` or `w3m`. If you use a different text-based browser, you will need to explicitly enable browser output with the `--show-browser-logs` option. If you believe your browser is popular enough, please submit an issue or pull request and we will consider whitelisting it. See the man page for more details on `--show-browser-logs`.
 
 ### Colors
 
