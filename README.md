@@ -50,16 +50,15 @@
 
 - Google Search, Google Site Search, Google News
 - Fast and clean (no ads, stray URLs or clutter), custom color
-- Open result URLs (or the actual search) in browser
-- Navigate search result pages from omniprompt
+- Navigate result pages from omniprompt, open URLs in browser
 - Fetch n results in a go, start at the n<sup>th</sup> result
 - Disable automatic spelling correction and search exact keywords
-- Limit search by duration, country/domain specific search (default: .com), language preference
-- Supports Google search keywords like `filetype:mime`, `site:somesite.com` etc.
-- Optionally open the first result directly in browser (as in *I'm Feeling Lucky*)
+- Specify duration, country/domain (default: worldwide/.com), language
+- Google keywords (e.g. `filetype:mime`, `site:somesite.com`) support
+- Open the first result directly in browser (as in *I'm Feeling Lucky*)
 - Non-stop searches: fire new searches at omniprompt without exiting
-- HTTPS proxy support
-- Man page with examples, shell completion scripts for Bash, Zsh and Fish
+- HTTPS proxy, User Agent, TLS 1.2 (default) support
+- Man page with examples, completion scripts for Bash, Zsh and Fish
 - Minimal dependencies
 
 ## Installation

@@ -6,6 +6,21 @@ googler \- Google from the command-line
 .SH DESCRIPTION
 .B googler
 is a command-line tool to search Google (Web & News) from the terminal. Google site search works too. \fBgoogler\fR shows the title, URL and text context for each result. Results are fetched in pages. Next or previous page navigation is possible using keyboard shortcuts. Results are indexed and a result URL can be opened in a browser using the index number. There is no configuration file as aliases serve the same purpose for this utility. Supports sequential searches in a single instance.
+.PP
+.B Features
+.PP
+  * Google Search, Google Site Search, Google News
+  * Fast and clean (no ads, stray URLs or clutter), custom color
+  * Navigate result pages from omniprompt, open URLs in browser
+  * Fetch n results in a go, start at the n<sup>th</sup> result
+  * Disable automatic spelling correction and search exact keywords
+  * Specify duration, country/domain (default: worldwide/.com), language
+  * Google keywords (e.g. \fIfiletype:mime\fR, \fIsite:somesite.com\fR) support
+  * Open the first result directly in browser (as in I'm Feeling Lucky)
+  * Non-stop searches: fire new searches at omniprompt without exiting
+  * HTTPS proxy, User Agent, TLS 1.2 (default) support
+  * Man page with examples, completion scripts for Bash, Zsh and Fish
+  * Minimal dependencies
 .SH OPTIONS
 .TP
 .BI "-h, --help"
