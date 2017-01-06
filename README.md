@@ -181,6 +181,7 @@ and upgrade by running
       o [index ...]         open space-separated result indices in browser
                             open the current search in browser, if no arguments
       g keywords            new Google search for 'keywords' with original options
+                            should be used to search omniprompt keys and indices
       q, ^D, double Enter   exit googler
       ?                     show omniprompt help
       *                     other inputs issue a new search with original options
