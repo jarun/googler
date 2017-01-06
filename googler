@@ -1890,7 +1890,10 @@ class GooglerCmd(object):
             return
 
         for nav in args:
-            if nav in self._urltable:
+            if nav == 'a':
+                for key, value in sorted(self._urltable.items()):
+                    open_url(self._urltable[key])
+            elif nav in self._urltable:
                 open_url(self._urltable[nav])
             else:
                 printerr("Invalid index %s." % nav)
@@ -1980,7 +1983,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
           n, p                  fetch the next or previous set of search results
           index                 open the result corresponding to index in browser
           f                     jump to the first page
-          o [index ...]         open space-separated result indices in browser
+          o [index ...] [a]     open cherry-picked result indices, or all, in browser
                                 open the current search in browser, if no arguments
           g keywords            new Google search for 'keywords' with original options
                                 should be used to search omniprompt keys and indices
