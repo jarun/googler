@@ -178,7 +178,7 @@ and upgrade by running
       n, p                  fetch the next or previous set of search results
       index                 open the result corresponding to index in browser
       f                     jump to the first page
-      o [index ...] [a]     open cherry-picked result indices, or all, in browser
+      o [index ...] [a]     open space-separated result indices, or all, in browser
                             open the current search in browser, if no arguments
       g keywords            new Google search for 'keywords' with original options
                             should be used to search omniprompt keys and indices
