@@ -1182,6 +1182,17 @@ class GoogleParser(html.parser.HTMLParser):
         {
             'tag': 'div',
             'class': 'related-question-pair'
+        },
+        # We omit Google's "smart card" results (term coined by me) by
+        # guarding against the 'g-blk' class (sample response: https://git.io/voJgB)
+        {
+            'tag': 'div',
+            'class': 'g-blk'
+        },
+        # We also guard against "smart-card" results with `--noua` option
+        {
+            'tag': 'div',
+            'class': 'hp-xpdbox'
         }
     ]
 
@@ -1189,9 +1200,7 @@ class GoogleParser(html.parser.HTMLParser):
 
     @annotate_tag
     def root_start(self, tag, attrs):
-        # We omit Google's "smart card" results (term coined by me) by
-        # guarding against the 'g-blk' class (sample response: https://git.io/voJgB)
-        if tag == 'div' and 'g' in self.classes(attrs) and 'g-blk' not in self.classes(attrs):
+        if tag == 'div' and 'g' in self.classes(attrs):
             # Initialize result field registers
             self.title = ''
             self.url = ''
@@ -2316,6 +2325,7 @@ def main():
             open_url.suppress_browser_output = False
 
         if opts.noua:
+            logger.debug('User Agent is disabled')
             ua = False
 
         repl = GooglerCmd(opts)
