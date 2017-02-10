@@ -733,7 +733,7 @@ class GoogleConnection(object):
         while resp.status != 200 and redirect_counter < 3:
             if resp.status in {301, 302, 303, 307, 308}:
                 redirection_url = resp.getheader('location', '')
-                if 'sorry/IndexRedirect?' in redirection_url:
+                if 'sorry/IndexRedirect?' in redirection_url or 'sorry/index?' in redirection_url:
                     raise GoogleConnectionError('Connection blocked due to unusual activity.')
                 self._redirect(redirection_url)
                 resp = self._resp
