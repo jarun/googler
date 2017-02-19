@@ -37,6 +37,7 @@
     - [Downloading a single file](#downloading-a-single-file)
 - [Usage](#usage)
     - [Cmdline options](#cmdline-options)
+    - [googler @t](#googler-t)
     - [Configuration file](#configuration-file)
     - [Text-based browser integration](#text-based-browser-integration)
     - [Colors](#colors)
@@ -51,6 +52,7 @@
 - Google Search, Google Site Search, Google News
 - Fast and clean (no ads, stray URLs or clutter), custom color
 - Navigate result pages from omniprompt, open URLs in browser
+- Effortless keyword-based site search with googler @t add-on
 - Fetch n results in a go, start at the n<sup>th</sup> result
 - Disable automatic spelling correction and search exact keywords
 - Specify duration, country/domain (default: worldwide/.com), language
@@ -200,6 +202,21 @@ The alias serves both the purposes of using config files:
 
 - Persistent settings: when the user invokes `g`, it expands to the preferred settings.
 - Override settings: thanks to the way Python `argparse` works, `googler` is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs `g -l de -c de -n 12 hello world`, 12 results are returned from the Google Germany server, with preference towards results in German.
+
+### googler @t
+
+`googler @t` is a convenient add-on to Google Site Search with unique keywords. While `googler` has an integrated option to search a site, we simplified it further with aliases. The file [googler_at](https://github.com/jarun/googler/blob/master/auto-completion/googler_at/googler_at) contains a list of website search aliases. To source it, run:
+
+    $ source googler_at
+or,
+
+    $ . googler_at
+With `googler @t`, here's how you search Wikipedia for `hexspeak`:
+
+    $ @w hexspeak
+Oh yes! You can combine other `googler` options too! To make life easier, you can also configure your shell to source the file when it starts.
+
+All the aliases start with the `@` symbol (hence the name `googler @t`) and there is minimum chance they will conflict with any shell commands. Feel free to add your own aliases to the file and contribute back the interesting ones.
 
 ### Text-based browser integration
 

@@ -12,6 +12,7 @@ is a command-line tool to search Google (Web & News) from the terminal. Google s
   * Google Search, Google Site Search, Google News
   * Fast and clean (no ads, stray URLs or clutter), custom color
   * Navigate result pages from omniprompt, open URLs in browser
+  * Effortless keyword-based site search with googler @t add-on
   * Fetch n results in a go, start at the n<sup>th</sup> result
   * Disable automatic spelling correction and search exact keywords
   * Specify duration, country/domain (default: worldwide/.com), language
@@ -113,6 +114,25 @@ Show omniprompt help.
 .TP
 .BI *
 Any other string initiates a new search with original options.
+.SH GOOGLER @T
+\fBgoogler @t\fR is a convenient add-on to Google Site Search with unique keywords. While \fBgoogler\fR has an integrated option to search a site, it could be simplified further with aliases. The file \fIgoogler_at\fR (https://github.com/jarun/googler/blob/master/auto-completion/googler_at/googler_at) contains a list of website search aliases. To source it, run:
+.PP
+.IP "" 4
+.B source googler_at
+.PP
+or
+.PP
+.IP "" 4
+.B . googler_at
+.PP
+With \fBgoogler @t\fR, the following command searches Wikipedia for \fIhexspeak\fR:
+.PP
+.IP "" 4
+.B @w hexspeak
+.PP
+Other \fBgoogler\fR options can be combined. The shell can be configured to be source the file at start-up for further convenience.
+.PP
+All the aliases start with the \fB@\fR symbol (hence the name \fBgoogler @t\fR) and there is minimum chance they will conflict with any shell commands. Users can add new aliases to the file.
 .SH COLORS
 \fBgoogler\fR allows you to customize the color scheme via a six-letter string, reminiscent of BSD \fBLSCOLORS\fR. The six letters represent the colors of
 .IP - 2
