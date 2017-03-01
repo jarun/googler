@@ -2113,13 +2113,13 @@ def download_latest_googler(include_git=False):
         git_ref = response.read().decode('utf-8')
     else:
         # Get name of latest tag
-        request = urllib.request.Request('%s/tags?per_page=1' % API_REPO_BASE,
+        request = urllib.request.Request('%s/releases?per_page=1' % API_REPO_BASE,
                                          headers={'Accept': 'application/vnd.github.v3+json'})
         response = urllib.request.urlopen(request)
         if response.status != 200:
             raise http.client.HTTPException(response.reason)
         import json
-        git_ref = json.loads(response.read().decode('utf-8'))[0]['name']
+        git_ref = json.loads(response.read().decode('utf-8'))[0]['tag_name']
 
     # Download googler to a tempfile
     googler_download_url = '%s/%s/googler' % (RAW_DOWNLOAD_REPO_BASE, git_ref)
