@@ -99,6 +99,36 @@ RAW_DOWNLOAD_REPO_BASE = 'https://raw.githubusercontent.com/jarun/googler'
 
 # Global helper functions
 
+def _version_():
+    """Returns a version number with git commit embedded if possible.
+
+    Falls back to _VERSION_ otherwise.
+    """
+    import subprocess
+
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    DEVNULL = subprocess.DEVNULL
+
+    try:
+        description = subprocess.check_output(
+            ['git', '-C', script_dir, 'describe', '--abbrev', 'HEAD'],
+            stdin=DEVNULL, stderr=DEVNULL,
+        ).decode('utf-8')
+        return description.lstrip('v')
+    except subprocess.CalledProcessError:
+        pass
+
+    try:
+        sha = subprocess.check_output(
+            ['git', '-C', script_dir, 'rev-parse', '--short', 'HEAD'],
+            stdin=DEVNULL, stderr=DEVNULL,
+        ).decode('utf-8')
+        return '%s-*-g%s' % (_VERSION_, sha)
+    except subprocess.CalledProcessError:
+        pass
+
+    return _VERSION_
+
 def open_url(url):
     """Open an URL in the user's default web browser.
 
@@ -2012,7 +2042,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
         Zhiming Wang <zmwangx@gmail.com>
         License: GPLv3
         Webpage: https://github.com/jarun/googler
-        """ % _VERSION_))
+        """ % _version_()))
 
     # Augment print_help to print more than synopsis and options
     def print_help(self, file=None):
@@ -2277,7 +2307,7 @@ def parse_args(args=None, namespace=None):
                help='perform in-place self-upgrade')
         addarg('--include-git', action='store_true',
                help='when used with --upgrade, upgrade to latest git master')
-    addarg('-v', '--version', action='version', version=_VERSION_)
+    addarg('-v', '--version', action='version', version=_version_())
     addarg('-d', '--debug', action='store_true', help='enable debugging')
 
     return argparser.parse_args(args, namespace)
@@ -2296,7 +2326,7 @@ def main():
         # Set logging level
         if opts.debug:
             logger.setLevel(logging.DEBUG)
-            logger.debug('Version %s', _VERSION_)
+            logger.debug('Version %s', _version_())
 
         # Handle self-upgrade
         if hasattr(opts, 'upgrade') and opts.upgrade:
