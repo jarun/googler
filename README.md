@@ -125,7 +125,7 @@ You could then let googler upgrade itself by running
 
     $ sudo googler -u
 
-Similarly, if you want to install from git master, run
+Similarly, if you want to install from git master (*risky*), run
 
     $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/master/googler && sudo chmod +x /usr/local/bin/googler
 
