@@ -1,3 +1,15 @@
+googler 3.0
+2017-03-12
+
+Modifications
+- Introducing [googler @t](https://github.com/jarun/googler#googler-t) add-on!
+- Open multiple indices from omniprompt
+- Open all indices from omniprompt
+- Option `--enable-browser-output` is now `--show-browser-logs`
+- Multiple bug fixes
+
+-------------------------------------------------------------------------------
+
 googler 2.9
 2016-12-18
 
