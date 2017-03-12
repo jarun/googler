@@ -1295,7 +1295,7 @@ class GoogleParser(html.parser.HTMLParser):
         elif annotation == 'abstract_gservices':
             self.stop_populating_textbuf()
             self.abstract = self.pop_textbuf().replace('  ', ' ')
-            self.abstract_registered = False
+            self.abstract_registered = True
 
     @annotate_tag
     def title_start(self, tag, attrs):
@@ -1331,16 +1331,23 @@ class GoogleParser(html.parser.HTMLParser):
 
     @annotate_tag
     def abstract_start(self, tag, attrs):
+        if tag == 'div' and 'slp' in self.classes(attrs):
+            self.start_populating_textbuf()
+            return 'result_metadata'
         if tag == 'span' and 'st' in self.classes(attrs):
             self.start_populating_textbuf()
             return 'abstract_text'
 
     @retrieve_tag_annotation
     def abstract_end(self, tag, annotation):
-        if annotation == 'abstract_text':
+        if annotation == 'result_metadata':
+            self.stop_populating_textbuf()
+            self.metadata = self.pop_textbuf().strip()
+            self.metadata_registered = True
+        elif annotation == 'abstract_text':
             self.stop_populating_textbuf()
             self.abstract = self.pop_textbuf()
-            self.abstract_registered = False
+            self.abstract_registered = True
         elif annotation == 'abstract':
             self.set_handlers_to('result')
 
