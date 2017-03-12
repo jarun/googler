@@ -1331,7 +1331,8 @@ class GoogleParser(html.parser.HTMLParser):
 
     @annotate_tag
     def abstract_start(self, tag, attrs):
-        if tag == 'div' and 'slp' in self.classes(attrs):
+        if (not self.metadata_registered and
+                tag == 'div' and 'slp' in self.classes(attrs)):
             self.start_populating_textbuf()
             return 'result_metadata'
         if tag == 'span' and 'st' in self.classes(attrs):
@@ -1342,7 +1343,7 @@ class GoogleParser(html.parser.HTMLParser):
     def abstract_end(self, tag, annotation):
         if annotation == 'result_metadata':
             self.stop_populating_textbuf()
-            self.metadata = self.pop_textbuf().strip()
+            self.metadata = self.pop_textbuf().strip().replace('\u200e', '')
             self.metadata_registered = True
         elif annotation == 'abstract_text':
             self.stop_populating_textbuf()
