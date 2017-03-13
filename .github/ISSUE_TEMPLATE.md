@@ -6,7 +6,7 @@ If the issue can be reproduced on master, then please make sure you provide the 
 - Output of `googler -d`;
 - Link to the response body (you should see a line like `[DEBUG] Response body written to '/Volumes/ramdisk/googler-response-xxxxxxxx'` in the output of `googler -d`; please upload the file to a [gist](https://gist.github.com/) and include the gist's URL in the issue);
 - Details of operating system, Python version used, terminal emulator and shell;
-- `locale` output, if relevant. It's a good idea to set your locale to UFT-8. Please refer to [Buku #30](https://github.com/jarun/Buku/issues/30).
+- `locale` output, if relevant. It's a good idea to set your locale to UFT-8. Please refer to [googler #131](https://github.com/jarun/googler/issues/131).
 
 If we need more information and there is no communication from the bug reporter within 7 days from the date of request, we will close the issue. If you have relevant information, resume discussion any time.
 
