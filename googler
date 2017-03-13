@@ -1966,8 +1966,10 @@ class GooglerCmd(object):
                     self.do_next('')
                 elif cmd == 'o':
                     self.do_open()
+                    self.display_results()
                 elif cmd.startswith('o '):
                     self.do_open(*cmd[2:].split())
+                    self.display_results()
                 elif cmd == 'p':
                     self.do_previous('')
                 elif cmd == 'q':
@@ -1980,6 +1982,7 @@ class GooglerCmd(object):
                     self.help()
                 elif cmd in self._urltable:
                     open_url(self._urltable[cmd])
+                    self.display_results()
                 elif self.keywords and cmd.isdigit() and int(cmd) < 100:
                     printerr('Index out of bound. To search for the number, use g.')
                 else:
