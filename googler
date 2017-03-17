@@ -1913,7 +1913,7 @@ class GooglerCmd(object):
             elif nav in self._urltable:
                 open_url(self._urltable[nav])
             else:
-                printerr("Invalid index %s." % nav)
+                printerr('Invalid index %s.' % nav)
 
     @require_keywords
     @no_argument
