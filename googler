@@ -584,14 +584,14 @@ class GoogleUrl(object):
         sites = self._sites
         if keywords:
             if isinstance(keywords, list):
-                q += '+'.join([urllib.parse.quote_plus(kw) for kw in keywords])
+                q += '+'.join(urllib.parse.quote_plus(kw) for kw in keywords)
             else:
                 q += urllib.parse.quote_plus(keywords)
         if sites:
-            q += '+OR'.join(['+site:' + urllib.parse.quote_plus(site) for site in sites])
+            q += '+OR'.join('+site:' + urllib.parse.quote_plus(site) for site in sites)
         qd['q'] = q
 
-        return '&'.join(['%s=%s' % (k, qd[k]) for k in sorted(qd.keys())])
+        return '&'.join('%s=%s' % (k, qd[k]) for k in sorted(qd.keys()))
 
 
 class GoogleConnectionError(Exception):
