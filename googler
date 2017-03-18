@@ -292,7 +292,7 @@ class GoogleUrl(object):
         self._num = 10
         self._start = 0
         self._keywords = []
-        self._site = None
+        self._sites = None
         self._query_dict = {
             'ie': 'UTF-8',
             'oe': 'UTF-8',
@@ -418,8 +418,8 @@ class GoogleUrl(object):
                 qd.pop('tbm', None)
         if 'num' in opts:
             self._num = opts['num']
-        if 'site' in opts:
-            self._site = opts['site']
+        if 'sites' in opts:
+            self._sites = opts['sites']
         if 'start' in opts:
             self._start = opts['start']
         if 'tld' in opts:
@@ -581,16 +581,17 @@ class GoogleUrl(object):
         # Construct the q query
         q = ''
         keywords = self._keywords
+        sites = self._sites
         if keywords:
             if isinstance(keywords, list):
-                q += '+'.join([urllib.parse.quote_plus(kw) for kw in keywords])
+                q += '+'.join(urllib.parse.quote_plus(kw) for kw in keywords)
             else:
                 q += urllib.parse.quote_plus(keywords)
-        if self._site:
-            q += '+OR'.join(['+site:' + urllib.parse.quote_plus(site) for site in self._site])
+        if sites:
+            q += '+OR'.join('+site:' + urllib.parse.quote_plus(site) for site in sites)
         qd['q'] = q
 
-        return '&'.join(['%s=%s' % (k, qd[k]) for k in sorted(qd.keys())])
+        return '&'.join('%s=%s' % (k, qd[k]) for k in sorted(qd.keys()))
 
 
 class GoogleConnectionError(Exception):
@@ -2268,7 +2269,7 @@ def parse_args(args=None, namespace=None):
     addarg('-t', '--time', dest='duration', type=argparser.is_duration,
            metavar='dN', help='time limit search '
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
-    addarg('-w', '--site', action='append', metavar='SITE',
+    addarg('-w', '--site', dest='sites', action='append', metavar='SITE',
            help='search a site using Google')
     addarg('-p', '--proxy', default=https_proxy_from_environment(),
            help='tunnel traffic through an HTTPS proxy (HOST:PORT)')
