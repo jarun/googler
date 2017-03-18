@@ -272,6 +272,8 @@
   alias @tldrlegal='googler -w tldrlegal.com'
 # Torrentz2
   alias @to='googler -w torrentz2.eu'
+# The Pirate Bay
+  alias @tpb='googler -w thepiratebay.org'
 # TuneIn
   alias @tunein='googler -w tunein.com'
 # Twitter
