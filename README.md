@@ -293,9 +293,9 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 
         $ googler hello world
 
-2. Fetch **15 results** updated within last **14 months**, starting from the **3<sup>rd</sup> result** for the string **cmdline utility** in **site** tuxdiary.com:
+2. Fetch **15 results** updated within the last **14 months**, starting from the **3<sup>rd</sup> result** for the keywords **jungle book** in **site** imdb.com:
 
-        $ googler -n 15 -s 3 -t m14 -w tuxdiary.com cmdline utility
+        $ googler -n 15 -s 3 -t m14 -w imdb.com jungle book
 
 3. Read recent **news** on gadgets:
 
@@ -323,7 +323,7 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 
 9. **Website specific** search:
 
-        $ googler -w tuxdiary.com hello world
+        $ googler -w amazon.com -w ebay.com digital camera
 Site specific search continues at omniprompt. Use the `g` key to run a regular Google search.
 10. Alias to find **definitions of words**:
 

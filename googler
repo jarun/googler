@@ -575,7 +575,8 @@ class GoogleUrl(object):
         qd = {}
         qd.update(self._query_dict)
         qd['num'] = self._num
-        qd['start'] = self._start
+        if self._start:
+            qd['start'] = self._start
 
         # Construct the q query
         q = ''
@@ -586,7 +587,7 @@ class GoogleUrl(object):
             else:
                 q += urllib.parse.quote_plus(keywords)
         if self._site:
-            q += '+site:' + urllib.parse.quote_plus(self._site)
+            q += '+OR'.join(['+site:' + urllib.parse.quote_plus(site) for site in self._site])
         qd['q'] = q
 
         return '&'.join(['%s=%s' % (k, qd[k]) for k in sorted(qd.keys())])
@@ -1913,7 +1914,7 @@ class GooglerCmd(object):
             elif nav in self._urltable:
                 open_url(self._urltable[nav])
             else:
-                printerr("Invalid index %s." % nav)
+                printerr('Invalid index %s.' % nav)
 
     @require_keywords
     @no_argument
@@ -2267,7 +2268,8 @@ def parse_args(args=None, namespace=None):
     addarg('-t', '--time', dest='duration', type=argparser.is_duration,
            metavar='dN', help='time limit search '
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
-    addarg('-w', '--site', metavar='SITE', help='search a site using Google')
+    addarg('-w', '--site', action='append', metavar='SITE',
+           help='search a site using Google')
     addarg('-p', '--proxy', default=https_proxy_from_environment(),
            help='tunnel traffic through an HTTPS proxy (HOST:PORT)')
     addarg('--noua', action='store_true', help='disable user agent')
