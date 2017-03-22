@@ -93,6 +93,8 @@
   alias @forbes='googler -w forbes.com'
 # Forvo
   alias @forvo='googler -w forvo.com'
+# Financial Times
+  alias @ft='googler -w markets.ft.com'
 
     # G
 
