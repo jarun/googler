@@ -210,9 +210,13 @@ class TLS1_2Connection(HTTPSConnection):
 
         # Optimizations not available on OS X
         if not notweak and sys.platform.startswith('linux'):
-            sock.setsockopt(socket.SOL_TCP, socket.TCP_DEFER_ACCEPT, 1)
-            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 524288)
+            try:
+                sock.setsockopt(socket.SOL_TCP, socket.TCP_DEFER_ACCEPT, 1)
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 524288)
+            except OSError:
+                # Doesn't work on Windows' Linux subsystem (#179)
+                logger.debug('setsockopt failed')
 
         if getattr(self, '_tunnel_host', None):
             self.sock = sock
