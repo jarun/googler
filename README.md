@@ -93,6 +93,18 @@ To remove `googler` and associated docs, run
 
     $ ./googler
 
+#### Running with Docker
+
+We provide `googler` with a tiny lightweight Docker image derived from python:3-alpine.
+
+In order to build `googler` docker image, run:
+
+    $ docker build -t jarun/googler path/to/Dockerfile
+
+Once the docker image has been built, run the following command to execute `googler`:
+
+    $ docker run -it jarun/googler
+
 #### Shell completion
 
 Shell completion scripts for Bash, Fish and Zsh can be found in respective subdirectories of [`auto-completion/`](auto-completion). Please refer to your shell's manual for installation instructions.
