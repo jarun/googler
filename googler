@@ -121,7 +121,7 @@ def open_url(url):
         os.dup2(fd, 2)
         os.dup2(fd, 1)
     try:
-        webbrowser.open(url)
+        webbrowser.open(url, new=2)
     finally:
         if open_url.suppress_browser_output:
             os.close(fd)
