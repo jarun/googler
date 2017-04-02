@@ -1,8 +1,9 @@
 #
 # Rudimentary Bash completion definition for googler.
 #
-# Author:
+# Authors:
 #   Zhiming Wang <zmwangx@gmail.com>
+#   Jorge Maldonado Ventura <jorgesumle@freakspot.net>
 #
 
 _googler () {
@@ -34,7 +35,7 @@ _googler () {
         -v --version
         -d --debug
     )
-    opts_with_arg=(
+    opts_with_args=(
         -s --start
         -n --count
         -c --tld
@@ -49,7 +50,7 @@ _googler () {
     [[ $cur == -* ]] || return 1
 
     # Do not complete when the previous arg is an option expecting an argument
-    for opt in "${opts_with_arg[@]}"; do
+    for opt in "${opts_with_args[@]}"; do
         [[ $opt == $prev ]] && return 1
     done
 
