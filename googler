@@ -1918,6 +1918,23 @@ class GooglerCmd(object):
                     open_url(self._urltable[key])
             elif nav in self._urltable:
                 open_url(self._urltable[nav])
+            elif '-' in nav:
+                try:
+                    vals = [int(x) for x in nav.split('-')]
+                    if (len(vals) != 2):
+                        printerr('Invalid range %s.' % nav)
+                        continue
+
+                    if vals[0] > vals[1]:
+                        vals[0], vals[1] = vals[1], vals[0]
+
+                    for _id in range(vals[0], vals[1] + 1):
+                        if str(_id) in self._urltable:
+                            open_url(self._urltable[str(_id)])
+                        else:
+                            printerr('Invalid index %s.' % _id)
+                except ValueError:
+                    printerr('Invalid range %s.' % nav)
             else:
                 printerr('Invalid index %s.' % nav)
 
@@ -2006,8 +2023,8 @@ class GooglerArgumentParser(argparse.ArgumentParser):
           n, p                  fetch the next or previous set of search results
           index                 open the result corresponding to index in browser
           f                     jump to the first page
-          o [index ...] [a]     open space-separated result indices, or all, in browser
-                                open the current search in browser, if no arguments
+          o [index|range|a ...] open space-separated result indices, numeric ranges
+                                (sitelinks unsupported in ranges), or all, in browser
           g keywords            new Google search for 'keywords' with original options
                                 should be used to search omniprompt keys and indices
           q, ^D, double Enter   exit googler
