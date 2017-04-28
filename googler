@@ -65,7 +65,7 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 # Constants
 
-_VERSION_ = '3.0'
+_VERSION_ = '3.1'
 
 COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'a': '30', 'b': '31', 'c': '32', 'd': '33',
@@ -80,7 +80,7 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
 }.items()}
 
 # Disguise as Firefox on Ubuntu
-USER_AGENT = ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0')
+USER_AGENT = ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:53.0) Gecko/20100101 Firefox/53.0')
 ua = True  # User Agent is enabled by default
 
 # Self-upgrade parameters
@@ -2025,6 +2025,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
           f                     jump to the first page
           o [index|range|a ...] open space-separated result indices, numeric ranges
                                 (sitelinks unsupported in ranges), or all, in browser
+                                open the current search in browser, if no arguments
           g keywords            new Google search for 'keywords' with original options
                                 should be used to search omniprompt keys and indices
           q, ^D, double Enter   exit googler
