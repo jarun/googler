@@ -1,5 +1,6 @@
 PREFIX ?= /usr/local
 BINDIR = $(DESTDIR)$(PREFIX)/bin
+LIBEXECDIR = $(DESTDIR)$(PREFIX)/libexec/googler
 MANDIR = $(DESTDIR)$(PREFIX)/share/man/man1
 DOCDIR = $(DESTDIR)$(PREFIX)/share/doc/googler
 
@@ -9,10 +10,13 @@ all:
 
 install:
 	install -m755 -d $(BINDIR)
+	install -m755 -d $(LIBEXECDIR)
 	install -m755 -d $(MANDIR)
 	install -m755 -d $(DOCDIR)
 	gzip -c googler.1 > googler.1.gz
-	install -m755 googler $(BINDIR)
+	install -m755 googler $(LIBEXECDIR)
+	echo "#!/bin/sh\nPYTHONIOENCODING=utf-8 $(PREFIX)/libexec/googler/googler \"\$$@\"" >$(BINDIR)/googler
+	chmod 755 $(BINDIR)/googler
 	install -m644 googler.1.gz $(MANDIR)
 	install -m644 README.md $(DOCDIR)
 	rm -f googler.1.gz
