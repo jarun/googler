@@ -2299,7 +2299,7 @@ def parse_args(args=None, namespace=None):
     addarg('--notweak', action='store_true',
            help='disable TCP optimizations and forced TLS 1.2')
     addarg('--json', action='store_true',
-           help='output in JSON format; implies --exact and --noprompt')
+           help='output in JSON format; implies --noprompt')
     addarg('--show-browser-logs', action='store_true',
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
@@ -2321,10 +2321,6 @@ def main():
 
     try:
         opts = parse_args()
-
-        # --json implies --exact
-        if opts.json:
-            opts.exact = True
 
         # Set logging level
         if opts.debug:

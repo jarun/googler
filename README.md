@@ -168,7 +168,7 @@ and upgrade by running
                             tunnel traffic through an HTTPS proxy (HOST:PORT)
       --noua                disable user agent
       --notweak             disable TCP optimizations and forced TLS 1.2
-      --json                output in JSON format; implies --exact and --noprompt
+      --json                output in JSON format; implies --noprompt
       --show-browser-logs   do not suppress browser output (stdout and stderr)
       --np, --noprompt      search and exit, do not prompt
       -u, --upgrade         perform in-place self-upgrade
