@@ -370,6 +370,8 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 
 2. By default `googler` applies some TCP optimizations and forces TLS 1.2 (on Python 3.4 and above). If you are facing connection issues, try disabling both using the `--notweak` switch.
 
+3. Google News service is not available if the language is `dk` (Denmark), `fi` (Finland) or `is` (Iceland). Use `-l en`. Please refer to #187 for more information.
+
 ## Notes
 
 1. Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author [Henri Hakkinen](https://github.com/henux) in past year. I have created this independent repo for the project with the name `googler`. I retained the original copyright information.
