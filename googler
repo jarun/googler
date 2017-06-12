@@ -1314,6 +1314,10 @@ class GoogleParser(html.parser.HTMLParser):
             if attrs['href'].startswith('/search'):
                 return
 
+            # Skip card results
+            if not ua and "fl" in self.classes(attrs):
+                return
+
             self.url = attrs['href']
             try:
                 start = self.url.index('?q=') + len('?q=')
