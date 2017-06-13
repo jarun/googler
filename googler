@@ -1716,6 +1716,8 @@ class GooglerCmd(object):
         self._opts = opts
 
         self._google_url = GoogleUrl(opts)
+        if opts.unfilter or opts.noninteractive:
+            self._google_url.set_queries(filter=0)
         proxy = opts.proxy if hasattr(opts, 'proxy') else None
         self._conn = GoogleConnection(self._google_url.hostname, proxy=proxy,
                                       notweak=opts.notweak)
@@ -2308,6 +2310,8 @@ def parse_args(args=None, namespace=None):
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
            help='search and exit, do not prompt')
+    addarg('--unfilter', dest='unfilter', action='store_true',
+           help='unfilter search results')
     addarg('keywords', nargs='*', metavar='KEYWORD', help='search keywords')
     if ENABLE_SELF_UPGRADE_MECHANISM and not system_is_windows():
         addarg('-u', '--upgrade', action='store_true',
