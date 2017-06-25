@@ -672,22 +672,18 @@ class GoogleConnection(object):
         proxy = self._proxy
 
         if proxy:
-            auth_needed = False
-            if proxy.find('@'):
-                auth_needed = True
-                proxy_host_port = proxy[proxy.find('@')+1:]
-                proxy_user_pwd = proxy[0:proxy.find('@')]
+            proxy_user_passwd, proxy_host_port = parse_proxy_spec(proxy)
 
-            logger.debug('Connecting to proxy server %s', proxy)
+            logger.debug('Connecting to proxy server %s', proxy_host_port)
             self._conn = TLS1_2Connection(proxy_host_port, timeout=timeout)
 
             logger.debug('Tunnelling to host %s' % host_display)
-
-            if auth_needed:
-                auth_header_value = 'Basic ' + base64.b64encode(proxy_user_pwd.encode('utf-8')).decode('utf-8')
-                self._conn.set_tunnel(host, port=port, headers={'Proxy-Authorization': auth_header_value})
-            else:
-                self._conn.set_tunnel(host, port=port)
+            connect_headers = {}
+            if proxy_user_passwd:
+                connect_headers['Proxy-Authorization'] = 'Basic %s' % base64.b64encode(
+                    proxy_user_passwd.encode('utf-8')
+                ).decode('utf-8')
+            self._conn.set_tunnel(host, port=port, headers=connect_headers)
 
             try:
                 self._conn.connect(self._notweak)
@@ -2253,16 +2249,35 @@ def self_upgrade(include_git=False):
 # Miscellaneous functions
 
 def https_proxy_from_environment():
-    if 'https_proxy' not in os.environ:
-        return None
-    proxy = urllib.parse.urlparse(os.environ['https_proxy']).netloc
-    # urlparse recognizes a netloc only if it is introduced by '//'
-    # (https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urlparse).
-    # This means a bare host:port like 'localhost:8118' won't be
-    # recognized. In that case, try again with the '//' prefix.
-    if not proxy:
-        proxy = urllib.parse.urlparse('//' + os.environ['https_proxy']).netloc
-    return proxy if proxy else None
+    return os.getenv('https_proxy')
+
+
+def parse_proxy_spec(proxyspec):
+    if '://' in proxyspec:
+        pos = proxyspec.find('://')
+        scheme = proxyspec[:pos]
+        proxyspec = proxyspec[pos+3:]
+        if scheme.lower() != 'http':
+            # Only support HTTP proxies.
+            #
+            # In particular, we don't support HTTPS proxies since we
+            # only speak plain HTTP to the proxy server, so don't give
+            # users a false sense of security.
+            raise NotImplementedError('Unsupported proxy scheme %s.' % scheme)
+
+    if '@' in proxyspec:
+        pos = proxyspec.find('@')
+        user_passwd = urllib.parse.unquote(proxyspec[:pos])
+        host_port = proxyspec[pos+1:]
+    else:
+        user_passwd = None
+        host_port = proxyspec
+
+    if ':' not in host_port:
+        # Use port 1080 as default, following curl.
+        host_port += ':1080'
+
+    return user_passwd, host_port
 
 
 def parse_args(args=None, namespace=None):
@@ -2311,7 +2326,8 @@ def parse_args(args=None, namespace=None):
     addarg('-w', '--site', dest='sites', action='append', metavar='SITE',
            help='search a site using Google')
     addarg('-p', '--proxy', default=https_proxy_from_environment(),
-           help='tunnel traffic through an HTTPS proxy (HOST:PORT)')
+           help="""tunnel traffic through an HTTP proxy;
+           PROXY is of the form [http://][user:password@]proxyhost[:port]""")
     addarg('--noua', action='store_true', help='disable user agent')
     addarg('--notweak', action='store_true',
            help='disable TCP optimizations and forced TLS 1.2')

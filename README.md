@@ -166,7 +166,8 @@ and upgrade by running
                             weeks), m5 (5 months), y5 (5 years)]
       -w SITE, --site SITE  search a site using Google
       -p PROXY, --proxy PROXY
-                            tunnel traffic through an HTTPS proxy (HOST:PORT)
+                            tunnel traffic through an HTTP proxy; PROXY is of the
+                            form [http://][user:password@]proxyhost[:port]
       --noua                disable user agent
       --notweak             disable TCP optimizations and forced TLS 1.2
       --json                output in JSON format; implies --noprompt
