@@ -165,6 +165,7 @@ and upgrade by running
       -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
                             weeks), m5 (5 months), y5 (5 years)]
       -w SITE, --site SITE  search a site using Google
+      --unfilter            do not omit similar results
       -p PROXY, --proxy PROXY
                             tunnel traffic through an HTTP proxy; PROXY is of the
                             form [http://][user:password@]proxyhost[:port]

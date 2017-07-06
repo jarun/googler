@@ -388,6 +388,7 @@ class GoogleUrl(object):
                 site: str
                 start: int
                 tld: str
+                unfilter: bool
 
         Other Parameters
         ----------------
@@ -429,6 +430,8 @@ class GoogleUrl(object):
             self._start = opts['start']
         if 'tld' in opts:
             self._tld = opts['tld']
+        if 'unfilter' in opts and opts['unfilter']:
+            qd['filter'] = 0
 
     def set_queries(self, **kwargs):
         """Forcefully set queries outside the normal `update` mechanism.
@@ -2325,6 +2328,7 @@ def parse_args(args=None, namespace=None):
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
     addarg('-w', '--site', dest='sites', action='append', metavar='SITE',
            help='search a site using Google')
+    addarg('--unfilter', action='store_true', help='do not omit similar results')
     addarg('-p', '--proxy', default=https_proxy_from_environment(),
            help="""tunnel traffic through an HTTP proxy;
            PROXY is of the form [http://][user:password@]proxyhost[:port]""")
