@@ -179,8 +179,12 @@
   alias @man='googler -w manpages.ubuntu.com'
 # Linux manual page
   alias @man7='googler -w man7.org'
+# Manga Reader
+  alias @mangar='googler -w mangareader.net'
 # MLB
   alias @mlb='googler -w mlb.mlb.com'
+# Mac Rumors
+  alias @mr='googler -w macrumors.com'
 
     # N
 
@@ -201,6 +205,8 @@
   alias @ocw='googler -w ocw.mit.edu'
 # Open Embedded
   alias @oembedded='googler -w openembedded.org'
+# OMG! Ubuntu!
+  alias @omg='googler -w omgubuntu.co.uk'
 # OpenSubtitles
   alias @op='googler -w opensubtitles.org'
 # Opensource.com
