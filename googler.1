@@ -60,6 +60,9 @@ Time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 y
 .BI "-w, --site=" SITE
 Search a site using Google.
 .TP
+.BI "--unfilter"
+Do not omit similar results.
+.TP
 .BI "-p, --proxy=" PROXY
 Tunnel traffic through an HTTP proxy. \fIPROXY\fR is of the form \fI[http://][user:password@]proxyhost[:port]\fR. The proxy server must support HTTP CONNECT tunneling and must not block port 443 for the relevant Google hosts. If a proxy is not explicitly given, the \fIhttps_proxy\fR environment variable (if available) is used instead.
 .TP
