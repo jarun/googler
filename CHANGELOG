@@ -1,3 +1,15 @@
+googler 3.2
+2017-07-07
+
+What's in?
+- Basic authentication with `--proxy`
+- Option `--unfilter` to include similar results
+- New googler @ts : Manga Reader, Mac Rumors, OMG! Ubuntu!
+- Fix: skip certain card results with `--noua`
+- options `--json` and `--exact` decoupled
+
+-------------------------------------------------------------------------------
+
 googler 3.1
 2017-04-28
 

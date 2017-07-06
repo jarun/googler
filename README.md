@@ -120,7 +120,7 @@ Googler is a single standalone script, so you could download just a single file 
 
 To install the latest stable version, run
 
-    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.1/googler && sudo chmod +x /usr/local/bin/googler
+    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.2/googler && sudo chmod +x /usr/local/bin/googler
 
 You could then let googler upgrade itself by running
 
@@ -139,9 +139,9 @@ and upgrade by running
 ### Cmdline options
 
     usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
-                   [--colors COLORS] [-j] [-t dN] [-w SITE] [-p PROXY] [--noua]
-                   [--notweak] [--json] [--show-browser-logs] [--np] [-u]
-                   [--include-git] [-v] [-d]
+                   [--colors COLORS] [-j] [-t dN] [-w SITE] [--unfilter]
+                   [-p PROXY] [--noua] [--notweak] [--json] [--show-browser-logs]
+                   [--np] [-u] [--include-git] [-v] [-d]
                    [KEYWORD [KEYWORD ...]]
 
     Google from the command-line.
