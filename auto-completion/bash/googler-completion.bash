@@ -23,6 +23,7 @@ _googler () {
         -j --first --lucky
         -t --time
         -w --site
+        --unfilter
         -p --proxy
         --noua
         --notweak

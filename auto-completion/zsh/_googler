@@ -21,6 +21,7 @@ args=(
     '(-j --first --lucky)'{-j,--first,--lucky}'[open the first result in a web browser]'
     '(-t --time)'{-t,--time}'[time limit search]:period (h/d/w/m/y + number)'
     '(-w --site)'{-w,--site}'[search a site using Google]:domain'
+    '(--unfilter)--unfilter[do not omit similar results]'
     '(-p --proxy)'{-p,--proxy}'[proxy in HOST:PORT format]:proxy details'
     '(--noua)--noua[disable user agent]'
     '(--notweak)--notweak[disable TCP optimizations, forced TLS 1.2]'
