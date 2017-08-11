@@ -17,7 +17,7 @@ _googler_query_caching_policy () {
 
 _googler_complete_query () {
     local prefix=$words[CURRENT]
-    [[ -n $prefix ]] || return
+    [[ -n $prefix && $prefix != -* ]] || return
 
     local cache_id=googler_$prefix
     zstyle -s :completion:${curcontext}: cache-policy update_policy
