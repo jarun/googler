@@ -25,7 +25,7 @@ _googler_complete_query () {
 
     local -a completions
     if _cache_invalid $cache_id || ! _retrieve_cache $cache_id; then
-        completions=( ${(f)"$(googler-completer $prefix 2>/dev/null)"} )
+        completions=( ${(f)"$(googler --complete $prefix 2>/dev/null)"} )
         _store_cache $cache_id completions
     fi
 

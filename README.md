@@ -98,8 +98,6 @@ To remove `googler` and associated docs, run
 
 Shell completion scripts for Bash, Fish and Zsh can be found in respective subdirectories of [`auto-completion/`](auto-completion). Please refer to your shell's manual for installation instructions.
 
-In order to autocomplete queries (e.g. "git" may complete to "git stash", "github" and "gitlab"), you also need to install the `googler-completer` script to somewhere on your PATH. Autocompletion of queries is currently only supported in Zsh.
-
 ### Installing with a package manager
 
 - [AUR](https://aur.archlinux.org/packages/googler/)
