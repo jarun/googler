@@ -60,7 +60,7 @@ _googler () {
         COMPREPLY=()
         while IFS= read -r completion; do
             # Quote spaces for `complete -W wordlist`
-            COMPREPLY+=( "${completion/ /\\ }" )
+            COMPREPLY+=( "${completion// /\\ }" )
         done < <(googler --complete "$cur")
     fi
 
