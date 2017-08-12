@@ -2325,8 +2325,10 @@ def completer_fetch_completions(prefix):
 
 
 def completer_run(prefix):
-    completions = completer_fetch_completions(prefix)
-    print('\n'.join(completions))
+    if prefix:
+        completions = completer_fetch_completions(prefix)
+        if completions:
+            print('\n'.join(completions))
     sys.exit(0)
 
 
@@ -2414,7 +2416,7 @@ def main():
             logger.debug('Python version %s', python_version())
 
         # Handle query completer
-        if opts.complete:
+        if opts.complete is not None:
             completer_run(opts.complete)
 
         # Handle self-upgrade
