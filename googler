@@ -2054,13 +2054,14 @@ class GooglerArgumentParser(argparse.ArgumentParser):
     def print_general_info(file=None):
         file = sys.stderr if file is None else file
         file.write(textwrap.dedent("""
-        Version %s
+        googler version %s
+        Python version %s
         Copyright © 2008 Henri Hakkinen
         Copyright © 2015-2017 Arun Prakash Jana <engineerarun@gmail.com>
         Zhiming Wang <zmwangx@gmail.com>
         License: GPLv3
         Webpage: https://github.com/jarun/googler
-        """ % _VERSION_))
+        """ % (_VERSION_, python_version())))
 
     # Augment print_help to print more than synopsis and options
     def print_help(self, file=None):
@@ -2251,6 +2252,10 @@ def self_upgrade(include_git=False):
 
 # Miscellaneous functions
 
+def python_version():
+    return '%d.%d.%d' % sys.version_info[:3]
+
+
 def https_proxy_from_environment():
     return os.getenv('https_proxy')
 
@@ -2362,7 +2367,8 @@ def main():
         # Set logging level
         if opts.debug:
             logger.setLevel(logging.DEBUG)
-            logger.debug('Version %s', _VERSION_)
+            logger.debug('googler version %s', _VERSION_)
+            logger.debug('Python version %s', python_version())
 
         # Handle self-upgrade
         if hasattr(opts, 'upgrade') and opts.upgrade:
