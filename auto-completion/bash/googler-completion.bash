@@ -46,16 +46,24 @@ _googler () {
         -p --proxy
     )
 
-    # Do not complete non option names
-    [[ $cur == -* ]] || return 1
+    if [[ $cur == -* ]]; then
+        # The current argument is an option -- complete option names.
+        COMPREPLY=( $(compgen -W "${opts[*]}" -- "$cur") )
+    else
+        # Do not complete option arguments; only autocomplete positional
+        # arguments (queries).
+        for opt in "${opts_with_arg[@]}"; do
+            [[ $opt == $prev ]] && return 1
+        done
 
-    # Do not complete when the previous arg is an option expecting an argument
-    for opt in "${opts_with_arg[@]}"; do
-        [[ $opt == $prev ]] && return 1
-    done
+        local completion
+        COMPREPLY=()
+        while IFS= read -r completion; do
+            # Quote spaces for `complete -W wordlist`
+            COMPREPLY+=( "${completion/ /\\ }" )
+        done < <(googler --complete "$cur")
+    fi
 
-    # Complete option names
-    COMPREPLY=( $(compgen -W "${opts[*]}" -- "$cur") )
     return 0
 }
 

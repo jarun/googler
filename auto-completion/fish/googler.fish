@@ -4,6 +4,15 @@
 # Author:
 #   Arun Prakash Jana <engineerarun@gmail.com>
 #
+
+function __fish_googler_non_option_argument
+    not string match -- "-*" (commandline -ct)
+end
+
+function __fish_googler_complete_query
+    googler --complete (commandline -ct) ^/dev/null
+end
+
 complete -c googler -s h -l help              --description 'show help text and exit'
 complete -c googler -s s -l start  -r         --description 'start at the Nth result'
 complete -c googler -s n -l count  -r         --description 'show specified number of results (default 10)'
@@ -27,3 +36,4 @@ complete -c googler -s u -l upgrade           --description 'perform in-place se
 complete -c googler -l include-git            --description 'use git master for --upgrade'
 complete -c googler -s v -l version           --description 'show version number and exit'
 complete -c googler -s d -l debug             --description 'enable debugging'
+complete -c googler -n __fish_googler_non_option_argument -a '(__fish_googler_complete_query)'

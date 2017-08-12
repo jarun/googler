@@ -2288,6 +2288,48 @@ def parse_proxy_spec(proxyspec):
     return user_passwd, host_port
 
 
+# Query autocompleter
+
+# This function is largely experimental and could raise any exception;
+# you should be prepared to catch anything. When it works though, it
+# returns a list of strings the prefix could autocomplete to (however,
+# it is not guaranteed that they start with the specified prefix; for
+# instance, they won't if the specified prefix ends in a punctuation
+# mark.)
+def completer_fetch_completions(prefix):
+    import json
+    import re
+    import urllib.request
+
+    # One can pass the 'hl' query param to specify the language. We
+    # ignore that for now.
+    api_url = ('https://www.google.com/complete/search?client=psy-ab&q=%s' %
+               urllib.parse.quote(prefix, safe=''))
+    # A timeout of 3 seconds seems to be overly generous already.
+    resp = urllib.request.urlopen(api_url, timeout=3)
+    respobj = json.loads(resp.read().decode('utf-8'))
+
+    # The response object, once parsed as JSON, should look like
+    #
+    # ['git',
+    #  [['git<b>hub</b>', 0],
+    #   ['git', 0],
+    #   ['git<b>lab</b>', 0],
+    #   ['git<b> stash</b>', 0]],
+    #  {'q': 'oooAhRzoChqNmMbNaaDKXk1YY4k', 't': {'bpc': False, 'tlw': False}}]
+    #
+    # Note the each result entry need not have two members; e.g., for
+    # 'gi', there is an entry ['gi<b>f</b>', 0, [131]].
+    HTML_TAG = re.compile(r'<[^>]+>')
+    return [HTML_TAG.sub('', entry[0]) for entry in respobj[1]]
+
+
+def completer_run(prefix):
+    completions = completer_fetch_completions(prefix)
+    print('\n'.join(completions))
+    sys.exit(0)
+
+
 def parse_args(args=None, namespace=None):
     """Parse googler arguments/options.
 
@@ -2354,6 +2396,7 @@ def parse_args(args=None, namespace=None):
                help='when used with --upgrade, upgrade to latest git master')
     addarg('-v', '--version', action='version', version=_VERSION_)
     addarg('-d', '--debug', action='store_true', help='enable debugging')
+    addarg('--complete', help=argparse.SUPPRESS)
 
     return argparser.parse_args(args, namespace)
 
@@ -2369,6 +2412,10 @@ def main():
             logger.setLevel(logging.DEBUG)
             logger.debug('googler version %s', _VERSION_)
             logger.debug('Python version %s', python_version())
+
+        # Handle query completer
+        if opts.complete:
+            completer_run(opts.complete)
 
         # Handle self-upgrade
         if hasattr(opts, 'upgrade') and opts.upgrade:

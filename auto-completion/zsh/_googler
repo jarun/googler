@@ -7,6 +7,31 @@
 #
 
 setopt localoptions noshwordsplit noksharrays
+
+_googler_query_caching_policy () {
+    # rebuild if cache is more than a day old
+    local -a oldp
+    oldp=( $1(Nm+1) )
+    (( $#oldp ))
+}
+
+_googler_complete_query () {
+    local prefix=$words[CURRENT]
+    [[ -n $prefix && $prefix != -* ]] || return
+
+    local cache_id=googler_$prefix
+    zstyle -s :completion:${curcontext}: cache-policy update_policy
+    [[ -z $update_policy ]] && zstyle :completion:${curcontext}: cache_policy _googler_query_caching_policy
+
+    local -a completions
+    if _cache_invalid $cache_id || ! _retrieve_cache $cache_id; then
+        completions=( ${(f)"$(googler --complete $prefix 2>/dev/null)"} )
+        _store_cache $cache_id completions
+    fi
+
+    compadd $@ -- $completions
+}
+
 local -a args
 args=(
     '(- : *)'{-h,--help}'[show help text and exit]'
@@ -32,6 +57,6 @@ args=(
     '(--include-git)--include-git[when used with --upgrade, upgrade to git master]'
     '(- : *)'{-v,--version}'[show version number and exit]'
     '(-d --debug)'{-d,--debug}'[enable debugging]'
-    '*: :_guard "^-*" keyword'
+    '*:::query:_googler_complete_query'
 )
 _arguments -S -s $args
