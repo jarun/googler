@@ -395,5 +395,7 @@ Pull requests are welcome. Please visit [#87](https://github.com/jarun/googler/i
 1. Copyright © 2008 Henri Hakkinen
 2. Copyright © 2015-2017 [Arun Prakash Jana](https://github.com/jarun)
 3. [Zhiming Wang](https://github.com/zmwangx)
+4. [Johnathan Jenkins](https://github.com/shaggytwodope)
+5. [SZ Lin](https://github.com/szlin)
 
-Special thanks to [jeremija](https://github.com/jeremija), [shaggytwodope](https://github.com/shaggytwodope) and [Narrat](https://github.com/Narrat) for their contributions and efforts in spreading `googler`.
+Special thanks to [jeremija](https://github.com/jeremija) and [Narrat](https://github.com/Narrat) for their contributions.
