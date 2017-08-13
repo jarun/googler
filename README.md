@@ -34,7 +34,7 @@
     - [Installing from this repository](#installing-from-this-repository)
         - [Installing to default or custom location](#installing-to-default-or-custom-location)
         - [Running as a standalone utility](#running-as-a-standalone-utility)
-        - [Attached packages](#attached-packages)
+        - [Release packages](#release-packages)
     - [Downloading a single file](#downloading-a-single-file)
 - [Shell completion](#shell-completion)
 - [Usage](#usage)
@@ -108,7 +108,7 @@ To remove `googler` and associated docs, run
 
     $ ./googler
 
-#### Attached packages
+#### Release packages
 
 Packages for Arch Linux, CentOS, Fedora and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
 
