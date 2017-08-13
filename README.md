@@ -29,12 +29,12 @@
 
 - [Features](#features)
 - [Installation](#installation)
-    - [Installing with a package manager](#installing-with-a-package-manager)
+    - [Dependencies](#dependencies)
+    - [From a package manager](#from-a-package-manager)
         - [Tips for packagers](#tips-for-packagers)
-    - [Installing from this repository](#installing-from-this-repository)
-        - [Installing to default or custom location](#installing-to-default-or-custom-location)
-        - [Running as a standalone utility](#running-as-a-standalone-utility)
-        - [Release packages](#release-packages)
+    - [Release packages](#release-packages)
+    - [From source](#from-source)
+    - [Running standalone](#running-standalone)
     - [Downloading a single file](#downloading-a-single-file)
 - [Shell completion](#shell-completion)
 - [Usage](#usage)
@@ -68,9 +68,11 @@
 
 ## Installation
 
+### Dependencies
+
 `googler` requires Python 3.3 or later. Only the latest patch release of each minor version is supported.
 
-### Installing with a package manager
+### From a package manager
 
 - [AUR](https://aur.archlinux.org/packages/googler/)
 - [Debian](https://packages.debian.org/search?keywords=googler&searchon=names)
@@ -86,11 +88,13 @@
 
 before installation.
 
-### Installing from this repository
+### Release packages
+
+Packages for Arch Linux, CentOS, Fedora and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
+
+### From source
 
 If you have git installed, clone this repository. Otherwise download the [latest stable release](https://github.com/jarun/googler/releases/latest) or [development version](https://github.com/jarun/googler/archive/master.zip).
-
-#### Installing to default or custom location
 
 To install to the default location (`/usr/local`):
 
@@ -102,15 +106,11 @@ To remove `googler` and associated docs, run
 
 `PREFIX` is supported, in case you want to install to a different location.
 
-#### Running as a standalone utility
+### Running standalone
 
 `googler` is a standalone executable. From the containing directory:
 
     $ ./googler
-
-#### Release packages
-
-Packages for Arch Linux, CentOS, Fedora and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
 
 ### Downloading a single file
 
