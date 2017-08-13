@@ -29,13 +29,14 @@
 
 - [Features](#features)
 - [Installation](#installation)
+    - [Installing with a package manager](#installing-with-a-package-manager)
+        - [Tips for packagers](#tips-for-packagers)
     - [Installing from this repository](#installing-from-this-repository)
         - [Installing to default or custom location](#installing-to-default-or-custom-location)
         - [Running as a standalone utility](#running-as-a-standalone-utility)
-        - [Shell completion](#shell-completion)
-    - [Installing with a package manager](#installing-with-a-package-manager)
-        - [Tips for packagers](#tips-for-packagers)
+        - [Attached packages](#attached-packages)
     - [Downloading a single file](#downloading-a-single-file)
+- [Shell completion](#shell-completion)
 - [Usage](#usage)
     - [Cmdline options](#cmdline-options)
     - [googler @t](#googler-t)
@@ -54,6 +55,7 @@
 - Fast and clean (no ads, stray URLs or clutter), custom color
 - Navigate result pages from omniprompt, open URLs in browser
 - Effortless keyword-based site search with googler @t add-on
+- Search and option completion scripts for Bash, Zsh and Fish
 - Fetch n results in a go, start at the n<sup>th</sup> result
 - Disable automatic spelling correction and search exact keywords
 - Specify duration, country/domain (default: worldwide/.com), language
@@ -61,20 +63,32 @@
 - Open the first result directly in browser (as in *I'm Feeling Lucky*)
 - Non-stop searches: fire new searches at omniprompt without exiting
 - HTTPS proxy, User Agent, TLS 1.2 (default) support
-- Man page with examples, completion scripts for Bash, Zsh and Fish
+- Comprehensive documentation, man page with handy usage examples
 - Minimal dependencies
 
 ## Installation
 
 `googler` requires Python 3.3 or later. Only the latest patch release of each minor version is supported.
 
+### Installing with a package manager
+
+- [AUR](https://aur.archlinux.org/packages/googler/)
+- [Debian](https://packages.debian.org/search?keywords=googler&searchon=names)
+- [Homebrew](http://braumeister.org/formula/googler)
+- [Ubuntu](http://packages.ubuntu.com/search?keywords=googler&searchon=names)
+- [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
+
+#### Tips for packagers
+
+`googler` v2.7 and later ships with an in-place self-upgrade mechanism which you may want to disable. To do this, run
+
+    $ make disable-self-upgrade
+
+before installation.
+
 ### Installing from this repository
 
-To download this repository, you may either clone via git:
-
-    $ git clone https://github.com/jarun/googler/
-
-or download a source code archive: [the latest stable release](https://github.com/jarun/googler/releases/latest) or [the development version](https://github.com/jarun/googler/archive/master.zip).
+If you have git installed, clone this repository. Otherwise download the [latest stable release](https://github.com/jarun/googler/releases/latest) or [development version](https://github.com/jarun/googler/archive/master.zip).
 
 #### Installing to default or custom location
 
@@ -94,25 +108,9 @@ To remove `googler` and associated docs, run
 
     $ ./googler
 
-#### Shell completion
+#### Attached packages
 
-Shell completion scripts for Bash, Fish and Zsh can be found in respective subdirectories of [`auto-completion/`](auto-completion). Please refer to your shell's manual for installation instructions.
-
-### Installing with a package manager
-
-- [AUR](https://aur.archlinux.org/packages/googler/)
-- [Homebrew](http://braumeister.org/formula/googler)
-- [Debian](https://packages.debian.org/search?keywords=googler&searchon=names)
-- [Ubuntu](http://packages.ubuntu.com/search?keywords=googler&searchon=names)
-- [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
-
-#### Tips for packagers
-
-`googler` v2.7 and later ships with an in-place self-upgrade mechanism which you may want to disable. To do this, run
-
-    $ make disable-self-upgrade
-
-before installation.
+Packages for Arch Linux, CentOS, Fedora and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
 
 ### Downloading a single file
 
@@ -133,6 +131,10 @@ Similarly, if you want to install from git master (*risky*), run
 and upgrade by running
 
     $ sudo googler -u --include-git
+
+## Shell completion
+
+Search keyword and option completion scripts for Bash, Fish and Zsh can be found in respective subdirectories of [`auto-completion/`](auto-completion). Please refer to your shell's manual for installation instructions.
 
 ## Usage
 
