@@ -25,7 +25,7 @@
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q"><img src="https://img.shields.io/badge/PayPal-donate-FC746D.svg" alt="Donate via PayPal!" /></a>
 </p>
 
-## Table of contents
+### Table of contents
 
 - [Features](#features)
 - [Installation](#installation)
@@ -39,8 +39,8 @@
 - [Shell completion](#shell-completion)
 - [Usage](#usage)
     - [Cmdline options](#cmdline-options)
-    - [googler @t](#googler-t)
     - [Configuration file](#configuration-file)
+    - [googler @t](#googler-t)
     - [Text-based browser integration](#text-based-browser-integration)
     - [Colors](#colors)
 - [Examples](#examples)
@@ -49,7 +49,7 @@
 - [Contributions](#contributions)
 - [Developers](#developers)
 
-## Features
+### Features
 
 - Google Search, Google Site Search, Google News
 - Fast and clean (no ads, stray URLs or clutter), custom color
@@ -66,13 +66,13 @@
 - Comprehensive documentation, man page with handy usage examples
 - Minimal dependencies
 
-## Installation
+### Installation
 
-### Dependencies
+#### Dependencies
 
 `googler` requires Python 3.3 or later. Only the latest patch release of each minor version is supported.
 
-### From a package manager
+#### From a package manager
 
 - [AUR](https://aur.archlinux.org/packages/googler/)
 - [Debian](https://packages.debian.org/search?keywords=googler&searchon=names)
@@ -80,7 +80,7 @@
 - [Ubuntu](http://packages.ubuntu.com/search?keywords=googler&searchon=names)
 - [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
 
-#### Tips for packagers
+##### Tips for packagers
 
 `googler` v2.7 and later ships with an in-place self-upgrade mechanism which you may want to disable. To do this, run
 
@@ -88,11 +88,11 @@
 
 before installation.
 
-### Release packages
+#### Release packages
 
 Packages for Arch Linux, CentOS, Fedora and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
 
-### From source
+#### From source
 
 If you have git installed, clone this repository. Otherwise download the [latest stable release](https://github.com/jarun/googler/releases/latest) or [development version](https://github.com/jarun/googler/archive/master.zip).
 
@@ -106,13 +106,13 @@ To remove `googler` and associated docs, run
 
 `PREFIX` is supported, in case you want to install to a different location.
 
-### Running standalone
+#### Running standalone
 
 `googler` is a standalone executable. From the containing directory:
 
     $ ./googler
 
-### Downloading a single file
+#### Downloading a single file
 
 Googler is a single standalone script, so you could download just a single file if you'd like to.
 
@@ -132,13 +132,13 @@ and upgrade by running
 
     $ sudo googler -u --include-git
 
-## Shell completion
+### Shell completion
 
 Search keyword and option completion scripts for Bash, Fish and Zsh can be found in respective subdirectories of [`auto-completion/`](auto-completion). Please refer to your shell's manual for installation instructions.
 
-## Usage
+### Usage
 
-### Cmdline options
+#### Cmdline options
 
     usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
                    [--colors COLORS] [-j] [-t dN] [-w SITE] [--unfilter]
@@ -194,7 +194,7 @@ Search keyword and option completion scripts for Bash, Fish and Zsh can be found
       ?                     show omniprompt help
       *                     other inputs issue a new search with original options
 
-### Configuration file
+#### Configuration file
 
 `googler` doesn't have any! This is to retain the speed of the utility and avoid OS-specific differences. Users can enjoy the advantages of config files using aliases (with the exception of the color scheme, which can be additionally customized through an environment variable; see [Colors](#colors)). There's no need to memorize options.
 
@@ -209,7 +209,7 @@ The alias serves both the purposes of using config files:
 - Persistent settings: when the user invokes `g`, it expands to the preferred settings.
 - Override settings: thanks to the way Python `argparse` works, `googler` is written so that the settings in alias are completely overridden by any options passed from cli. So when the same user runs `g -l de -c de -n 12 hello world`, 12 results are returned from the Google Germany server, with preference towards results in German.
 
-### googler @t
+#### googler @t
 
 `googler @t` is a convenient add-on to Google Site Search with unique keywords. While `googler` has an integrated option to search a site, we simplified it further with aliases. The file [googler_at](https://github.com/jarun/googler/blob/master/auto-completion/googler_at/googler_at) contains a list of website search aliases. To source it, run:
 
@@ -224,7 +224,7 @@ Oh yes! You can combine other `googler` options too! To make life easier, you ca
 
 All the aliases start with the `@` symbol (hence the name `googler @t`) and there is minimum chance they will conflict with any shell commands. Feel free to add your own aliases to the file and contribute back the interesting ones.
 
-### Text-based browser integration
+#### Text-based browser integration
 
 `googler` works out of the box with several text-based browsers if the `BROWSER` environment variable is set. For instance,
 
@@ -236,7 +236,7 @@ or for one-time use,
 
 Due to certain graphical browsers spewing messages to the console, `googler` suppresses browser output by default unless `BROWSER` is set to one of the known text-based browsers: currently `elinks`, `links`, `lynx` or `w3m`. If you use a different text-based browser, you will need to explicitly enable browser output with the `--show-browser-logs` option. If you believe your browser is popular enough, please submit an issue or pull request and we will consider whitelisting it. See the man page for more details on `--show-browser-logs`.
 
-### Colors
+#### Colors
 
 `googler` allows you to customize the color scheme via a six-letter string, reminiscent of BSD `LSCOLORS`. The six letters represent the colors of
 
@@ -293,7 +293,7 @@ Note that
 
 Please consult the manual of your terminal emulator as well as the [Wikipedia article](https://en.wikipedia.org/wiki/ANSI_escape_code) on ANSI escape sequences.
 
-## Examples
+### Examples
 
 1. Google **hello world**:
 
@@ -368,7 +368,7 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
         $ googler -h
         $ man googler
 
-## Troubleshooting
+### Troubleshooting
 
 1. In some instances `googler` may show fewer number of results than you expect, e.g., if you fetch a single result (`-n 1`) it may not show any results. The reason is Google shows some Google service (e.g. Youtube) results, map locations etc. depending on your geographical data, which `googler` tries to omit. In some cases Google (the web-service) doesn't show exactly 10 results (default) on a search. We chose to omit these results as far as possible. While this can be fixed, it would need more processing (and more time). You can just navigate forward to fetch the next set of results.
 
@@ -376,7 +376,7 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 
 3. Google News service is not available if the language is `dk` (Denmark), `fi` (Finland) or `is` (Iceland). Use `-l en`. Please refer to #187 for more information.
 
-## Notes
+### Notes
 
 1. Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author [Henri Hakkinen](https://github.com/henux) in past year. I have created this independent repo for the project with the name `googler`. I retained the original copyright information.
 
@@ -384,13 +384,13 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 
 3. You can find a rofi script for `googler` [here](http://hastebin.com/fonowacija.bash). Written by an anonymous user, untested and we don't maintain it.
 
-## Contributions
+### Contributions
 
 Pull requests are welcome. Please visit [#87](https://github.com/jarun/googler/issues/87) for a list of TODOs.
 <br>
 <p><a href="https://gitter.im/jarun/googler"><img src="https://img.shields.io/gitter/room/jarun/googler.svg?maxAge=2592000" alt="gitter chat" /></a></p>
 
-## Developers
+### Developers
 
 1. Copyright © 2008 Henri Hakkinen
 2. Copyright © 2015-2017 [Arun Prakash Jana](https://github.com/jarun)
