@@ -90,7 +90,7 @@ before installation.
 
 #### Release packages
 
-Packages for Arch Linux, CentOS, Fedora and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
+Packages for Arch Linux, CentOS, Debian, Fedora and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
 
 #### From source
 
@@ -118,7 +118,7 @@ Googler is a single standalone script, so you could download just a single file 
 
 To install the latest stable version, run
 
-    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.2/googler && sudo chmod +x /usr/local/bin/googler
+    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.3/googler && sudo chmod +x /usr/local/bin/googler
 
 You could then let googler upgrade itself by running
 
@@ -140,59 +140,61 @@ Search keyword and option completion scripts for Bash, Fish and Zsh can be found
 
 #### Cmdline options
 
-    usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
-                   [--colors COLORS] [-j] [-t dN] [-w SITE] [--unfilter]
-                   [-p PROXY] [--noua] [--notweak] [--json] [--show-browser-logs]
-                   [--np] [-u] [--include-git] [-v] [-d]
-                   [KEYWORD [KEYWORD ...]]
+```
+usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
+               [--colors COLORS] [-j] [-t dN] [-w SITE] [--unfilter]
+               [-p PROXY] [--noua] [--notweak] [--json] [--show-browser-logs]
+               [--np] [-u] [--include-git] [-v] [-d]
+               [KEYWORD [KEYWORD ...]]
 
-    Google from the command-line.
+Google from the command-line.
 
-    positional arguments:
-      KEYWORD               search keywords
+positional arguments:
+  KEYWORD               search keywords
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      -s N, --start N       start at the Nth result
-      -n N, --count N       show N results (default 10)
-      -N, --news            show results from news section
-      -c TLD, --tld TLD     country-specific search with top-level domain .TLD,
-                            e.g., 'in' for India. Ref:
-                            https://en.wikipedia.org/wiki/List_of_Google_domains
-      -l LANG, --lang LANG  display in language LANG
-      -x, --exact           disable automatic spelling correction
-      -C, --nocolor         disable color output
-      --colors COLORS       set output colors (see man page for details)
-      -j, --first, --lucky  open the first result in web browser and exit
-      -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
-                            weeks), m5 (5 months), y5 (5 years)]
-      -w SITE, --site SITE  search a site using Google
-      --unfilter            do not omit similar results
-      -p PROXY, --proxy PROXY
-                            tunnel traffic through an HTTP proxy; PROXY is of the
-                            form [http://][user:password@]proxyhost[:port]
-      --noua                disable user agent
-      --notweak             disable TCP optimizations and forced TLS 1.2
-      --json                output in JSON format; implies --noprompt
-      --show-browser-logs   do not suppress browser output (stdout and stderr)
-      --np, --noprompt      search and exit, do not prompt
-      -u, --upgrade         perform in-place self-upgrade
-      --include-git         when used with --upgrade, upgrade to latest git master
-      -v, --version         show program's version number and exit
-      -d, --debug           enable debugging
+optional arguments:
+  -h, --help            show this help message and exit
+  -s N, --start N       start at the Nth result
+  -n N, --count N       show N results (default 10)
+  -N, --news            show results from news section
+  -c TLD, --tld TLD     country-specific search with top-level domain .TLD,
+                        e.g., 'in' for India. Ref:
+                        https://en.wikipedia.org/wiki/List_of_Google_domains
+  -l LANG, --lang LANG  display in language LANG
+  -x, --exact           disable automatic spelling correction
+  -C, --nocolor         disable color output
+  --colors COLORS       set output colors (see man page for details)
+  -j, --first, --lucky  open the first result in web browser and exit
+  -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
+                        weeks), m5 (5 months), y5 (5 years)]
+  -w SITE, --site SITE  search a site using Google
+  --unfilter            do not omit similar results
+  -p PROXY, --proxy PROXY
+                        tunnel traffic through an HTTP proxy; PROXY is of the
+                        form [http://][user:password@]proxyhost[:port]
+  --noua                disable user agent
+  --notweak             disable TCP optimizations and forced TLS 1.2
+  --json                output in JSON format; implies --noprompt
+  --show-browser-logs   do not suppress browser output (stdout and stderr)
+  --np, --noprompt      search and exit, do not prompt
+  -u, --upgrade         perform in-place self-upgrade
+  --include-git         when used with --upgrade, upgrade to latest git master
+  -v, --version         show program's version number and exit
+  -d, --debug           enable debugging
 
-    omniprompt keys:
-      n, p                  fetch the next or previous set of search results
-      index                 open the result corresponding to index in browser
-      f                     jump to the first page
-      o [index|range|a ...] open space-separated result indices, numeric ranges
-                            (sitelinks unsupported in ranges), or all, in browser
-                            open the current search in browser, if no arguments
-      g keywords            new Google search for 'keywords' with original options
-                            should be used to search omniprompt keys and indices
-      q, ^D, double Enter   exit googler
-      ?                     show omniprompt help
-      *                     other inputs issue a new search with original options
+omniprompt keys:
+  n, p                  fetch the next or previous set of search results
+  index                 open the result corresponding to index in browser
+  f                     jump to the first page
+  o [index|range|a ...] open space-separated result indices, numeric ranges
+                        (sitelinks unsupported in ranges), or all, in browser
+                        open the current search in browser, if no arguments
+  g keywords            new Google search for 'keywords' with original options
+                        should be used to search omniprompt keys and indices
+  q, ^D, double Enter   exit googler
+  ?                     show omniprompt help
+  *                     other inputs issue a new search with original options
+```
 
 #### Configuration file
 

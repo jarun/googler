@@ -1,3 +1,13 @@
+googler 3.3
+2017-08-17
+
+What's in?
+- Search auto-completion (using completion scripts)
+- Python 3.6 support
+- Automated release package builds using PackageCore
+
+-------------------------------------------------------------------------------
+
 googler 3.2
 2017-07-07
 
