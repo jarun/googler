@@ -1,0 +1,43 @@
+name: buku
+metadata:
+  maintainer: Arun Prakash Jana <engineerarun@gmail.com>
+  license: GPLv3
+  summary: Google from the command-line.
+  homepage: https://github.com/jarun/googler
+commands:
+  install:
+    - make PREFIX="/usr" install DESTDIR="${BP_DESTDIR}"
+packages:
+  archlinux:
+    builddeps:
+      - make
+    deps:
+      - python
+  fedora26:
+    builddeps:
+      - make
+    deps:
+      - python3
+  centos7.3:
+    builddeps:
+      - make
+    deps:
+      - python
+    commands:
+      pre:
+        - yum install epel-release
+  ubuntu16.04:
+    builddeps:
+      - make
+    deps:
+      - python3
+  ubuntu17.10:
+    builddeps:
+      - make
+    deps:
+      - python3
+  debian9:
+    builddeps:
+      - make
+    deps:
+      - python3
