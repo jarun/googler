@@ -1,4 +1,4 @@
-<h1 align="center">googler</h1>
+<h1 align="center"><img src="https://cdn.rawgit.com/jarun/googler/master/googler.svg" alt="googler" /></h1>
 
 <p align="center">
 <a href="https://github.com/jarun/googler/releases/latest"><img src="https://img.shields.io/github/release/jarun/googler.svg?maxAge=600" alt="Latest release" /></a>
@@ -401,3 +401,9 @@ Pull requests are welcome. Please visit [#87](https://github.com/jarun/googler/i
 5. [SZ Lin](https://github.com/szlin)
 
 Special thanks to [jeremija](https://github.com/jeremija) and [Narrat](https://github.com/Narrat) for their contributions.
+
+### Logo
+
+Logo copyright © 2017 Zhiming Wang.
+
+You may freely redistribute it alongside the code, or use it when describing or linking to this project. You should NOT create modified versions of it, make it the logo or icon of your project (except personal forks and/or forks with the goal of upstreaming), or otherwise use it without written permission.
