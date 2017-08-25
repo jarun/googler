@@ -582,8 +582,9 @@ class GoogleUrl(object):
         """The query string."""
         qd = {}
         qd.update(self._query_dict)
-        qd['num'] = self._num
-        if self._start:
+        if self._num != 10:  # Skip sending the default
+            qd['num'] = self._num
+        if self._start:  # Skip sending the default
             qd['start'] = self._start
 
         # Construct the q query
