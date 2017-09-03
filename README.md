@@ -42,6 +42,7 @@
     - [Configuration file](#configuration-file)
     - [googler @t](#googler-t)
     - [Text-based browser integration](#text-based-browser-integration)
+    - [Terminal Reading Mode or Reader View](#terminal-reading-mode-or-reader-view)
     - [Colors](#colors)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
@@ -238,6 +239,10 @@ or for one-time use,
     $ BROWSER=w3m googler query
 
 Due to certain graphical browsers spewing messages to the console, `googler` suppresses browser output by default unless `BROWSER` is set to one of the known text-based browsers: currently `elinks`, `links`, `lynx` or `w3m`. If you use a different text-based browser, you will need to explicitly enable browser output with the `--show-browser-logs` option. If you believe your browser is popular enough, please submit an issue or pull request and we will consider whitelisting it. See the man page for more details on `--show-browser-logs`.
+
+#### Terminal Reading Mode or Reader View
+
+You can easily integrate `googler` with some equally awesome utilities to enjoy your daily dose of news in a completely distraction-free environment. Read more [in the wiki](https://github.com/jarun/googler/wiki/Terminal-Reading-Mode-or-Reader-View).
 
 #### Colors
 
