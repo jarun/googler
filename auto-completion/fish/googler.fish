@@ -30,6 +30,7 @@ complete -c googler -s p -l proxy  -r         --description 'proxy in HOST:PORT 
 complete -c googler -l noua                   --description 'disable user agent'
 complete -c googler -l notweak                --description 'disable TCP optimizations, forced TLS 1.2'
 complete -c googler -l json                   --description 'output in JSON format'
+complete -c googler -l url-handler -r         --description 'cli script or utility'
 complete -c googler -l show-browser-logs      --description 'do not suppress browser output'
 complete -c googler -l np -l noprompt         --description 'perform search and exit'
 complete -c googler -s u -l upgrade           --description 'perform in-place self-upgrade'

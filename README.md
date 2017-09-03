@@ -175,6 +175,7 @@ optional arguments:
   --noua                disable user agent
   --notweak             disable TCP optimizations and forced TLS 1.2
   --json                output in JSON format; implies --noprompt
+  --url-handler UTIL    custom script or cli utility to open results
   --show-browser-logs   do not suppress browser output (stdout and stderr)
   --np, --noprompt      search and exit, do not prompt
   -u, --upgrade         perform in-place self-upgrade

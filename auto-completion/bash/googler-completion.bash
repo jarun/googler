@@ -28,6 +28,7 @@ _googler () {
         --noua
         --notweak
         --json
+        --url-handler
         --show-browser-logs
         --np --noprompt
         -u --upgrade
@@ -44,6 +45,7 @@ _googler () {
         -t --time
         -w --site
         -p --proxy
+        --url-handler
     )
 
     if [[ $cur == -* ]]; then

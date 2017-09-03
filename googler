@@ -33,6 +33,7 @@ import os
 import signal
 import socket
 import ssl
+import subprocess
 import sys
 import textwrap
 import urllib.parse
@@ -103,6 +104,10 @@ RAW_DOWNLOAD_REPO_BASE = 'https://raw.githubusercontent.com/jarun/googler'
 def open_url(url):
     """Open an URL in the user's default web browser.
 
+    The string attribute ``open_url.url_handler`` can be used to open URLs
+    in a custom CLI script or utility. A subprocess is spawned with url as
+    the parameter in this case instead of the usual webbrowser.open() call.
+
     Whether the browser's output (both stdout and stderr) are suppressed
     depends on the boolean attribute ``open_url.suppress_browser_output``.
     If the attribute is not set upon a call, set it to a default value,
@@ -110,6 +115,12 @@ def open_url(url):
     elinks, links, lynx or w3m; or True otherwise.
     """
     logger.debug('Opening %s', url)
+
+    if hasattr(open_url, 'url_handler'):
+        p = subprocess.Popen([open_url.url_handler, url], stdin=subprocess.PIPE)
+        p.communicate()
+        return
+
     if open_url.suppress_browser_output:
         _stderr = os.dup(2)
         os.close(2)
@@ -2383,6 +2394,8 @@ def parse_args(args=None, namespace=None):
            help='disable TCP optimizations and forced TLS 1.2')
     addarg('--json', action='store_true',
            help='output in JSON format; implies --noprompt')
+    addarg('--url-handler', metavar='UTIL',
+           help='custom script or cli utility to open results')
     addarg('--show-browser-logs', action='store_true',
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
@@ -2438,11 +2451,14 @@ def main():
         Result.colors = colors
         GooglerCmd.colors = colors
 
-        # Handle browser output suppression
-        if opts.show_browser_logs or (os.getenv('BROWSER') in ['elinks', 'links', 'lynx', 'w3m']):
-            open_url.suppress_browser_output = False
+        if opts.url_handler is not None:
+            open_url.url_handler = opts.url_handler
         else:
-            open_url.suppress_browser_output = True
+            # Handle browser output suppression
+            if opts.show_browser_logs or (os.getenv('BROWSER') in ['elinks', 'links', 'lynx', 'w3m']):
+                open_url.suppress_browser_output = False
+            else:
+                open_url.suppress_browser_output = True
 
         if opts.noua:
             logger.debug('User Agent is disabled')
