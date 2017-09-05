@@ -1,9 +1,8 @@
 name: googler
-metadata:
-  maintainer: Arun Prakash Jana <engineerarun@gmail.com>
-  license: GPLv3
-  summary: Google from the command-line.
-  homepage: https://github.com/jarun/googler
+maintainer: Arun Prakash Jana <engineerarun@gmail.com>
+license: GPLv3
+summary: Google from the command-line.
+homepage: https://github.com/jarun/googler
 commands:
   install:
     - make PREFIX="/usr" install DESTDIR="${BP_DESTDIR}"
