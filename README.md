@@ -5,7 +5,8 @@
 <a href="https://aur.archlinux.org/packages/googler"><img src="https://img.shields.io/aur/version/googler.svg?maxAge=600" alt="AUR" /></a>
 <a href="http://braumeister.org/formula/googler"><img src="https://img.shields.io/homebrew/v/googler.svg?maxAge=600" alt="Homebrew" /></a>
 <a href="https://packages.debian.org/search?keywords=googler&searchon=names"><img src="https://img.shields.io/badge/debian-9+-blue.svg?maxAge=2592000" alt="Debian Strech+" /></a>
-<a href="http://packages.ubuntu.com/search?keywords=googler&searchon=names"><img src="https://img.shields.io/badge/ubuntu-16.10+-blue.svg?maxAge=2592000" alt="Ubuntu Yakkety+" /></a>
+<a href="https://packages.ubuntu.com/search?keywords=googler&searchon=names"><img src="https://img.shields.io/badge/ubuntu-16.10+-blue.svg?maxAge=2592000" alt="Ubuntu Yakkety+" /></a>
+<a href="https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/"><img src="https://img.shields.io/badge/ubuntu-PPA-blue.svg?maxAge=2592000" alt="Ubuntu PPA" /></a>
 <a href="https://github.com/jarun/googler/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPLv3-yellow.svg?maxAge=2592000" alt="License" /></a>
 <a href="https://travis-ci.org/jarun/googler"><img src="https://travis-ci.org/jarun/googler.svg?branch=master" alt="Build Status" /></a>
 </p>
