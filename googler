@@ -1886,7 +1886,8 @@ class GooglerCmd(object):
         enter_count = 0
         while True:
             try:
-                cmd = input(prompt)
+                sys.stderr.write(prompt)
+                cmd = input()
             except EOFError:
                 sys.exit(0)
 
