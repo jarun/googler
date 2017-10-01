@@ -107,6 +107,9 @@ Jump to the first page.
 .BI o " [index|range|a ...]"
 Open space-separated result indices, numeric ranges (sitelinks unsupported in ranges) or all indices, if 'a' is specified, in the browser. Open the current search in the browser, if no arguments.
 .TP
+.BI O " [index|range|a ...]"
+Works similar to key 'o', but tries to ignore text-based browsers (even if BROWSER is set) and open links in a GUI browser.
+.TP
 .BI g " keywords"
 Initiate a new Google search for \fIkeywords\fR with original options. This key should be used to search omniprompt keys (including itself) and indices.
 .TP

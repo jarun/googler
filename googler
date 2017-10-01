@@ -85,6 +85,8 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
 USER_AGENT = ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0')
 ua = True  # User Agent is enabled by default
 
+text_browsers = ['elinks', 'links', 'lynx', 'w3m', 'www-browser']
+
 # Self-upgrade parameters
 #
 # Downstream packagers are recommended to turn off the entire self-upgrade
@@ -112,14 +114,32 @@ def open_url(url):
     depends on the boolean attribute ``open_url.suppress_browser_output``.
     If the attribute is not set upon a call, set it to a default value,
     which means False if BROWSER is set to a known text-based browser --
-    elinks, links, lynx or w3m; or True otherwise.
+    elinks, links, lynx, w3m or 'www-browser'; or True otherwise.
+
+    The string attribute ``open_url.override_text_browser`` can be used to
+    ignore env var BROWSER as well as some known text based browsers and
+    attempt to open url in a GUI browser available.
+    Note: If a GUI browser is indeed found, this option ignores the program
+          option `show-browser-logs`
     """
     logger.debug('Opening %s', url)
 
+    # Custom URL handler gets max priority
     if hasattr(open_url, 'url_handler'):
         p = subprocess.Popen([open_url.url_handler, url], stdin=subprocess.PIPE)
         p.communicate()
         return
+
+    browser = webbrowser.get()
+    if open_url.override_text_browser:
+        browser_output = open_url.suppress_browser_output
+        for name in [b for b in webbrowser._tryorder if b not in text_browsers]:
+            browser = webbrowser.get(name)
+            logger.debug(browser)
+
+            # Found a GUI browser, suppress browser output
+            open_url.suppress_browser_output = True
+            break
 
     if open_url.suppress_browser_output:
         _stderr = os.dup(2)
@@ -130,12 +150,15 @@ def open_url(url):
         os.dup2(fd, 2)
         os.dup2(fd, 1)
     try:
-        webbrowser.open(url, new=2)
+        browser.open(url, new=2)
     finally:
         if open_url.suppress_browser_output:
             os.close(fd)
             os.dup2(_stderr, 2)
             os.dup2(_stdout, 1)
+
+    if open_url.override_text_browser:
+        open_url.suppress_browser_output = browser_output
 
 
 def printerr(msg):
@@ -2017,6 +2040,10 @@ class GooglerCmd(object):
                     self.do_open()
                 elif cmd.startswith('o '):
                     self.do_open(*cmd[2:].split())
+                elif cmd.startswith('O '):
+                    open_url.override_text_browser = True
+                    self.do_open(*cmd[2:].split())
+                    open_url.override_text_browser = False
                 elif cmd == 'p':
                     self.do_previous('')
                 elif cmd == 'q':
@@ -2052,6 +2079,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
           o [index|range|a ...] open space-separated result indices, numeric ranges
                                 (sitelinks unsupported in ranges), or all, in browser
                                 open the current search in browser, if no arguments
+          O [index|range|a ...] like key 'o', but try to open in a GUI browser
           g keywords            new Google search for 'keywords' with original options
                                 should be used to search omniprompt keys and indices
           q, ^D, double Enter   exit googler
@@ -2455,8 +2483,11 @@ def main():
         if opts.url_handler is not None:
             open_url.url_handler = opts.url_handler
         else:
+            # Set text browser override to False
+            open_url.override_text_browser = False
+
             # Handle browser output suppression
-            if opts.show_browser_logs or (os.getenv('BROWSER') in ['elinks', 'links', 'lynx', 'w3m']):
+            if opts.show_browser_logs or (os.getenv('BROWSER') in text_browsers):
                 open_url.suppress_browser_output = False
             else:
                 open_url.suppress_browser_output = True

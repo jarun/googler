@@ -192,6 +192,7 @@ omniprompt keys:
   o [index|range|a ...] open space-separated result indices, numeric ranges
                         (sitelinks unsupported in ranges), or all, in browser
                         open the current search in browser, if no arguments
+  O [index|range|a ...] like key 'o', but try to open in a GUI browser
   g keywords            new Google search for 'keywords' with original options
                         should be used to search omniprompt keys and indices
   q, ^D, double Enter   exit googler
