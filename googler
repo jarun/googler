@@ -117,7 +117,7 @@ def open_url(url):
     elinks, links, lynx, w3m or 'www-browser'; or True otherwise.
 
     The string attribute ``open_url.override_text_browser`` can be used to
-    ignore env var BROWSER as well as some known text based browsers and
+    ignore env var BROWSER as well as some known text-based browsers and
     attempt to open url in a GUI browser available.
     Note: If a GUI browser is indeed found, this option ignores the program
           option `show-browser-logs`
