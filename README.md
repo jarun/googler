@@ -307,39 +307,39 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 
 1. Google **hello world**:
 
-        $ googler hello world
+       $ googler hello world
 
 2. Fetch **15 results** updated within the last **14 months**, starting from the **3<sup>rd</sup> result** for the keywords **jungle book** in **site** imdb.com:
 
-        $ googler -n 15 -s 3 -t m14 -w imdb.com jungle book
+       $ googler -n 15 -s 3 -t m14 -w imdb.com jungle book
 
 3. Read recent **news** on gadgets:
 
-        $ googler -N gadgets
+       $ googler -N gadgets
 
 4. Fetch results on IPL cricket from **Google India** server in **English**:
 
-        $ googler -c in -l en IPL cricket
+       $ googler -c in -l en IPL cricket
 
 5. Search **quoted text**:
 
-        $ googler it\'s a \"beautiful world\" in spring
+       $ googler it\'s a \"beautiful world\" in spring
 
 6. Search for a **specific file type**:
 
-        $ googler instrumental filetype:mp3
+       $ googler instrumental filetype:mp3
 
 7. Disable **automatic spelling correction**, e.g. fetch results for `googler` instead of `google`:
 
-        $ googler -x googler
+       $ googler -x googler
 
 8. **I'm feeling lucky** search:
 
-        $ googler -j leather jackets
+       $ googler -j leather jackets
 
 9. **Website specific** search:
 
-        $ googler -w amazon.com -w ebay.com digital camera
+       $ googler -w amazon.com -w ebay.com digital camera
     Site specific search continues at omniprompt. Use the `g` key to run a regular Google search.
 
 10. Alias to find **definitions of words**:
@@ -355,7 +355,6 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 12. Input and output **redirection**:
 
         $ googler -C hello world < input > output
-
     Note that `-C` is required to avoid printing control characters (for colored output).
 
 13. **Pipe** output:
@@ -370,7 +369,6 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 15. Tunnel traffic through an **HTTPS proxy**, e.g., a local Privoxy instance listening on port 8118:
 
         $ googler --proxy localhost:8118 google
-
     By default the environment variable `https_proxy` is used, if defined.
 
 16. More **help**:
