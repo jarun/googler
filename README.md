@@ -371,7 +371,11 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
         $ googler --proxy localhost:8118 google
     By default the environment variable `https_proxy` is used, if defined.
 
-16. More **help**:
+16. Quote multiple search keywords to auto-complete (using completion script):
+
+        $ googler 'hello w<TAB>
+
+17. More **help**:
 
         $ googler -h
         $ man googler
