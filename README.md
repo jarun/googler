@@ -160,8 +160,7 @@ optional arguments:
   -n N, --count N       show N results (default 10)
   -N, --news            show results from news section
   -c TLD, --tld TLD     country-specific search with top-level domain .TLD,
-                        e.g., 'in' for India. Ref:
-                        https://en.wikipedia.org/wiki/List_of_Google_domains
+                        e.g., 'in' for India.
   -l LANG, --lang LANG  display in language LANG
   -x, --exact           disable automatic spelling correction
   -C, --nocolor         disable color output

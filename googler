@@ -2398,7 +2398,7 @@ def parse_args(args=None, namespace=None):
            help='show results from news section')
     addarg('-c', '--tld', metavar='TLD',
            help="""country-specific search with top-level domain .TLD, e.g., 'in'
-           for India. Ref: https://en.wikipedia.org/wiki/List_of_Google_domains""")
+           for India.""")
     addarg('-l', '--lang', metavar='LANG', help='display in language LANG')
     addarg('-x', '--exact', action='store_true',
            help='disable automatic spelling correction')
