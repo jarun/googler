@@ -347,7 +347,7 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 
         alias define='googler -n 2 define'
 
-11. Look up `n`, `p`, `o`, `q`, `g keywords` or a result index at the **omniprompt**: As the omniprompt recognizes `n`, `p`, `o`, `q`, `g` or index strings as commands, you need to prefix them with `g`, e.g.,
+11. Look up `n`, `p`, `o`, `O`, `q`, `g keywords` or a result index at the **omniprompt**: as the omniprompt recognizes these keys or index strings as commands, you need to prefix them with `g`, e.g.,
 
         g n
         g g keywords
