@@ -76,6 +76,9 @@ Disable TCP optimizations. Negotiate Transport Layer Security protocol instead o
 .BI "--json"
 Output in JSON format; implies \fB--noprompt\fR.
 .TP
+.BI "--url-handler=" UTIL
+Custom script or command-line utility to open urls with.
+.TP
 .BI "--show-browser-logs"
 Do not suppress browser output when opening result in browser; that is, connect stdout and stderr of the browser to googler's stdout and stderr instead of /dev/null. By default, browser output is suppressed (due to certain graphical browsers spewing messages to console) unless the \fBBROWSER\fR environment variable is a known text-based browser: elinks, links, lynx, w3m or www-browser.
 .TP
