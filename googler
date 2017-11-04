@@ -1934,7 +1934,12 @@ class GooglerCmd(object):
     @require_keywords
     @no_argument
     def do_first(self):
-        self._google_url.first_page()
+        try:
+            self._google_url.first_page()
+        except ValueError as e:
+            print(e, file=sys.stderr)
+            return
+
         self.fetch_and_display()
 
     def do_google(self, arg):
