@@ -50,7 +50,7 @@ args=(
     '(-p --proxy)'{-p,--proxy}'[proxy in HOST:PORT format]:proxy details'
     '(--noua)--noua[disable user agent]'
     '(--notweak)--notweak[disable TCP optimizations, forced TLS 1.2]'
-    '(--json --exact --np --noprompt)--json[output in JSON format; implies --exact and --noprompt]'
+    '(--json)--json[output in JSON format; implies --exact and --noprompt]'
     '(--url-handler)--url-handler[cli script or utility]:url opener'
     '(--show-browser-logs)--show-browser-logs[do not suppress browser output]'
     '(--np --noprompt)'{--np,--noprompt}'[perform search and exit, do not prompt for further interactions]'
