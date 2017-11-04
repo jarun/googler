@@ -341,7 +341,7 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 9. **Website specific** search:
 
        $ googler -w amazon.com -w ebay.com digital camera
-    Site specific search continues at omniprompt. Use the `g` key to run a regular Google search.
+    Site specific search continues at omniprompt.
 
 10. Alias to find **definitions of words**:
 
