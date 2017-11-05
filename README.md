@@ -116,7 +116,7 @@ To remove `googler` and associated docs, run
 
 #### Downloading a single file
 
-Googler is a single standalone script, so you could download just a single file if you'd like to.
+`googler` is a single standalone script, so you could download just a single file if you'd like to.
 
 To install the latest stable version, run
 
