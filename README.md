@@ -81,6 +81,7 @@
 - [AUR](https://aur.archlinux.org/packages/googler/)
 - [Debian](https://packages.debian.org/search?keywords=googler&searchon=names)
 - [Homebrew](http://braumeister.org/formula/googler)
+- [NixOS](https://github.com/NixOS/nixpkgs/tree/master/pkgs/applications/misc/googler) (`sudo nix-env -i googler`)
 - [Ubuntu](http://packages.ubuntu.com/search?keywords=googler&searchon=names)
 - [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
 
