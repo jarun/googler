@@ -666,13 +666,13 @@ class GoogleConnection(object):
 
     """
 
-    def __init__(self, host, port=None, timeout=45, proxy=None, notweak=False):
+    def __init__(self, host, port=None, timeout=45, proxy=None, notweak=False, source_address=None):
         self._host = None
         self._port = None
         self._proxy = proxy
         self._notweak = notweak
         self._conn = None
-        self.new_connection(host, port=port, timeout=timeout)
+        self.new_connection(host, port=port, timeout=timeout, source_address=source_address)
         self.cookie = ''
 
     @property
@@ -680,7 +680,7 @@ class GoogleConnection(object):
         """The host currently connected to."""
         return self._host
 
-    def new_connection(self, host=None, port=None, timeout=45):
+    def new_connection(self, host=None, port=None, timeout=45, source_address=None):
         """Close the current connection (if any) and establish a new one.
 
         Parameters
@@ -704,13 +704,17 @@ class GoogleConnection(object):
         self._port = port
         host_display = host + (':%d' % port if port else '')
 
+        if not source_address and hasattr(self, '_source_address'):
+            source_address = self._source_address
+        self._source_address = source_address
+
         proxy = self._proxy
 
         if proxy:
             proxy_user_passwd, proxy_host_port = parse_proxy_spec(proxy)
 
             logger.debug('Connecting to proxy server %s', proxy_host_port)
-            self._conn = TLS1_2Connection(proxy_host_port, timeout=timeout)
+            self._conn = TLS1_2Connection(proxy_host_port, timeout=timeout, source_address=source_address)
 
             logger.debug('Tunnelling to host %s' % host_display)
             connect_headers = {}
@@ -727,7 +731,7 @@ class GoogleConnection(object):
                 raise GoogleConnectionError(msg)
         else:
             logger.debug('Connecting to new host %s', host_display)
-            self._conn = TLS1_2Connection(host, port=port, timeout=timeout)
+            self._conn = TLS1_2Connection(host, port=port, timeout=timeout, source_address=source_address)
             try:
                 self._conn.connect(self._notweak)
             except Exception as e:
@@ -1761,8 +1765,11 @@ class GooglerCmd(object):
 
         self._google_url = GoogleUrl(opts)
         proxy = opts.proxy if hasattr(opts, 'proxy') else None
+        source_address = None
+        if opts.source_host:
+            source_address = (opts.source_host, opts.source_port)
         self._conn = GoogleConnection(self._google_url.hostname, proxy=proxy,
-                                      notweak=opts.notweak)
+                                      notweak=opts.notweak, source_address=source_address)
         atexit.register(self._conn.close)
 
         self.results = []
@@ -2433,6 +2440,8 @@ def parse_args(args=None, namespace=None):
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
            help='search and exit, do not prompt')
+    addarg('--source-host', help='source host to initiate connections from')
+    addarg('--source-port', type=int, default=0, help='source port to initiate connections from')
     addarg('keywords', nargs='*', metavar='KEYWORD', help='search keywords')
     if ENABLE_SELF_UPGRADE_MECHANISM and not system_is_windows():
         addarg('-u', '--upgrade', action='store_true',
