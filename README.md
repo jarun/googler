@@ -402,7 +402,7 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 
 ### Contributions
 
-Pull requests are welcome. Please visit [#87](https://github.com/jarun/googler/issues/87) for a list of TODOs.
+Pull requests are welcome. Please visit [#209](https://github.com/jarun/googler/issues/209) for a list of TODOs.
 <br>
 <p><a href="https://gitter.im/jarun/googler"><img src="https://img.shields.io/gitter/room/jarun/googler.svg?maxAge=2592000" alt="gitter chat" /></a></p>
 
