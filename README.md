@@ -74,7 +74,7 @@
 
 #### Dependencies
 
-`googler` requires Python 3.3 or later. Only the latest patch release of each minor version is supported.
+`googler` requires Python 3.4 or later. Only the latest patch release of each minor version is supported.
 
 #### From a package manager
 
