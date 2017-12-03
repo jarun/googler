@@ -384,6 +384,26 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
         $ googler -h
         $ man googler
 
+### Docker
+ 
+#### Build image locally
+   
+```
+docker build -t googler .
+```
+       
+#### Use locally built image
+         
+```
+docker run --rm -ti googler -h
+```
+             
+#### Use multiarch already built image
+               
+```
+docker run --rm -ti jaymoulin/googler -h
+```
+
 ### Troubleshooting
 
 1. In some instances `googler` may show fewer number of results than you expect, e.g., if you fetch a single result (`-n 1`) it may not show any results. The reason is Google shows some Google service (e.g. Youtube) results, map locations etc. depending on your geographical data, which `googler` tries to omit. In some cases Google (the web-service) doesn't show exactly 10 results (default) on a search. We chose to omit these results as far as possible. While this can be fixed, it would need more processing (and more time). You can just navigate forward to fetch the next set of results.
