@@ -2034,29 +2034,37 @@ class GooglerCmd(object):
             # `no_argument' decorator.
             try:
                 cmd = self.cmd
-                if cmd == 'f':
+                if cmd == 'f' or cmd == 'first':
                     self.do_first('')
                 elif cmd.startswith('g '):
                     self.do_google(cmd[2:])
-                elif cmd == 'n':
+                elif cmd.startswith('google '):
+                    self.do_google(cmd[7:])
+                elif cmd == 'n' or cmd == 'next':
                     self.do_next('')
-                elif cmd == 'o':
+                elif cmd == 'o' or 'open':
                     self.do_open()
                 elif cmd.startswith('o '):
                     self.do_open(*cmd[2:].split())
+                elif cmd.startswith('open '):
+                    self.do_open(*cmd[5:].split())
                 elif cmd.startswith('O '):
                     open_url.override_text_browser = True
                     self.do_open(*cmd[2:].split())
                     open_url.override_text_browser = False
-                elif cmd == 'p':
+                elif cmd.startswith('override '):
+                    open_url.override_text_browser = True
+                    self.do_open(*cmd[9:].split())
+                    open_url.override_text_browser = False
+                elif cmd == 'p' or 'previous':
                     self.do_previous('')
-                elif cmd == 'q':
+                elif cmd == 'q' or 'quit':
                     break
-                elif cmd == 'x':
+                elif cmd == 'x' or 'exact':
                     self.do_exact('')
                 elif cmd == 'unfilter':
                     self.do_unfilter('')
-                elif cmd == '?':
+                elif cmd == '?' or 'help':
                     self.help()
                 elif cmd in self._urltable:
                     open_url(self._urltable[cmd])
@@ -2077,17 +2085,18 @@ class GooglerArgumentParser(argparse.ArgumentParser):
         file = sys.stderr if file is None else file
         file.write(textwrap.dedent("""
         omniprompt keys:
-          n, p                  fetch the next or previous set of search results
+          n(ext), p(revious)    fetch the next or previous set of search results
           index                 open the result corresponding to index in browser
-          f                     jump to the first page
-          o [index|range|a ...] open space-separated result indices, numeric ranges
-                                (sitelinks unsupported in ranges), or all, in browser
+          f(irst)               jump to the first page
+          o(pen)                open space-separated result indices, numeric ranges
+            [index|range|a ...] (sitelinks unsupported in ranges), or all, in browser
                                 open the current search in browser, if no arguments
-          O [index|range|a ...] like key 'o', but try to open in a GUI browser
-          g keywords            new Google search for 'keywords' with original options
+          O(verride)            like key 'o', but try to open in a GUI browser
+            [index|range|a ...]
+          g(oogle) keywords     new Google search for 'keywords' with original options
                                 should be used to search omniprompt keys and indices
-          q, ^D, double Enter   exit googler
-          ?                     show omniprompt help
+          q(uit),^D,double Enter exit googler
+          ? (help)              show omniprompt help
           *                     other inputs issue a new search with original options
         """))
 
@@ -2515,6 +2524,7 @@ def main():
             sys.exit(0)
         else:
             # Interactive mode
+
             repl.cmdloop()
     except Exception as e:
         # With debugging on, let the exception through for a traceback;
@@ -2527,3 +2537,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
