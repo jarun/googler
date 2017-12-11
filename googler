@@ -1770,6 +1770,8 @@ class GooglerCmd(object):
         self._results_filtered = False
         self._urltable = {}
 
+        self.promptcolor = True if os.getenv('DISABLE_PROMPT_COLOR') is None else False
+
     @property
     def options(self):
         """Current options."""
@@ -1905,7 +1907,7 @@ class GooglerCmd(object):
         """
         colors = self.colors
         message = 'googler (? for help)'
-        prompt = (colors.prompt + message + colors.reset + ' ') if colors else (message + ': ')
+        prompt = (colors.prompt + message + colors.reset + ' ') if (colors and self.promptcolor) else (message + ': ')
         enter_count = 0
         while True:
             try:
