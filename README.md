@@ -82,6 +82,7 @@
 
 - [AUR](https://aur.archlinux.org/packages/googler/)
 - [Debian](https://packages.debian.org/search?keywords=googler&searchon=names)
+- [FreeBSD](https://www.freshports.org/www/googler/) (`pkg install googler`)
 - [Homebrew](http://formulae.brew.sh/formula/googler)
 - [NixOS](https://github.com/NixOS/nixpkgs/tree/master/pkgs/applications/misc/googler) (`sudo nix-env -i googler`)
 - [Ubuntu](https://packages.ubuntu.com/search?keywords=googler&searchon=names)
