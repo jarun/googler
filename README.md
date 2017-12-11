@@ -395,6 +395,10 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 
 3. Google News service is not available if the language is `dk` (Denmark), `fi` (Finland) or `is` (Iceland). Use `-l en`. Please refer to #187 for more information.
 
+4. Some users have reported problems with a colored omniprompt (refer to issue [#203](https://github.com/jarun/googler/issues/203)) with iTerm2 on OS X. To force a plain omniprompt:
+
+       export DISABLE_PROMPT_COLOR=1
+
 ### Notes
 
 1. Initially I raised a pull request but I could see that the last change was made 7 years earlier. In addition, there is no GitHub activity from the original author [Henri Hakkinen](https://github.com/henux) in past year. I have created this independent repo for the project with the name `googler`. I retained the original copyright information.
