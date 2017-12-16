@@ -85,6 +85,7 @@
 - [FreeBSD](https://www.freshports.org/www/googler/) (`pkg install googler`)
 - [Homebrew](http://formulae.brew.sh/formula/googler)
 - [NixOS](https://github.com/NixOS/nixpkgs/tree/master/pkgs/applications/misc/googler) (`sudo nix-env -i googler`)
+- [Slackware](http://slackbuilds.org/repository/14.2/network/googler/)
 - [Ubuntu](https://packages.ubuntu.com/search?keywords=googler&searchon=names)
 - [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
 
