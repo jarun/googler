@@ -314,7 +314,7 @@ Note that
 
 Please consult the manual of your terminal emulator as well as the [Wikipedia article](https://en.wikipedia.org/wiki/ANSI_escape_code) on ANSI escape sequences.
 
-### Domain-only URL
+#### Domain-only URL
 
 To show the domain names in search results instead of the expanded URL (and use lesser space), set the environment variable `DISABLE_URL_EXPANSION`.
 
