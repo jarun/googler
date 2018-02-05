@@ -49,6 +49,7 @@
     - [Text-based browser integration](#text-based-browser-integration)
     - [Terminal Reading Mode or Reader View](#terminal-reading-mode-or-reader-view)
     - [Colors](#colors)
+    - [Domain-only URL](#domain-only-url)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
 - [Notes](#notes)
@@ -202,6 +203,7 @@ omniprompt keys:
   O [index|range|a ...] like key 'o', but try to open in a GUI browser
   g keywords            new Google search for 'keywords' with original options
                         should be used to search omniprompt keys and indices
+  u                     toggle url expansion
   q, ^D, double Enter   exit googler
   ?                     show omniprompt help
   *                     other inputs issue a new search with original options
@@ -311,6 +313,10 @@ Note that
 - Some terminal emulators only distinguish between bold and bright colors via a default-off switch.
 
 Please consult the manual of your terminal emulator as well as the [Wikipedia article](https://en.wikipedia.org/wiki/ANSI_escape_code) on ANSI escape sequences.
+
+### Domain-only URL
+
+To show the domain names in search results instead of the expanded URL (and use lesser space), set the environment variable `DISABLE_URL_EXPANSION`.
 
 ### Examples
 

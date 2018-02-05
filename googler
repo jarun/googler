@@ -1592,6 +1592,7 @@ class Result(object):
 
     # Class variables
     colors = None
+    urlexpand = True
 
     def __init__(self, index, title, url, abstract, metadata=None, sitelinks=None):
         index = str(index)
@@ -1613,15 +1614,25 @@ class Result(object):
     def _print_title_and_url(self, index, title, url, indent=0):
         colors = self.colors
 
+        if not self.urlexpand:
+            segments = urllib.parse.urlparse(url)
+            url = '  [' + segments.netloc + ']'
+
         # Pad index and url with `indent` number of spaces
         index = ' ' * indent + str(index)
         url = ' ' * indent + url
         if colors:
             print(colors.index + index + colors.reset, end='')
-            print(' ' + colors.title + title + colors.reset)
-            print(colors.url + url + colors.reset)
+            if self.urlexpand:
+                print(' ' + colors.title + title + colors.reset)
+                print(colors.url + url + colors.reset)
+            else:
+                print(' ' + colors.title + title + colors.reset + colors.url + url + colors.reset)
         else:
-            print(' %s %s\n%s' % (index, title, url))
+            if self.urlexpand:
+                print(' %s %s\n%s' % (index, title, url))
+            else:
+                print(' %s %s%s' % (index, title, url))
 
     def _print_metadata_and_abstract(self, abstract, metadata=None, indent=0):
         colors = self.colors
@@ -2064,6 +2075,9 @@ class GooglerCmd(object):
                     open_url(self._urltable[cmd])
                 elif self.keywords and cmd.isdigit() and int(cmd) < 100:
                     printerr('Index out of bound. To search for the number, use g.')
+                elif cmd == 'u':
+                    Result.urlexpand = not Result.urlexpand
+                    printerr('url expansion toggled.')
                 else:
                     self.do_google(cmd)
             except NoKeywordsException:
@@ -2088,6 +2102,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
           O [index|range|a ...] like key 'o', but try to open in a GUI browser
           g keywords            new Google search for 'keywords' with original options
                                 should be used to search omniprompt keys and indices
+          u                     toggle url expansion
           q, ^D, double Enter   exit googler
           ?                     show omniprompt help
           *                     other inputs issue a new search with original options
@@ -2484,6 +2499,7 @@ def main():
         else:
             colors = None
         Result.colors = colors
+        Result.urlexpand = True if os.getenv('DISABLE_URL_EXPANSION') is None else False
         GooglerCmd.colors = colors
 
         if opts.url_handler is not None:
