@@ -79,6 +79,8 @@
 
 `googler` requires Python 3.4 or later. Only the latest patch release of each minor version is supported.
 
+To copy url to clipboard at the omniprompt, `googler` uses `xsel` on Linux, `pbcopy` (default installed) on OS X and `clip` (default installed) on Windows.
+
 #### From a package manager
 
 - [AUR](https://aur.archlinux.org/packages/googler/)
@@ -203,6 +205,7 @@ omniprompt keys:
   O [index|range|a ...] like key 'o', but try to open in a GUI browser
   g keywords            new Google search for 'keywords' with original options
                         should be used to search omniprompt keys and indices
+  c index               copy url to clipboard
   u                     toggle url expansion
   q, ^D, double Enter   exit googler
   ?                     show omniprompt help

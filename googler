@@ -30,10 +30,11 @@ from http.client import HTTPSConnection
 import locale
 import logging
 import os
+import shutil
 import signal
 import socket
 import ssl
-import subprocess
+from subprocess import Popen, PIPE, DEVNULL
 import sys
 import textwrap
 import urllib.parse
@@ -126,7 +127,7 @@ def open_url(url):
 
     # Custom URL handler gets max priority
     if hasattr(open_url, 'url_handler'):
-        p = subprocess.Popen([open_url.url_handler, url], stdin=subprocess.PIPE)
+        p = Popen([open_url.url_handler, url], stdin=PIPE)
         p.communicate()
         return
 
@@ -2078,6 +2079,29 @@ class GooglerCmd(object):
                 elif cmd == 'u':
                     Result.urlexpand = not Result.urlexpand
                     printerr('url expansion toggled.')
+                elif cmd.startswith('c ') and cmd[2:].isdigit():
+                    try:
+                        # try copying the url to clipboard using native utilities
+                        if sys.platform.startswith(('linux', 'freebsd', 'openbsd')):
+                            if shutil.which('xsel') is None:
+                                raise FileNotFoundError
+                            copier_params = ['xsel', '-b', '-i']
+                        elif sys.platform == 'darwin':
+                            copier_params = ['pbcopy']
+                        elif sys.platform == 'win32':
+                            copier_params = ['clip']
+                        else:
+                            copier_params = []
+
+                        if not copier_params:
+                            printerr('operating system not identified')
+                        else:
+                            Popen(copier_params, stdin=PIPE, stdout=DEVNULL,
+                                  stderr=DEVNULL).communicate(self._urltable[cmd[2:]].encode('utf-8'))
+                    except FileNotFoundError:
+                        printerr('xsel missing')
+                    except Exception:
+                        raise NoKeywordsException
                 else:
                     self.do_google(cmd)
             except NoKeywordsException:
@@ -2102,6 +2126,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
           O [index|range|a ...] like key 'o', but try to open in a GUI browser
           g keywords            new Google search for 'keywords' with original options
                                 should be used to search omniprompt keys and indices
+          c index               copy url to clipboard
           u                     toggle url expansion
           q, ^D, double Enter   exit googler
           ?                     show omniprompt help
