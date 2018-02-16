@@ -1,3 +1,15 @@
+googler 3.5
+2018-02-16
+
+What's in?
+- URL folding to show only domain name
+- Omniprompt key `c` to copy URL to clipboard
+- Support env var `DISABLE_PROMPT_COLOR` to disable prompt color (see #203)
+
+Note: Python 3.3 reached EOL, will not be supported anymore.
+
+-------------------------------------------------------------------------------
+
 googler 3.4
 2017-10-02
 

@@ -12,11 +12,6 @@ packages:
       - make
     deps:
       - python
-  fedora26:
-    builddeps:
-      - make
-    deps:
-      - python3
   centos7.3:
     builddeps:
       - make
@@ -25,17 +20,32 @@ packages:
     commands:
       pre:
         - yum install epel-release
+  debian9:
+    builddeps:
+      - make
+    deps:
+      - python3
+  fedora26:
+    builddeps:
+      - make
+    deps:
+      - python3
+  fedora27:
+    builddeps:
+      - make
+    deps:
+      - python3
+  opensuse42.3:
+    builddeps:
+      - make
+    deps:
+      - python3
   ubuntu16.04:
     builddeps:
       - make
     deps:
       - python3
   ubuntu17.10:
-    builddeps:
-      - make
-    deps:
-      - python3
-  debian9:
     builddeps:
       - make
     deps:

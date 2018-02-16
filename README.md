@@ -103,7 +103,7 @@ before installation.
 
 #### Release packages
 
-Packages for Arch Linux, CentOS, Debian, Fedora and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
+Packages for Arch Linux, CentOS, Debian, Fedora, openSUSE and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
 
 #### From source
 
@@ -131,7 +131,7 @@ To remove `googler` and associated docs, run
 
 To install the latest stable version, run
 
-    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.4/googler && sudo chmod +x /usr/local/bin/googler
+    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.5/googler && sudo chmod +x /usr/local/bin/googler
 
 You could then let googler upgrade itself by running
 
@@ -427,7 +427,7 @@ Pull requests are welcome. Please visit [#209](https://github.com/jarun/googler/
 ### Developers
 
 1. Copyright © 2008 Henri Hakkinen
-2. Copyright © 2015-2017 [Arun Prakash Jana](https://github.com/jarun)
+2. Copyright © 2015-2018 [Arun Prakash Jana](https://github.com/jarun)
 3. [Zhiming Wang](https://github.com/zmwangx)
 4. [Johnathan Jenkins](https://github.com/shaggytwodope)
 5. [SZ Lin](https://github.com/szlin)
