@@ -92,6 +92,7 @@ To copy url to clipboard at the omniprompt, `googler` uses `xsel` on Linux, `pbc
 - [Slackware](http://slackbuilds.org/repository/14.2/network/googler/)
 - [Ubuntu](https://packages.ubuntu.com/search?keywords=googler&searchon=names)
 - [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
+- [Void Linux](https://github.com/voidlinux/void-packages/blob/master/srcpkgs/googler/template) (`sudo xbps-install -S googler`)
 
 ##### Tips for packagers
 
