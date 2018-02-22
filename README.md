@@ -104,7 +104,7 @@ before installation.
 
 #### Release packages
 
-Packages for Arch Linux, CentOS, Debian, Fedora, openSUSE and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
+Packages for Arch Linux, CentOS, Debian, Fedora, openSUSE Leap and Ubuntu are available with the [latest stable release](https://github.com/jarun/googler/releases/latest).
 
 #### From source
 

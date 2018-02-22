@@ -61,6 +61,8 @@
   alias @di='googler -w dictionary.com'
 # DistroWatch
   alias @distrowatch='googler -w distrowatch.com'
+# Daily Natural Remedies
+  alias @dnr='googler -w dailynaturalremedies.com'
 # Debian Package Search
   alias @dpkg='googler -w packages.debian.org'
 
@@ -119,6 +121,8 @@
 
 # Hackaday
   alias @had='googler -w hackaday.com'
+# Healthline
+  alias @hl='googler -w healthline.com'
 # History
   alias @history='googler -w history.com'
 # Hacker News
