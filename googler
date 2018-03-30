@@ -2340,7 +2340,9 @@ def python_version():
 
 
 def https_proxy_from_environment():
-    return os.getenv('https_proxy')
+    import re
+    # remove leading / from port number if any.
+    return re.sub( r'(\:\d+)\/', r'\1', os.getenv( 'https_proxy') )
 
 
 def parse_proxy_spec(proxyspec):
