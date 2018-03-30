@@ -83,17 +83,17 @@ To copy url to clipboard at the omniprompt, `googler` uses `xsel` on Linux, `pbc
 
 #### From a package manager
 
-- [AUR](https://aur.archlinux.org/packages/googler/)
-- [Debian](https://packages.debian.org/search?keywords=googler&searchon=names)
+- [AUR](https://aur.archlinux.org/packages/googler/) (`pacman -S googler`)
+- [Debian](https://packages.debian.org/search?keywords=googler&searchon=names) (`apt-get install googler`)
 - [Fedora](https://apps.fedoraproject.org/packages/googler) (`dnf install googler`)
 - [FreeBSD](https://www.freshports.org/www/googler/) (`pkg install googler`)
-- [Homebrew](http://formulae.brew.sh/formula/googler)
-- [NixOS](https://github.com/NixOS/nixpkgs/tree/master/pkgs/applications/misc/googler) (`sudo nix-env -i googler`)
+- [Homebrew](http://formulae.brew.sh/formula/googler) (`brew install googler`)
+- [NixOS](https://github.com/NixOS/nixpkgs/tree/master/pkgs/applications/misc/googler) (`nix-env -i googler`)
 - [openSUSE](https://software.opensuse.org/package/googler)
-- [Slackware](http://slackbuilds.org/repository/14.2/network/googler/)
-- [Ubuntu](https://packages.ubuntu.com/search?keywords=googler&searchon=names)
-- [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/)
-- [Void Linux](https://github.com/voidlinux/void-packages/blob/master/srcpkgs/googler/template) (`sudo xbps-install -S googler`)
+- [Slackware](http://slackbuilds.org/repository/14.2/network/googler/) (`slackpkg install googler`)
+- [Ubuntu](https://packages.ubuntu.com/search?keywords=googler&searchon=names) (`apt-get install googler`)
+- [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/) (`apt-get install googler`)
+- [Void Linux](https://github.com/voidlinux/void-packages/blob/master/srcpkgs/googler/template) (`xbps-install -S googler`)
 
 ##### Tips for packagers
 
