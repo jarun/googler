@@ -2340,9 +2340,7 @@ def python_version():
 
 
 def https_proxy_from_environment():
-    import re
-    # remove leading / from port number if any.
-    return re.sub( r'(\:\d+)\/', r'\1', os.getenv( 'https_proxy') )
+    return os.getenv( 'https_proxy' )
 
 
 def parse_proxy_spec(proxyspec):
@@ -2361,7 +2359,8 @@ def parse_proxy_spec(proxyspec):
     if '@' in proxyspec:
         pos = proxyspec.find('@')
         user_passwd = urllib.parse.unquote(proxyspec[:pos])
-        host_port = proxyspec[pos+1:]
+        # Remove trailing '/' if any
+        host_port = proxyspec[pos+1:].replace( r'/', '' ) 
     else:
         user_passwd = None
         host_port = proxyspec
