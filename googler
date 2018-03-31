@@ -2360,7 +2360,7 @@ def parse_proxy_spec(proxyspec):
         pos = proxyspec.find('@')
         user_passwd = urllib.parse.unquote(proxyspec[:pos])
         # Remove trailing '/' if any
-        host_port = proxyspec[pos+1:].replace( r'/', '' ) 
+        host_port = proxyspec[pos+1:].rstrip('/') 
     else:
         user_passwd = None
         host_port = proxyspec
