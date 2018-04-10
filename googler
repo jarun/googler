@@ -2391,7 +2391,9 @@ def completer_fetch_completions(prefix):
                urllib.parse.quote(prefix, safe=''))
     # A timeout of 3 seconds seems to be overly generous already.
     resp = urllib.request.urlopen(api_url, timeout=3)
-    respobj = json.loads(resp.read().decode('utf-8'))
+    charset = resp.headers.get_content_charset()
+    logger.debug('Completions charset: %s', charset)
+    respobj = json.loads(resp.read().decode(charset))
 
     # The response object, once parsed as JSON, should look like
     #
