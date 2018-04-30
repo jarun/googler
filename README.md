@@ -6,7 +6,11 @@
 <a href="http://formulae.brew.sh/formula/googler"><img src="https://img.shields.io/homebrew/v/googler.svg?maxAge=600" alt="Homebrew" /></a>
 <a href="https://packages.debian.org/search?keywords=googler&searchon=names"><img src="https://img.shields.io/badge/debian-9+-blue.svg?maxAge=2592000" alt="Debian Stretch+" /></a>
 <a href="https://apps.fedoraproject.org/packages/googler"><img src="https://img.shields.io/badge/fedora-27+-blue.svg?maxAge=2592000" alt="Fedora 27+" /></a>
+<a href="https://software.opensuse.org/search?q=googler"><img src="https://img.shields.io/badge/opensuse%20leap-15.0+-blue.svg?maxAge=2592000" alt="openSUSE Leap 15.0+" /></a>
 <a href="https://packages.ubuntu.com/search?keywords=googler&searchon=names"><img src="https://img.shields.io/badge/ubuntu-16.10+-blue.svg?maxAge=2592000" alt="Ubuntu Yakkety+" /></a>
+</p>
+
+<p align="center">
 <a href="https://github.com/jarun/googler/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPLv3-yellow.svg?maxAge=2592000" alt="License" /></a>
 <a href="https://travis-ci.org/jarun/googler"><img src="https://travis-ci.org/jarun/googler.svg?branch=master" alt="Build Status" /></a>
 </p>
@@ -89,7 +93,7 @@ To copy url to clipboard at the omniprompt, `googler` uses `xsel` on Linux, `pbc
 - [FreeBSD](https://www.freshports.org/www/googler/) (`pkg install googler`)
 - [Homebrew](http://formulae.brew.sh/formula/googler) (`brew install googler`)
 - [NixOS](https://github.com/NixOS/nixpkgs/tree/master/pkgs/applications/misc/googler) (`nix-env -i googler`)
-- [openSUSE](https://software.opensuse.org/package/googler)
+- [openSUSE](https://software.opensuse.org/search?q=googler) (`zypper in googler`)
 - [Slackware](http://slackbuilds.org/repository/14.2/network/googler/) (`slackpkg install googler`)
 - [Ubuntu](https://packages.ubuntu.com/search?keywords=googler&searchon=names) (`apt-get install googler`)
 - [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/) (`apt-get install googler`)
