@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-<a href="https://asciinema.org/a/85019"><img src="https://s1.postimg.org/1hg2x1dqrj/googler.png" alt="Asciicast" width="734"/></a>
+<a href="https://asciinema.org/a/85019"><img src="https://i.imgur.com/EbZof9q.png" alt="Asciicast" width="734"/></a>
 </p>
 
 `googler` is a power tool to Google (Web & News) and Google Site Search from the command-line. It shows the title, URL and abstract for each result, which can be directly opened in a browser from the terminal. Results are fetched in pages (with page navigation). Supports sequential searches in a single `googler` instance.
