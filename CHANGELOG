@@ -1,3 +1,16 @@
+googler 3.6
+2018-05-23
+
+What's in?
+- Decode auto-completion info as per charset in response header
+- Ignore trailing `/` in proxy
+- Some heath sites added to googler @t
+- User agent updated to Firefox 60
+- Availability on Fedora and openSUSE
+- More auto-generated packages
+
+-------------------------------------------------------------------------------
+
 googler 3.5
 2018-02-16
 

@@ -49,9 +49,6 @@ packages:
       - make
     deps:
       - python
-    commands:
-      pre:
-        - yum install epel-release
   debian8:
     builddeps:
       - make
