@@ -2082,25 +2082,24 @@ class GooglerCmd(object):
                 elif cmd.startswith('c ') and cmd[2:].isdigit():
                     try:
                         # try copying the url to clipboard using native utilities
-                        copier_params = []
                         if sys.platform.startswith(('linux', 'freebsd', 'openbsd')):
-                            if shutil.which('xsel'):
-                                copier_params = ['xsel', '-b', '-i']
+                            if shutil.which('xsel') is None:
+                                raise FileNotFoundError
+                            copier_params = ['xsel', '-b', '-i']
                         elif sys.platform == 'darwin':
                             copier_params = ['pbcopy']
                         elif sys.platform == 'win32':
                             copier_params = ['clip']
-
-                        if not copier_params and os.getenv('TMUX_PANE', None):
-                            copier_params = ['tmux', 'set-buffer']
+                        else:
+                            copier_params = []
 
                         if not copier_params:
-                            printerr('failed to locate suitable clipboard utility')
+                            printerr('operating system not identified')
                         else:
                             Popen(copier_params, stdin=PIPE, stdout=DEVNULL,
                                   stderr=DEVNULL).communicate(self._urltable[cmd[2:]].encode('utf-8'))
                     except FileNotFoundError:
-                        printerr('copier utility missing')
+                        printerr('xsel missing')
                     except Exception:
                         raise NoKeywordsException
                 else:
