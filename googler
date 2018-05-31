@@ -723,7 +723,7 @@ class GoogleConnection(object):
 
             try:
                 self._conn.connect(self._notweak)
-            except Exception as e:
+            except Exception:
                 msg = 'Failed to connect to proxy server %s: %s.' % (proxy, e)
                 raise GoogleConnectionError(msg)
         else:
@@ -2083,9 +2083,12 @@ class GooglerCmd(object):
                     try:
                         # try copying the url to clipboard using native utilities
                         if sys.platform.startswith(('linux', 'freebsd', 'openbsd')):
+                            if self._opts.tmux and os.getenv('TMUX_PANE'):
+                                copier_params = 'tmux_detected'
+                            else:
+                                copier_params = ['xsel', '-b', '-i']
                             if shutil.which('xsel') is None:
                                 raise FileNotFoundError
-                            copier_params = ['xsel', '-b', '-i']
                         elif sys.platform == 'darwin':
                             copier_params = ['pbcopy']
                         elif sys.platform == 'win32':
@@ -2095,12 +2098,14 @@ class GooglerCmd(object):
 
                         if not copier_params:
                             printerr('operating system not identified')
+                        elif 'tmux_detected' in copier_params:
+                            Popen(['tmux', 'setb', self._urltable[cmd[2:]].encode('utf-8')], stdout=DEVNULL).communicate()
                         else:
                             Popen(copier_params, stdin=PIPE, stdout=DEVNULL,
                                   stderr=DEVNULL).communicate(self._urltable[cmd[2:]].encode('utf-8'))
                     except FileNotFoundError:
                         printerr('xsel missing')
-                    except Exception:
+                    except Exception as e:
                         raise NoKeywordsException
                 else:
                     self.do_google(cmd)
@@ -2487,6 +2492,8 @@ def parse_args(args=None, namespace=None):
     addarg('-v', '--version', action='version', version=_VERSION_)
     addarg('-d', '--debug', action='store_true', help='enable debugging')
     addarg('--complete', help=argparse.SUPPRESS)
+    addarg('--tmux', action='store_true',
+           help='try to use tmux buffer instead of xsel (Linux/BSD only)')
 
     return argparser.parse_args(args, namespace)
 

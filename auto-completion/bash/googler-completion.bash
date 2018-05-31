@@ -35,6 +35,7 @@ _googler () {
         --include-git
         -v --version
         -d --debug
+	--tmux
     )
     opts_with_arg=(
         -s --start
