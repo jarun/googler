@@ -2082,24 +2082,31 @@ class GooglerCmd(object):
                 elif cmd.startswith('c ') and cmd[2:].isdigit():
                     try:
                         # try copying the url to clipboard using native utilities
+                        copier_params = []
+                        copier_mode = 'stdin'
                         if sys.platform.startswith(('linux', 'freebsd', 'openbsd')):
-                            if shutil.which('xsel') is None:
-                                raise FileNotFoundError
-                            copier_params = ['xsel', '-b', '-i']
+                            if shutil.which('xsel'):
+                                copier_params = ['xsel', '-b', '-i']
                         elif sys.platform == 'darwin':
                             copier_params = ['pbcopy']
                         elif sys.platform == 'win32':
                             copier_params = ['clip']
-                        else:
-                            copier_params = []
+
+                        if not copier_params and os.getenv('TMUX_PANE'):
+                            # Try to use tmux buffer as fallback. Use case suggested by #230.
+                            copier_params = ['tmux', 'set-buffer']
+                            copier_mode = 'cmdline_arg'
 
                         if not copier_params:
-                            printerr('operating system not identified')
+                            printerr('failed to locate suitable clipboard utility')
                         else:
-                            Popen(copier_params, stdin=PIPE, stdout=DEVNULL,
-                                  stderr=DEVNULL).communicate(self._urltable[cmd[2:]].encode('utf-8'))
-                    except FileNotFoundError:
-                        printerr('xsel missing')
+                            content = self._urltable[cmd[2:]].encode('utf-8')
+                            if copier_mode == 'stdin':
+                                Popen(copier_params, stdin=PIPE,
+                                      stdout=DEVNULL, stderr=DEVNULL).communicate(content)
+                            else:
+                                Popen(copier_params + [content], stdin=DEVNULL,
+                                      stdout=DEVNULL, stderr=DEVNULL).communicate()
                     except Exception:
                         raise NoKeywordsException
                 else:
