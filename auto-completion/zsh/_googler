@@ -58,6 +58,7 @@ args=(
     '(--include-git)--include-git[when used with --upgrade, upgrade to git master]'
     '(- : *)'{-v,--version}'[show version number and exit]'
     '(-d --debug)'{-d,--debug}'[enable debugging]'
+    '(--tmux)--tmux[use tmux for clipboard operations]'
     '*:::query:_googler_complete_query'
 )
 _arguments -S -s $args
