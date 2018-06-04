@@ -2097,6 +2097,11 @@ class GooglerCmd(object):
                             copier_params = ['tmux', 'set-buffer']
                             copier_mode = 'cmdline_arg'
 
+                        if not copier_params and os.getenv('STY'):
+                            # Try to use GNU screen's exchange-file as fallback.
+                            copier_params = ['screen', '-X', 'readbuf']
+                            copier_mode = 'ext_file'
+
                         if not copier_params:
                             printerr('failed to locate suitable clipboard utility')
                         else:
@@ -2104,8 +2109,13 @@ class GooglerCmd(object):
                             if copier_mode == 'stdin':
                                 Popen(copier_params, stdin=PIPE,
                                       stdout=DEVNULL, stderr=DEVNULL).communicate(content)
-                            else:
+                            elif copier_mode == 'cmdline_arg':
                                 Popen(copier_params + [content], stdin=DEVNULL,
+                                      stdout=DEVNULL, stderr=DEVNULL).communicate()
+                            else:
+                                with open('/tmp/screen-exchange', 'wb') as f:
+                                    f.write(content)
+                                Popen(copier_params, stdin=DEVNULL,
                                       stdout=DEVNULL, stderr=DEVNULL).communicate()
                     except Exception:
                         raise NoKeywordsException
