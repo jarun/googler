@@ -2092,15 +2092,15 @@ class GooglerCmd(object):
                         elif sys.platform == 'win32':
                             copier_params = ['clip']
 
-                        if not copier_params and os.getenv('TMUX_PANE'):
-                            # Try to use tmux buffer as fallback. Use case suggested by #230.
-                            copier_params = ['tmux', 'set-buffer']
-                            copier_mode = 'cmdline_arg'
-
-                        if not copier_params and os.getenv('STY'):
-                            # Try to use GNU screen's exchange-file as fallback.
-                            copier_params = ['screen', '-X', 'readbuf']
-                            copier_mode = 'ext_file'
+                        if not copier_params:
+                            if os.getenv('TMUX_PANE'):  # check for tmux
+                                # Try to use tmux buffer as fallback. Use case suggested by #230.
+                                copier_params = ['tmux', 'set-buffer']
+                                copier_mode = 'cmdline_arg'
+                            elif os.getenv('STY'):  # check for GNU screen
+                                # Try to use GNU screen's exchange-file as fallback.
+                                copier_params = ['screen', '-X', 'readbuf']
+                                copier_mode = 'ext_file'
 
                         if not copier_params:
                             printerr('failed to locate suitable clipboard utility')
