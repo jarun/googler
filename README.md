@@ -151,6 +151,18 @@ and upgrade by running
 
     $ sudo googler -u --include-git
 
+### Installation in Android
+
+- First Install `Termux` app from Playstore
+- Open it and install python and curl by following command
+
+`pkg install python python-dev curl`
+- Then download googler and give proper permission
+
+`curl -o /data/data/com.termux/files/usr/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.6/googler && chmod +x /data/data/com.termux/files/usr/bin/googler`
+- Run `googler`
+<img src="https://preview.ibb.co/dhpACo/Screenshot_2018_06_05_12_30_48.png" width="320" />
+
 ### Shell completion
 
 Search keyword and option completion scripts for Bash, Fish and Zsh can be found in respective subdirectories of [`auto-completion/`](auto-completion). Please refer to your shell's manual for installation instructions.
