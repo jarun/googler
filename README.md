@@ -25,9 +25,7 @@
 
 `googler` isn't affiliated to Google in any way.
 
-*Looking for a similar utility for privacy-aware DuckDuckGo?* Check out [`ddgr`](https://github.com/jarun/ddgr)!
-
-*Love smart and efficient terminal utilities? Explore my repositories. Buy me a cup of coffee if they help you.*
+*Love smart and efficient utilities? Explore [my repositories](https://github.com/jarun?tab=repositories). Buy me a cup of coffee if they help you.*
 
 <p align="center">
 <a href="https://saythanks.io/to/jarun"><img src="https://img.shields.io/badge/say-thanks!-ff69b4.svg" /></a>
