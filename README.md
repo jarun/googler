@@ -81,7 +81,7 @@
 
 `googler` requires Python 3.4 or later. Only the latest patch release of each minor version is supported.
 
-To copy url to clipboard at the omniprompt, `googler` uses `xsel` on Linux, `pbcopy` (default installed) on OS X and `clip` (default installed) on Windows.
+To copy url to clipboard at the omniprompt, `googler` looks for `xsel` or `xclip` or `termux-clipboard-set` (in the same order) on Linux, `pbcopy` (default installed) on OS X and `clip` (default installed) on Windows.
 
 #### From a package manager
 
