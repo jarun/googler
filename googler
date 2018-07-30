@@ -2085,13 +2085,19 @@ class GooglerCmd(object):
                         copier_params = []
                         copier_mode = 'stdin'
                         if sys.platform.startswith(('linux', 'freebsd', 'openbsd')):
-                            if shutil.which('xsel'):
+                            if shutil.which('xsel') is not None:
                                 copier_params = ['xsel', '-b', '-i']
+                            elif shutil.which('xclip') is not None:
+                                copier_params = ['xclip', '-selection', 'clipboard']
+                            elif shutil.which('termux-clipboard-set') is not None:
+                                copier_params = ['termux-clipboard-set']
                         elif sys.platform == 'darwin':
                             copier_params = ['pbcopy']
                         elif sys.platform == 'win32':
                             copier_params = ['clip']
 
+                        # If native clipboard utilities are absent, try to use terminal
+                        # multiplexers, tmux/GNU screen, as fallback.
                         if not copier_params:
                             if os.getenv('TMUX_PANE'):  # check for tmux
                                 # Try to use tmux buffer as fallback. Use case suggested by #230.
