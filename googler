@@ -2481,6 +2481,8 @@ def parse_args(args=None, namespace=None):
            help='set output colors (see man page for details)')
     addarg('-j', '--first', '--lucky', dest='lucky', action='store_true',
            help='open the first result in web browser and exit')
+    addarg('-i', '--immediately', dest='immediately', action='store_true',
+           help='open the first results page in web browser immediately and exit')
     addarg('-t', '--time', dest='duration', type=argparser.is_duration,
            metavar='dN', help='time limit search '
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
@@ -2571,10 +2573,12 @@ def main():
 
         repl = GooglerCmd(opts)
 
-        if opts.json or opts.lucky or opts.noninteractive:
+        if opts.json or opts.lucky or opts.noninteractive or opts.immediately:
             # Non-interactive mode
             repl.fetch()
-            if opts.lucky:
+            if opts.immediately:
+                repl.do_open()
+            elif opts.lucky:
                 if repl.results:
                     open_url(repl.results[0].url)
                 else:
