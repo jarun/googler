@@ -125,7 +125,7 @@ To remove `googler` and associated docs, run
 
 #### Running standalone
 
-`googler` is a standalone executable. From the containing directory:
+`googler` is a standalone executable (and can run even on environments like Termux). From the containing directory:
 
     $ ./googler
 
