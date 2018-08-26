@@ -2386,7 +2386,7 @@ def parse_proxy_spec(proxyspec):
         host_port = proxyspec[pos+1:].rstrip('/')
     else:
         user_passwd = None
-        host_port = proxyspec
+        host_port = proxyspec.rstrip('/')
 
     if ':' not in host_port:
         # Use port 1080 as default, following curl.
