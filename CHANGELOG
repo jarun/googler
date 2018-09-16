@@ -1,3 +1,13 @@
+googler 3.7
+2018-09-16
+
+What's in?
+- Support xclip as a clipboard utility on *nix
+- Support GNU Screen and tmux as clipboard fallback
+- Support Termux clipboard on Android
+
+-------------------------------------------------------------------------------
+
 googler 3.6
 2018-05-23
 

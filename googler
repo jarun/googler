@@ -68,7 +68,7 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 # Constants
 
-_VERSION_ = '3.6'
+_VERSION_ = '3.7'
 
 COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'a': '30', 'b': '31', 'c': '32', 'd': '33',
@@ -83,7 +83,7 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
 }.items()}
 
 # Disguise as Firefox on Ubuntu
-USER_AGENT = ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0')
+USER_AGENT = ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0')
 ua = True  # User Agent is enabled by default
 
 text_browsers = ['elinks', 'links', 'lynx', 'w3m', 'www-browser']
