@@ -2404,6 +2404,7 @@ def parse_proxy_spec(proxyspec):
 # instance, they won't if the specified prefix ends in a punctuation
 # mark.)
 def completer_fetch_completions(prefix):
+    import html
     import json
     import re
     import urllib.request
@@ -2430,7 +2431,7 @@ def completer_fetch_completions(prefix):
     # Note the each result entry need not have two members; e.g., for
     # 'gi', there is an entry ['gi<b>f</b>', 0, [131]].
     HTML_TAG = re.compile(r'<[^>]+>')
-    return [HTML_TAG.sub('', entry[0]) for entry in respobj[1]]
+    return [html.unescape(HTML_TAG.sub('', entry[0])) for entry in respobj[1]]
 
 
 def completer_run(prefix):
