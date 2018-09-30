@@ -32,32 +32,34 @@ _googler_complete_query () {
     compadd $@ -- $completions
 }
 
-local -a args
-args=(
-    '(- : *)'{-h,--help}'[show help text and exit]'
-    '(-s --start)'{-s,--start}'[start at the Nth result]:result number'
-    '(-n --count)'{-n,--count}'[show specified number of results (default 10)]:count'
-    '(-N --news)'{-N,--news}'[show results from news section]'
-    '(-c --tld)'{-c,--tld}'[country-specific search with top-level domain]:top level domain without dot'
-    '(-l --lang)'{-l,--lang}'[display in specified language]:language code'
-    '(-x --exact)'{-x,--exact}'[disable automatic spelling correction]'
-    '(-C --nocolor)'{-C,--nocolor}'[disable color output]'
-    '(--colors)--colors[set output colors]:six-letter string'
-    '(-j --first --lucky)'{-j,--first,--lucky}'[open the first result in a web browser]'
-    '(-t --time)'{-t,--time}'[time limit search]:period (h/d/w/m/y + number)'
-    '(-w --site)'{-w,--site}'[search a site using Google]:domain'
-    '(--unfilter)--unfilter[do not omit similar results]'
-    '(-p --proxy)'{-p,--proxy}'[proxy in HOST:PORT format]:proxy details'
-    '(--noua)--noua[disable user agent]'
-    '(--notweak)--notweak[disable TCP optimizations, forced TLS 1.2]'
-    '(--json)--json[output in JSON format; implies --exact and --noprompt]'
-    '(--url-handler)--url-handler[cli script or utility]:url opener'
-    '(--show-browser-logs)--show-browser-logs[do not suppress browser output]'
-    '(--np --noprompt)'{--np,--noprompt}'[perform search and exit, do not prompt for further interactions]'
-    '(-u --upgrade)'{-u,--upgrade}'[perform in-place self-upgrade]'
-    '(--include-git)--include-git[when used with --upgrade, upgrade to git master]'
-    '(- : *)'{-v,--version}'[show version number and exit]'
-    '(-d --debug)'{-d,--debug}'[enable debugging]'
-    '*:::query:_googler_complete_query'
-)
-_arguments -S -s $args
+_googler () {
+    local -a args
+    args=(
+        '(- : *)'{-h,--help}'[show help text and exit]'
+        '(-s --start)'{-s,--start}'[start at the Nth result]:result number'
+        '(-n --count)'{-n,--count}'[show specified number of results (default 10)]:count'
+        '(-N --news)'{-N,--news}'[show results from news section]'
+        '(-c --tld)'{-c,--tld}'[country-specific search with top-level domain]:top level domain without dot'
+        '(-l --lang)'{-l,--lang}'[display in specified language]:language code'
+        '(-x --exact)'{-x,--exact}'[disable automatic spelling correction]'
+        '(-C --nocolor)'{-C,--nocolor}'[disable color output]'
+        '(--colors)--colors[set output colors]:six-letter string'
+        '(-j --first --lucky)'{-j,--first,--lucky}'[open the first result in a web browser]'
+        '(-t --time)'{-t,--time}'[time limit search]:period (h/d/w/m/y + number)'
+        '(-w --site)'{-w,--site}'[search a site using Google]:domain'
+        '(--unfilter)--unfilter[do not omit similar results]'
+        '(-p --proxy)'{-p,--proxy}'[proxy in HOST:PORT format]:proxy details'
+        '(--noua)--noua[disable user agent]'
+        '(--notweak)--notweak[disable TCP optimizations, forced TLS 1.2]'
+        '(--json)--json[output in JSON format; implies --exact and --noprompt]'
+        '(--url-handler)--url-handler[cli script or utility]:url opener'
+        '(--show-browser-logs)--show-browser-logs[do not suppress browser output]'
+        '(--np --noprompt)'{--np,--noprompt}'[perform search and exit, do not prompt for further interactions]'
+        '(-u --upgrade)'{-u,--upgrade}'[perform in-place self-upgrade]'
+        '(--include-git)--include-git[when used with --upgrade, upgrade to git master]'
+        '(- : *)'{-v,--version}'[show version number and exit]'
+        '(-d --debug)'{-d,--debug}'[enable debugging]'
+        '*:::query:_googler_complete_query'
+    )
+    _arguments -S -s $args
+}
