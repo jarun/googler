@@ -93,6 +93,7 @@ To copy url to clipboard at the omniprompt, `googler` looks for `xsel` or `xclip
 - [NixOS](https://github.com/NixOS/nixpkgs/tree/master/pkgs/applications/misc/googler) (`nix-env -i googler`)
 - [openSUSE](https://software.opensuse.org/search?q=googler) (`zypper in googler`)
 - [Slackware](http://slackbuilds.org/repository/14.2/network/googler/) (`slackpkg install googler`)
+- [Snap Store](https://snapcraft.io/googler) (`snap install googler`)
 - [Ubuntu](https://packages.ubuntu.com/search?keywords=googler&searchon=names) (`apt-get install googler`)
 - [Ubuntu PPA](https://launchpad.net/~twodopeshaggy/+archive/ubuntu/jarun/) (`apt-get install googler`)
 - [Void Linux](https://github.com/void-linux/void-packages/blob/master/srcpkgs/googler/template) (`xbps-install -S googler`)
