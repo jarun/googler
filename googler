@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# TODO: showing results for... in --noprompt mode
+
 import argparse
 import atexit
 import base64
@@ -99,6 +101,1154 @@ text_browsers = ['elinks', 'links', 'lynx', 'w3m', 'www-browser']
 ENABLE_SELF_UPGRADE_MECHANISM = True
 API_REPO_BASE = 'https://api.github.com/repos/jarun/googler'
 RAW_DOWNLOAD_REPO_BASE = 'https://raw.githubusercontent.com/jarun/googler'
+
+debugger = False
+
+
+### begin dim (DOM implementation with CSS support) ###
+### https://github.com/zmwangx/dim/blob/master/dim.py ###
+
+import html
+import re
+import textwrap
+from collections import OrderedDict
+from enum import Enum
+from html.parser import HTMLParser
+
+try:
+    from typing import (
+        Any,
+        Dict,
+        Generator,
+        Iterable,
+        Iterator,
+        List,
+        Match,
+        Optional,
+        Tuple,
+        Union,
+        cast,
+    )
+except ImportError:  # pragma: no cover
+    # Python 3.4 without external typing module
+
+    class _TypeStub:
+        def __getitem__(self, _):  # type: ignore
+            return None
+
+    Any = None
+    Dict = Generator = Iterable = Iterator = List = Match = _TypeStub()  # type: ignore
+    Optional = Tuple = Union = _TypeStub()  # type: ignore
+
+    def cast(typ, val):  # type: ignore
+        return val
+
+
+SelectorGroupLike = Union[str, "SelectorGroup", "Selector"]
+
+
+class Node(object):
+    """
+    Represents a DOM node.
+
+    Parts of JavaScript's DOM ``Node`` API and ``Element`` API are
+    mirrored here, with extensions. In particular, ``querySelector`` and
+    ``querySelectorAll`` are mirrored.
+
+    Notable properties and methods: :meth:`attr()`, :attr:`classes`,
+    :attr:`html`, :attr:`text`, :meth:`ancestors()`,
+    :meth:`descendants()`, :meth:`select()`, :meth:`select_all()`,
+    :meth:`matched_by()`,
+
+    Attributes:
+        tag      (:class:`Optional`\\[:class:`str`])
+        attrs    (:class:`Dict`\\[:class:`str`, :class:`str`])
+        parent   (:class:`Optional`\\[:class:`Node`])
+        children (:class:`List`\\[:class:`Node`])
+    """
+
+    # Meant to be reimplemented by subclasses.
+    def __init__(self) -> None:
+        self.tag = None  # type: Optional[str]
+        self.attrs = {}  # type: Dict[str, str]
+        self.parent = None  # type: Optional[Node]
+        self.children = []  # type: List[Node]
+
+        # Used in DOMBuilder.
+        self._partial = False
+
+    # HTML representation of the node. Meant to be implemented by
+    # subclasses.
+    def __str__(self) -> str:  # pragma: no cover
+        raise NotImplementedError
+
+    def select(self, selector: SelectorGroupLike) -> Optional["Node"]:
+        """DOM ``querySelector`` clone. Returns one match (if any)."""
+        selector = self._normalize_selector(selector)
+        for node in self._select_all(selector):
+            return node
+        return None
+
+    def query_selector(self, selector: SelectorGroupLike) -> Optional["Node"]:
+        """Alias of :meth:`select`."""
+        return self.select(selector)
+
+    def select_all(self, selector: SelectorGroupLike) -> List["Node"]:
+        """DOM ``querySelectorAll`` clone. Returns all matches in a list."""
+        selector = self._normalize_selector(selector)
+        return list(self._select_all(selector))
+
+    def query_selector_all(self, selector: SelectorGroupLike) -> List["Node"]:
+        """Alias of :meth:`select_all`."""
+        return self.select_all(selector)
+
+    def matched_by(
+        self, selector: SelectorGroupLike, root: Optional["Node"] = None
+    ) -> bool:
+        """
+        Checks whether this node is matched by `selector`.
+
+        See :meth:`SelectorGroup.matches()`.
+        """
+        selector = self._normalize_selector(selector)
+        return selector.matches(self, root=root)
+
+    @staticmethod
+    def _normalize_selector(selector: SelectorGroupLike) -> "SelectorGroup":
+        if isinstance(selector, str):
+            return SelectorGroup.from_str(selector)
+        if isinstance(selector, SelectorGroup):
+            return selector
+        if isinstance(selector, Selector):
+            return SelectorGroup([selector])
+        raise ValueError("not a selector or group of selectors: %s" % repr(selector))
+
+    def _select_all(self, selector: "SelectorGroup") -> Generator["Node", None, None]:
+        for descendant in self.descendants():
+            if selector.matches(descendant, root=self):
+                yield descendant
+
+    def child_nodes(self) -> List["Node"]:
+        return self.children
+
+    def first_child(self) -> Optional["Node"]:
+        if self.children:
+            return self.children[0]
+        else:
+            return None
+
+    def first_element_child(self) -> Optional["Node"]:
+        for child in self.children:
+            if isinstance(child, ElementNode):
+                return child
+        return None
+
+    def last_child(self) -> Optional["Node"]:
+        if self.children:
+            return self.children[-1]
+        else:
+            return None
+
+    def last_element_child(self) -> Optional["Node"]:
+        for child in reversed(self.children):
+            if isinstance(child, ElementNode):
+                return child
+        return None
+
+    def next_sibling(self) -> Optional["Node"]:
+        """.. note:: Not O(1), use with caution."""
+        next_siblings = self.next_siblings()
+        if next_siblings:
+            return next_siblings[0]
+        else:
+            return None
+
+    def next_siblings(self) -> List["Node"]:
+        parent = self.parent
+        if not parent:
+            return []
+        try:
+            index = parent.children.index(self)
+            return parent.children[index + 1 :]
+        except ValueError:  # pragma: no cover
+            raise ValueError("node is not found in children of its parent")
+
+    def next_element_sibling(self) -> Optional["ElementNode"]:
+        """.. note:: Not O(1), use with caution."""
+        for sibling in self.next_siblings():
+            if isinstance(sibling, ElementNode):
+                return sibling
+        return None
+
+    def previous_sibling(self) -> Optional["Node"]:
+        """.. note:: Not O(1), use with caution."""
+        previous_siblings = self.previous_siblings()
+        if previous_siblings:
+            return previous_siblings[0]
+        else:
+            return None
+
+    def previous_siblings(self) -> List["Node"]:
+        """
+        Compared to the natural DOM order, the order of returned nodes
+        are reversed. That is, the adjacent sibling (if any) is the
+        first in the returned list.
+        """
+        parent = self.parent
+        if not parent:
+            return []
+        try:
+            index = parent.children.index(self)
+            if index > 0:
+                return parent.children[index - 1 :: -1]
+            else:
+                return []
+        except ValueError:  # pragma: no cover
+            raise ValueError("node is not found in children of its parent")
+
+    def previous_element_sibling(self) -> Optional["ElementNode"]:
+        """.. note:: Not O(1), use with caution."""
+        for sibling in self.previous_siblings():
+            if isinstance(sibling, ElementNode):
+                return sibling
+        return None
+
+    def ancestors(
+        self, *, root: Optional["Node"] = None
+    ) -> Generator["Node", None, None]:
+        """
+        Ancestors are generated in reverse order of depth, stopping at
+        `root`.
+
+        A :class:`RuntimeException` is raised if `root` is not in the
+        ancestral chain.
+        """
+        if self is root:
+            return
+        ancestor = self.parent
+        while ancestor is not root:
+            if ancestor is None:
+                raise RuntimeError("provided root node not found in ancestral chain")
+            yield ancestor
+            ancestor = ancestor.parent
+        if root:
+            yield root
+
+    def descendants(self) -> Generator["Node", None, None]:
+        """Descendants are generated in depth-first order."""
+        for child in self.children:
+            yield child
+            yield from child.descendants()
+
+    def attr(self, attr: str) -> Optional[str]:
+        """Returns the attribute if it exists on the node, otherwise ``None``."""
+        return self.attrs.get(attr)
+
+    @property
+    def html(self) -> str:
+        """
+        HTML representation of the node.
+
+        (For a :class:`TextNode`, :meth:`html` returns the escaped version of the
+        text.
+        """
+        return str(self)
+
+    def outer_html(self) -> str:
+        """Alias of :attr:`html`."""
+        return self.html
+
+    def inner_html(self) -> str:
+        """HTML representation of the node's children."""
+        return "".join(child.html for child in self.children)
+
+    @property
+    def text(self) -> str:  # pragma: no cover
+        """This property is expected to be implemented by subclasses."""
+        raise NotImplementedError
+
+    def text_content(self) -> str:
+        """Alias of :attr:`text`."""
+        return self.text
+
+    @property
+    def classes(self) -> List[str]:
+        return self.attrs.get("class", "").split()
+
+    def class_list(self) -> List[str]:
+        return self.classes
+
+
+class ElementNode(Node):
+    """
+    Represents an element node.
+
+    Note that tag and attribute names are case-insensitive; attribute
+    values are case-sensitive.
+    """
+
+    def __init__(
+        self,
+        tag: str,
+        attrs: Iterable[Tuple[str, str]],
+        *,
+        parent: Optional["Node"] = None,
+        children: Optional[List["Node"]] = None
+    ) -> None:
+        Node.__init__(self)
+        self.tag = tag.lower()  # type: str
+        self.attrs = OrderedDict((attr.lower(), val) for attr, val in attrs)
+        self.parent = parent
+        self.children = children or []
+
+    def __repr__(self) -> str:
+        s = "<" + self.tag
+        if self.attrs:
+            s += " attrs=%s" % repr(list(self.attrs.items()))
+        if self.children:
+            s += " children=%s" % repr(self.children)
+        s += ">"
+        return s
+
+    # https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html
+    def _repr_pretty_(self, p: Any, cycle: bool) -> None:  # pragma: no cover
+        if cycle:
+            raise RuntimeError("cycle detected in DOM tree")
+        p.text("<\x1b[1m%s\x1b[0m" % self.tag)
+        if self.attrs:
+            p.text(" attrs=%s" % repr(list(self.attrs.items())))
+        if self.children:
+            p.text(" children=[")
+            if len(self.children) == 1 and isinstance(self.first_child(), TextNode):
+                p.text("\x1b[4m%s\x1b[0m" % repr(self.first_child()))
+            else:
+                with p.indent(2):
+                    for child in self.children:
+                        p.break_()
+                        if hasattr(child, "_repr_pretty_"):
+                            child._repr_pretty_(p, False)  # type: ignore
+                        else:
+                            p.text("\x1b[4m%s\x1b[0m" % repr(child))
+                        p.text(",")
+                p.break_()
+            p.text("]")
+        p.text(">")
+
+    def __str__(self) -> str:
+        """HTML representation of the node."""
+        s = "<" + self.tag
+        for attr, val in self.attrs.items():
+            s += ' %s="%s"' % (attr, html.escape(val))
+        if self.children:
+            s += ">"
+            s += "".join(str(child) for child in self.children)
+            s += "</%s>" % self.tag
+        else:
+            if _tag_is_void(self.tag):
+                s += "/>"
+            else:
+                s += "></%s>" % self.tag
+        return s
+
+    @property
+    def text(self) -> str:
+        """The concatenation of all descendant text nodes."""
+        return "".join(child.text for child in self.children)
+
+
+class TextNode(str, Node):
+    """
+    Represents a text node.
+
+    Subclasses :class:`Node` and :class:`str`.
+    """
+
+    def __new__(cls, text: str) -> "TextNode":
+        s = str.__new__(cls, text)  # type: ignore
+        s.parent = None
+        return s  # type: ignore
+
+    def __init__(self, text: str) -> None:
+        Node.__init__(self)
+
+    def __repr__(self) -> str:
+        return "<%s>" % str.__repr__(self)
+
+    # HTML-escaped form of the text node. use text() for unescaped
+    # version.
+    def __str__(self) -> str:
+        return html.escape(self)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Two text nodes are equal if and only if they are the same node.
+
+        For string comparision, use :attr:`text`.
+        """
+        return self is other
+
+    def __ne__(self, other: object) -> bool:
+        """
+        Two text nodes are non-equal if they are not the same node.
+
+        For string comparision, use :attr:`text`.
+        """
+        return self is not other
+
+    @property
+    def text(self) -> str:
+        return str.__str__(self)
+
+
+class DOMBuilderException(Exception):
+    """
+    Exception raised when :class:`DOMBuilder` detects a bad state.
+
+    Attributes:
+        pos (:class:`Tuple`\\[:class:`int`, :class:`int`]):
+            Line number and offset in HTML input.
+        why (:class:`str`):
+            Reason of the exception.
+    """
+
+    def __init__(self, pos: Tuple[int, int], why: str) -> None:
+        self.pos = pos
+        self.why = why
+
+    def __str__(self) -> str:  # pragma: no cover
+        return "DOM builder aborted at %d:%d: %s" % (self.pos[0], self.pos[1], self.why)
+
+
+class DOMBuilder(HTMLParser):
+    """
+    HTML parser / DOM builder.
+
+    Subclasses :class:`html.parser.HTMLParser`.
+
+    Consume HTML and builds a :class:`Node` tree. Once finished, use
+    :attr:`root` to access the root of the tree.
+
+    This parser cannot parse malformed HTML with tag mismatch.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self._stack = []  # type: List[Node]
+
+    def handle_starttag(self, tag: str, attrs: List[Tuple[str, str]]) -> None:
+        node = ElementNode(tag, attrs)
+        node._partial = True
+        self._stack.append(node)
+        # For void elements, immediately invoke the end tag handler (see
+        # handle_startendtag()).
+        if _tag_is_void(tag):
+            self.handle_endtag(tag)
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.lower()
+        children = []
+        while self._stack and not self._stack[-1]._partial:
+            children.append(self._stack.pop())
+        if not self._stack:
+            raise DOMBuilderException(self.getpos(), "extra end tag: %s" % repr(tag))
+        parent = self._stack[-1]
+        if parent.tag != tag:
+            raise DOMBuilderException(
+                self.getpos(),
+                "expecting end tag %s, got %s" % (repr(parent.tag), repr(tag)),
+            )
+        parent.children = list(reversed(children))
+        parent._partial = False
+        for child in children:
+            child.parent = parent
+
+    # Make parser behavior for explicitly and implicitly void elements
+    # (e.g., <hr> vs <hr/>) consistent. The former triggers
+    # handle_starttag only, whereas the latter triggers
+    # handle_startendtag (which by default triggers both handle_starttag
+    # and handle_endtag). See https://www.bugs.python.org/issue25258.
+    def handle_startendtag(self, tag: str, attrs: List[Tuple[str, str]]) -> None:
+        self.handle_starttag(tag, attrs)
+
+    def handle_data(self, text: str) -> None:
+        if not self._stack:
+            # Ignore text nodes before the first tag.
+            return
+        self._stack.append(TextNode(text))
+
+    @property
+    def root(self) -> "Node":
+        """
+        Finishes processing and returns the root node.
+
+        Raises :class:`DOMBuilderException` if there is no root tag or
+        root tag is not closed yet.
+        """
+        if not self._stack:
+            raise DOMBuilderException(self.getpos(), "no root tag")
+        if self._stack[0]._partial:
+            raise DOMBuilderException(self.getpos(), "root tag not closed yet")
+        return self._stack[0]
+
+
+def parse_html(html: str, *, ParserClass: type = DOMBuilder) -> "Node":
+    """
+    Parses HTML string, builds DOM, and returns root node.
+
+    The parser may raise :class:`DOMBuilderException`.
+
+    Args:
+        html: input HTML string
+        ParserClass: :class:`DOMBuilder` or a subclass
+
+    Returns:
+        Root note of the parsed tree. If the HTML string contains
+        multiple top-level elements, only the first is returned and the
+        rest are lost.
+    """
+    builder = ParserClass()  # type: DOMBuilder
+    builder.feed(html)
+    builder.close()
+    return builder.root
+
+
+class SelectorParserException(Exception):
+    """
+    Exception raised when the selector parser fails to parse an input.
+
+    Attributes:
+        s (:class:`str`):
+            The input string to be parsed.
+        cursor (:class:`int`):
+            Cursor position where the failure occurred.
+        why (:class:`str`):
+            Reason of the failure.
+    """
+
+    def __init__(self, s: str, cursor: int, why: str) -> None:
+        self.s = s
+        self.cursor = cursor
+        self.why = why
+
+    def __str__(self) -> str:  # pragma: no cover
+        return "selector parser aborted at character %d of %s: %s" % (
+            self.cursor,
+            repr(self.s),
+            self.why,
+        )
+
+
+class SelectorGroup:
+    """
+    Represents a group of CSS selectors.
+
+    A group of CSS selectors is simply a comma-separated list of
+    selectors. [#]_ See :class:`Selector` documentation for the scope of
+    support.
+
+    Typically, a :class:`SelectorGroup` is constructed from a string
+    (e.g., ``th.center, td.center``) using the factory function
+    :meth:`from_str`.
+
+    .. [#] https://www.w3.org/TR/selectors-3/#grouping
+    """
+
+    def __init__(self, selectors: Iterable["Selector"]) -> None:
+        self._selectors = list(selectors)
+
+    def __repr__(self) -> str:
+        return "<SelectorGroup %s>" % repr(str(self))
+
+    def __str__(self) -> str:
+        return ", ".join(str(selector) for selector in self._selectors)
+
+    def __len__(self) -> int:
+        return len(self._selectors)
+
+    def __getitem__(self, index: int) -> "Selector":
+        return self._selectors[index]
+
+    def __iter__(self) -> Iterator["Selector"]:
+        return iter(self._selectors)
+
+    @classmethod
+    def from_str(cls, s: str) -> "SelectorGroup":
+        """
+        Parses input string into a group of selectors.
+
+        :class:`SelectorParserException` is raised on invalid input. See
+        :class:`Selector` documentation for the scope of support.
+
+        Args:
+            s: input string
+
+        Returns:
+            Parsed group of selectors.
+        """
+        i = 0
+        selectors = []
+        while i < len(s):
+            selector, i = Selector.from_str(s, i)
+            selectors.append(selector)
+        if not selectors:
+            raise SelectorParserException(s, i, "selector group is empty")
+        return cls(selectors)
+
+    def matches(self, node: "Node", root: Optional["Node"] = None) -> bool:
+        """
+        Decides whether the group of selectors matches `node`.
+
+        The group of selectors matches `node` as long as one of the
+        selectors matches `node`.
+
+        If `root` is provided and child and/or descendant combinators
+        are involved, parent/ancestor lookup terminates at `root`.
+        """
+        return any(selector.matches(node, root=root) for selector in self)
+
+
+class Selector:
+    """
+    Represents a CSS selector.
+
+    Recall that a CSS selector is a chain of one or more *sequences of
+    simple selectors* separated by *combinators*. [#selectors-3]_ This
+    concept is represented as a cons list of sequences of simple
+    selectors (in right to left order). This class in fact holds a
+    single sequence, with an optional combinator and reference to the
+    previous sequence.
+
+    For instance, ``main#main p.important.definition >
+    a.term[id][href]`` would be parsed into (schematically) the
+    following structure::
+
+        ">" tag='a' classes=('term') attrs=([id], [href]) ~>
+        " " tag='p' classes=('important', 'definition') ~>
+        tag='main' id='main'
+
+    Each line is held in a separate instance of :class:`Selector`,
+    linked together by the :attr:`previous` attribute.
+
+    Supported grammar (from selectors level 3 [#selectors-3]_):
+
+    - Type selectors;
+    - Universal selectors;
+    - Class selectors;
+    - ID selectors;
+    - Attribute selectors;
+    - Combinators.
+
+    Unsupported grammar:
+
+    - Pseudo-classes;
+    - Pseudo-elements;
+    - Namespace prefixes (``ns|``, ``*|``, ``|``) in any part of any
+      selector.
+
+    Rationale:
+
+    - Pseudo-classes have too many variants, a few of which even
+      complete with an admittedly not-so-complex minilanguage. These add
+      up to a lot of code.
+    - Pseudo-elements are useless outside rendering contexts, hence out of
+      scope.
+    - Namespace support is too niche to be worth the parsing headache.
+      *Using namespace prefixes may confuse the parser!*
+
+    Note that the parser only loosely follows the spec and priotizes
+    ease of parsing (which includes readability and *writability* of
+    regexes), so some invalid selectors may be accepted (in fact, false
+    positives abound, but accepting valid inputs is a much more
+    important goal than rejecting invalid inputs for this library), and
+    some valid selectors may be rejected (but as long as you stick to
+    the scope outlined above and common sense you should be fine; the
+    false negatives shouldn't be used by actual human beings anyway).
+
+    In particular, whitespace character is simplified to ``\\s`` (ASCII
+    mode) despite CSS spec not counting U+000B (VT) as whitespace,
+    identifiers are simplified to ``[\\w-]+`` (ASCII mode), and strings
+    (attribute selector values can be either identifiers or strings)
+    allow escaped quotes (i.e., ``\\'`` inside single-quoted strings and
+    ``\\"`` inside double-quoted strings) but everything else is
+    interpreted literally. The exact specs for CSS identifiers and
+    strings can be found at [#]_.
+
+    Certain selectors and combinators may be implemented in the parser
+    but not implemented in matching and/or selection APIs.
+
+    .. [#selectors-3] https://www.w3.org/TR/selectors-3/
+    .. [#] https://www.w3.org/TR/CSS21/syndata.html
+
+    Attributes:
+        tag (:class:`Optional`\\[:class:`str`]):
+            Type selector.
+        classes (:class:`List`\\[:class:`str`]):
+            Class selectors.
+        id (:class:`Optional`\\[:class:`str`]):
+            ID selector.
+        attrs (:class:`List`\\[:class:`AttributeSelector`]):
+            Attribute selectors.
+        combinator (:class:`Optional`\\[:class:`Combinator`]):
+            Combinator with the previous sequence of simple selectors in
+            chain.
+        previous (:class:`Optional`\\[:class:`Selector`]):
+            Reference to the previous sequence of simple selectors in
+            chain.
+
+    """
+
+    def __init__(
+        self,
+        *,
+        tag: Optional[str] = None,
+        classes: Optional[List[str]] = None,
+        id: Optional[str] = None,
+        attrs: Optional[List["AttributeSelector"]] = None,
+        combinator: Optional["Combinator"] = None,
+        previous: Optional["Selector"] = None
+    ) -> None:
+        self.tag = tag.lower() if tag else None
+        self.classes = classes or []
+        self.id = id
+        self.attrs = attrs or []
+        self.combinator = combinator
+        self.previous = previous
+
+    def __repr__(self) -> str:
+        return "<Selector %s>" % repr(str(self))
+
+    def __str__(self) -> str:
+        sequences = []
+        delimiters = []
+        seq = self
+        while True:
+            sequences.append(seq._sequence_str_())
+            if seq.previous:
+                if seq.combinator == Combinator.DESCENDANT:
+                    delimiters.append(" ")
+                elif seq.combinator == Combinator.CHILD:
+                    delimiters.append(" > ")
+                elif seq.combinator == Combinator.NEXT_SIBLING:
+                    delimiters.append(" + ")
+                elif seq.combinator == Combinator.SUBSEQUENT_SIBLING:
+                    delimiters.append(" ~ ")
+                else:  # pragma: no cover
+                    raise RuntimeError(
+                        "unimplemented combinator: %s" % repr(self.combinator)
+                    )
+                seq = seq.previous
+            else:
+                delimiters.append("")
+                break
+        return "".join(
+            delimiter + sequence
+            for delimiter, sequence in zip(reversed(delimiters), reversed(sequences))
+        )
+
+    # Format a single sequence of simple selectors, without combinator.
+    def _sequence_str_(self) -> str:
+        s = ""
+        if self.tag:
+            s += self.tag
+        if self.classes:
+            s += "".join(".%s" % class_ for class_ in self.classes)
+        if self.id:
+            s += "#%s" % self.id
+        if self.attrs:
+            s += "".join(str(attr) for attr in self.attrs)
+        return s if s else "*"
+
+    @classmethod
+    def from_str(cls, s: str, cursor: int = 0) -> Tuple["Selector", int]:
+        """
+        Parses input string into selector.
+
+        This factory function only parses out one selector (up to a
+        comma or EOS), so partial consumption is allowed --- an optional
+        `cursor` is taken as input (0 by default) and the moved cursor
+        (either after the comma or at EOS) is returned as part of the
+        output.
+
+        :class:`SelectorParserException` is raised on invalid input. See
+        :class:`Selector` documentation for the scope of support.
+
+        If you need to completely consume a string representing
+        (potentially) a group of selectors, use
+        :meth:`SelectorGroup.from_str()`.
+
+        Args:
+            s:      input string
+            cursor: initial cursor position on `s`
+
+        Returns:
+            A tuple containing the parsed selector and the moved the
+            cursor (either after a comma-delimiter, or at EOS).
+        """
+        # Simple selectors.
+        TYPE_SEL = re.compile(r"[\w-]+", re.A)
+        UNIVERSAL_SEL = re.compile(r"\*")
+        ATTR_SEL = re.compile(
+            r"""\[
+            \s*(?P<attr>[\w-]+)\s*
+            (
+                (?P<op>[~|^$*]?=)\s*
+                (
+                    (?P<val_identifier>[\w-]+)|
+                    (?P<val_string>
+                        (?P<quote>['"])
+                        (?P<val_string_inner>.*?)
+                        (?<!\\)(?P=quote)
+                    )
+                )\s*
+            )?
+            \]""",
+            re.A | re.X,
+        )
+        CLASS_SEL = re.compile(r"\.([\w-]+)", re.A)
+        ID_SEL = re.compile(r"#([\w-]+)", re.A)
+        PSEUDO_CLASS_SEL = re.compile(r":[\w-]+(\([^)]+\))?", re.A)
+        PSEUDO_ELEM_SEL = re.compile(r"::[\w-]+", re.A)
+
+        # Combinators
+        DESCENDANT_COM = re.compile(r"\s+")
+        CHILD_COM = re.compile(r"\s*>\s*")
+        NEXT_SIB_COM = re.compile(r"\s*\+\s*")
+        SUB_SIB_COM = re.compile(r"\s*~\s*")
+
+        # Misc
+        WHITESPACE = re.compile(r"\s*")
+        END_OF_SELECTOR = re.compile(r"\s*($|,)")
+
+        tag = None
+        classes = []
+        id = None
+        attrs = []
+        combinator = None
+
+        selector = None
+        previous_combinator = None
+
+        i = cursor
+
+        # Skip leading whitespace
+        m = WHITESPACE.match(s, i)
+        if m:
+            i = m.end()
+
+        while i < len(s):
+            # Parse one simple selector.
+            #
+            # PEP 572 (assignment expressions; the one that burned Guido
+            # so much that he resigned as BDFL) would have been nice; it
+            # would have saved us from all the regex match
+            # reassignments, and worse still, the casts, since mypy
+            # complains about getting Optional[Match[str]] instead of
+            # Match[str].
+            if TYPE_SEL.match(s, i):
+                if tag:
+                    raise SelectorParserException(s, i, "multiple type selectors found")
+                m = cast(Match[str], TYPE_SEL.match(s, i))
+                tag = m.group()
+            elif UNIVERSAL_SEL.match(s, i):
+                m = cast(Match[str], UNIVERSAL_SEL.match(s, i))
+            elif ATTR_SEL.match(s, i):
+                m = cast(Match[str], ATTR_SEL.match(s, i))
+
+                attr = m.group("attr")
+                op = m.group("op")
+                val_identifier = m.group("val_identifier")
+                quote = m.group("quote")
+                val_string_inner = m.group("val_string_inner")
+                if val_identifier is not None:
+                    val = val_identifier
+                elif val_string_inner is not None:
+                    val = val_string_inner.replace("\\" + quote, quote)
+                else:
+                    val = None
+
+                if op is None:
+                    type = AttributeSelectorType.BARE
+                elif op == "=":
+                    type = AttributeSelectorType.EQUAL
+                elif op == "~=":
+                    type = AttributeSelectorType.TILDE
+                elif op == "|=":
+                    type = AttributeSelectorType.PIPE
+                elif op == "^=":
+                    type = AttributeSelectorType.CARET
+                elif op == "$=":
+                    type = AttributeSelectorType.DOLLAR
+                elif op == "*=":
+                    type = AttributeSelectorType.ASTERISK
+                else:  # pragma: no cover
+                    raise SelectorParserException(
+                        s,
+                        i,
+                        "unrecognized operator %s in attribute selector" % repr(op),
+                    )
+
+                attrs.append(AttributeSelector(attr, val, type))
+            elif CLASS_SEL.match(s, i):
+                m = cast(Match[str], CLASS_SEL.match(s, i))
+                classes.append(m.group(1))
+            elif ID_SEL.match(s, i):
+                if id:
+                    raise SelectorParserException(s, i, "multiple id selectors found")
+                m = cast(Match[str], ID_SEL.match(s, i))
+                id = m.group(1)
+            elif PSEUDO_CLASS_SEL.match(s, i):
+                raise SelectorParserException(s, i, "pseudo-classes not supported")
+            elif PSEUDO_ELEM_SEL.match(s, i):
+                raise SelectorParserException(s, i, "pseudo-elements not supported")
+            else:
+                raise SelectorParserException(
+                    s, i, "expecting simple selector, found none"
+                )
+            i = m.end()
+
+            # Try to parse a combinator, or end the selector.
+            if CHILD_COM.match(s, i):
+                m = cast(Match[str], CHILD_COM.match(s, i))
+                combinator = Combinator.CHILD
+            elif NEXT_SIB_COM.match(s, i):
+                m = cast(Match[str], NEXT_SIB_COM.match(s, i))
+                combinator = Combinator.NEXT_SIBLING
+            elif SUB_SIB_COM.match(s, i):
+                m = cast(Match[str], SUB_SIB_COM.match(s, i))
+                combinator = Combinator.SUBSEQUENT_SIBLING
+            elif END_OF_SELECTOR.match(s, i):
+                m = cast(Match[str], END_OF_SELECTOR.match(s, i))
+                combinator = None
+            # Need to parse descendant combinator at the very end
+            # because it could be a prefix to all previous cases.
+            elif DESCENDANT_COM.match(s, i):
+                m = cast(Match[str], DESCENDANT_COM.match(s, i))
+                combinator = Combinator.DESCENDANT
+            else:
+                continue
+            i = m.end()
+
+            if combinator and i == len(s):
+                raise SelectorParserException(s, i, "unexpected end at combinator")
+
+            selector = cls(
+                tag=tag,
+                classes=classes,
+                id=id,
+                attrs=attrs,
+                combinator=previous_combinator,
+                previous=selector,
+            )
+            previous_combinator = combinator
+
+            # End of selector.
+            if combinator is None:
+                break
+
+            tag = None
+            classes = []
+            id = None
+            attrs = []
+            combinator = None
+
+        if not selector:
+            raise SelectorParserException(s, i, "selector is empty")
+
+        return selector, i
+
+    def matches(self, node: "Node", root: Optional["Node"] = None) -> bool:
+        """
+        Decides whether the selector matches `node`.
+
+        Each sequence of simple selectors in the selector's chain must
+        be matched for a positive.
+
+        If `root` is provided and child and/or descendant combinators
+        are involved, parent/ancestor lookup terminates at `root`.
+        """
+        if self.tag:
+            if not node.tag or node.tag != self.tag:
+                return False
+        if self.id:
+            if node.attrs.get("id") != self.id:
+                return False
+        if self.classes:
+            classes = node.classes
+            for class_ in self.classes:
+                if class_ not in classes:
+                    return False
+        if self.attrs:
+            for attr_selector in self.attrs:
+                if not attr_selector.matches(node):
+                    return False
+
+        if not self.previous:
+            return True
+
+        if self.combinator == Combinator.DESCENDANT:
+            return any(
+                self.previous.matches(ancestor, root=root)
+                for ancestor in node.ancestors()
+            )
+        elif self.combinator == Combinator.CHILD:
+            if node is root or node.parent is None:
+                return False
+            else:
+                return self.previous.matches(node.parent)
+        elif self.combinator == Combinator.NEXT_SIBLING:
+            sibling = node.previous_element_sibling()
+            if not sibling:
+                return False
+            else:
+                return self.previous.matches(sibling)
+        elif self.combinator == Combinator.SUBSEQUENT_SIBLING:
+            return any(
+                self.previous.matches(sibling, root=root)
+                for sibling in node.previous_siblings()
+                if isinstance(sibling, ElementNode)
+            )
+        else:  # pragma: no cover
+            raise RuntimeError("unimplemented combinator: %s" % repr(self.combinator))
+
+
+class AttributeSelector:
+    """
+    Represents an attribute selector.
+
+    Attributes:
+        attr (:class:`str`)
+        val  (:class:`Optional`\\[:class:`str`])
+        type (:class:`AttributeSelectorType`)
+    """
+
+    def __init__(
+        self, attr: str, val: Optional[str], type: "AttributeSelectorType"
+    ) -> None:
+        self.attr = attr.lower()
+        self.val = val
+        self.type = type
+
+    def __repr__(self) -> str:
+        return "<AttributeSelector %s>" % repr(str(self))
+
+    def __str__(self) -> str:
+        if self.type == AttributeSelectorType.BARE:
+            fmt = "[{attr}{val:.0}]"
+        elif self.type == AttributeSelectorType.EQUAL:
+            fmt = "[{attr}={val}]"
+        elif self.type == AttributeSelectorType.TILDE:
+            fmt = "[{attr}~={val}]"
+        elif self.type == AttributeSelectorType.PIPE:
+            fmt = "[{attr}|={val}]"
+        elif self.type == AttributeSelectorType.CARET:
+            fmt = "[{attr}^={val}]"
+        elif self.type == AttributeSelectorType.DOLLAR:
+            fmt = "[{attr}$={val}]"
+        elif self.type == AttributeSelectorType.ASTERISK:
+            fmt = "[{attr}*={val}]"
+        return fmt.format(attr=self.attr, val=repr(self.val))
+
+    def matches(self, node: "Node") -> bool:
+        val = node.attrs.get(self.attr)
+        if val is None:
+            return False
+        if self.type == AttributeSelectorType.BARE:
+            return True
+        elif self.type == AttributeSelectorType.EQUAL:
+            return val == self.val
+        elif self.type == AttributeSelectorType.TILDE:
+            return self.val in val.split()
+        elif self.type == AttributeSelectorType.PIPE:
+            return val == self.val or val.startswith("%s-" % self.val)
+        elif self.type == AttributeSelectorType.CARET:
+            return bool(self.val and val.startswith(self.val))
+        elif self.type == AttributeSelectorType.DOLLAR:
+            return bool(self.val and val.endswith(self.val))
+        elif self.type == AttributeSelectorType.ASTERISK:
+            return bool(self.val and self.val in val)
+        else:  # pragma: no cover
+            raise RuntimeError("unimplemented attribute selector: %s" % repr(self.type))
+
+
+# Enum: basis for poor man's algebraic data type.
+class AttributeSelectorType(Enum):
+    """
+    Attribute selector types.
+
+    Members correspond to the following forms of attribute selector:
+
+    - :attr:`BARE`: ``[attr]``;
+    - :attr:`EQUAL`: ``[attr=val]``;
+    - :attr:`TILDE`: ``[attr~=val]``;
+    - :attr:`PIPE`: ``[attr|=val]``;
+    - :attr:`CARET`: ``[attr^=val]``;
+    - :attr:`DOLLAR`: ``[attr$=val]``;
+    - :attr:`ASTERISK`: ``[attr*=val]``.
+    """
+
+    # [attr]
+    BARE = 1
+    # [attr=val]
+    EQUAL = 2
+    # [attr~=val]
+    TILDE = 3
+    # [attr|=val]
+    PIPE = 4
+    # [attr^=val]
+    CARET = 5
+    # [attr$=val]
+    DOLLAR = 6
+    # [attr*=val]
+    ASTERISK = 7
+
+
+class Combinator(Enum):
+    """
+    Combinator types.
+
+    Members correspond to the following combinators:
+
+    - :attr:`DESCENDANT`: ``A B``;
+    - :attr:`CHILD`: ``A > B``;
+    - :attr:`NEXT_SIBLING`: ``A + B``;
+    - :attr:`SUBSEQUENT_SIBLING`: ``A ~ B``.
+    """
+
+    # ' '
+    DESCENDANT = 1
+    # >
+    CHILD = 2
+    # +
+    NEXT_SIBLING = 3
+    # ~
+    SUBSEQUENT_SIBLING = 4
+
+
+def _tag_is_void(tag: str) -> bool:
+    """
+    Checks whether the tag corresponds to a void element.
+
+    https://www.w3.org/TR/html5/syntax.html#void-elements
+    https://html.spec.whatwg.org/multipage/syntax.html#void-elements
+    """
+    return tag.lower() in (
+        "area",
+        "base",
+        "br",
+        "col",
+        "embed",
+        "hr",
+        "img",
+        "input",
+        "link",
+        "meta",
+        "param",
+        "source",
+        "track",
+        "wbr",
+    )
+
+### end dim ###
 
 
 # Global helper functions
@@ -870,674 +2020,103 @@ class GoogleConnection(object):
             self._conn.close()
 
 
-def annotate_tag(annotated_starttag_handler):
-    # See parser logic within the GoogleParser class for documentation.
-    #
-    # In particular, search for "Ignore List" to view detailed
-    # documentation of the ignore list.
-    #
-    # annotated_starttag_handler(self, tag: str, attrsdict: dict) -> annotation
-    # Returns: HTMLParser.handle_starttag(self, tag: str, attrs: list) -> None
+class GoogleParser(object):
 
-    def handler(self, tag, attrs):
-        # Get context; assumes that the handler is called SCOPE_start
-        context = annotated_starttag_handler.__name__[:-6]
-
-        # If context is 'ignore', ignore all tests
-        if context == 'ignore':
-            self.insert_annotation(tag, None)
-            return
-
-        attrs = dict(attrs)
-
-        # Compare against ignore list
-        ignored = False
-        for selector in self.IGNORE_LIST:
-            for attr in selector:
-                if attr == 'tag':
-                    if tag != selector['tag']:
-                        break
-                elif attr == 'class':
-                    tag_classes = set(self.classes(attrs))
-                    selector_classes = set(self.classes(selector))
-                    if not selector_classes.issubset(tag_classes):
-                        break
-                else:
-                    if attrs[attr] != selector[attr]:
-                        break
-            else:
-                # Passed all criteria of the selector
-                ignored = True
-                break
-
-        # If tag matches ignore list, annotate and hand over to ignore_*
-        if ignored:
-            self.insert_annotation(tag, context + '_ignored')
-            self.set_handlers_to('ignore')
-            return
-
-        # Standard
-        annotation = annotated_starttag_handler(self, tag, attrs)
-        self.insert_annotation(tag, annotation)
-
-    return handler
-
-
-def retrieve_tag_annotation(annotated_endtag_handler):
-    # See parser logic within the GoogleParser class for documentation.
-    #
-    # annotated_endtag_handler(self, tag: str, annotation) -> None
-    # Returns: HTMLParser.handle_endtag(self, tag: str) -> None
-
-    def handler(self, tag):
-        try:
-            annotation = self.tag_annotations[tag].pop()
-        except IndexError:
-            # Malformed HTML -- more close tags than open tags
-            annotation = None
-        annotated_endtag_handler(self, tag, annotation)
-
-    return handler
-
-
-class GoogleParser(html.parser.HTMLParser):
-    """The members of this class parse the result
-    HTML page fetched from Google server for a query.
-
-    The custom parser looks for tags enclosing search
-    results and extracts the URL, title and text for
-    each search result.
-
-    After parsing the complete HTML page results are
-    returned in a list of objects of class Result.
-    """
-
-    # Parser logic:
-    #
-    # - Guiding principles:
-    #
-    #   1. Tag handlers are contextual;
-    #
-    #   2. Contextual starttag and endtag handlers should come in pairs
-    #      and have a clear hierarchy;
-    #
-    #   3. starttag handlers should only yield control to a pair of
-    #      child handlers (that is, one level down the hierarchy), and
-    #      correspondingly, endtag handlers should only return control
-    #      to the parent (that is, the pair of handlers that gave it
-    #      control in the first place).
-    #
-    #   Principle 3 is meant to enforce a (possibly implicit) stack
-    #   structure and thus prevent careless jumps that result in what's
-    #   essentially spaghetti code with liberal use of GOTOs.
-    #
-    # - HTMLParser.handle_endtag gives us a bare tag name without
-    #   context, which is not good for enforcing principle 3 when we
-    #   have, say, nested div tags.
-    #
-    #   In order to precisely identify the matching opening tag, we
-    #   maintain a stack for each tag name with *annotations*. Important
-    #   opening tags (e.g., the ones where child handlers are
-    #   registered) can be annotated so that when we can watch for the
-    #   annotation in the endtag handler, and when the appropriate
-    #   annotation is popped, we perform the corresponding action (e.g.,
-    #   switch back to old handlers).
-    #
-    #   To facilitate this, each starttag handler is decorated with
-    #   @annotate_tag, which accepts a return value that is the
-    #   annotation (None by default), and additionally converts attrs to
-    #   a dict, which is much easier to work with; and each endtag
-    #   handler is decorated with @retrieve_tag_annotation which sends
-    #   an additional parameter that is the retrieved annotation to the
-    #   handler.
-    #
-    #   Note that some of our tag annotation stacks leak over time: this
-    #   happens to tags like <img> and <hr> which are not
-    #   closed. However, these tags play no structural role, and come
-    #   only in small quantities, so it's not really a problem.
-    #
-    # - All textual data (result title, result abstract, etc.) are
-    #   processed through a set of shared handlers. These handlers store
-    #   text in a shared buffer self.textbuf which can be retrieved and
-    #   cleared at appropriate times.
-    #
-    #   Data (including charrefs and entityrefs) are ignored initially,
-    #   and when data needs to be recorded, the start_populating_textbuf
-    #   method is called to register the appropriate data, charref and
-    #   entityref handlers so that they append to self.textbuf. When
-    #   recording ends, pop_textbuf should be called to extract the text
-    #   and clear the buffer. stop_populating_textbuf returns the
-    #   handlers to their pristine state (ignoring data).
-    #
-    #   Methods:
-    #   - start_populating_textbuf(self, data_transformer: Callable[[str], str]) -> None
-    #   - pop_textbuf(self) -> str
-    #   - stop_populating_textbuf(self) -> None
-    #
-    # - Outermost starttag and endtag handler methods: root_*. The whole
-    #   parser starts and ends in this state.
-    #
-    # - Each result is wrapped in a <div> tag with class "g".
-    #
-    #   <!-- within the scope of root_* -->
-    #   <div class="g">  <!-- annotate as 'result', hand over to result_* -->
-    #   </div>           <!-- hand back to root_*, register result -->
-    #
-    # - For each result, the first <h3> tag with class "r" contains the
-    #   hyperlinked title, and the (optional) first <div> tag with class
-    #   "s" contains the abstract of the result.
-    #
-    #   <!-- within the scope of result_* -->
-    #   <h3 class="r">   <!-- annotate as 'title', hand over to title_* -->
-    #   </h3>            <!-- hand back to result_* -->
-    #   <div class="s">  <!-- annotate as 'abstract', hand over to abstract_* -->
-    #   </div>           <!-- hand back to result_* -->
-    #
-    # - Each title looks like
-    #
-    #   <h3 class="r">
-    #     <!-- within the scope of title_* -->
-    #     <span>                 <!-- filetype (optional), annotate as title_filetype,
-    #                                 start_populating_textbuf -->
-    #       file type (e.g. [PDF])
-    #     </span>                <!-- stop_populating_textbuf -->
-    #     <a href="result url">  <!-- register self.url, annotate as 'title_link',
-    #                                 start_populating_textbuf -->
-    #       result title
-    #     </a>                   <!-- stop_populating_textbuf, pop to self.title -->
-    #   </h3>
-    #
-    # - For each abstract, the first <span> tag with class "st" contains
-    #   the body text of the abstract.
-    #
-    #   <!-- within the scope of abstract_* -->
-    #   <span class="st">  <!-- annotate as 'abstract_text', start_populating_textbuf -->
-    #     abstract text with <em> markup on keywords
-    #   </span>            <!-- stop_populating_textbuf, pop to self.abstract -->
-    #
-    # - Certain results may come with sitelinks, secondary results that
-    #   are usually subdomains or deep links within the primary
-    #   result. They are organized into a <table> tag, and each sitelink
-    #   is in a separate <td>:
-    #
-    #   <!-- within the scope of result_* -->
-    #   <table>    <!-- annotate as 'sitelink_table', hand over to sitelink_table_* -->
-    #     <tr>
-    #       <td>   <!-- annotate as 'sitelink', hand over to sitelink_* -->
-    #       </td>  <!-- append to self.sitelinks, hand back to sitelink_table_* -->
-    #       <td></td>
-    #       ...
-    #     </tr>
-    #     <tr></tr>
-    #     ...
-    #   </table>   <!-- hand back to result_* -->
-    #
-    #   Then for each sitelink, the hyperlinked title is in an <h3> tag
-    #   with class "r", and the abstract is in a <div> tag with class
-    #   "st". They are not necessarily on the same level, but we don't
-    #   really care.
-    #
-    #   <!-- within the scope of sitelink_* -->
-    #   <h3 class="r">             <!-- annotate as 'sitelink_title',
-    #                                   hand over to sitelink_title_* -->
-    #     <a href="sitelink url">  <!-- register sitelink url, annotate as 'sitelink_title_link',
-    #                                   start_populating_textbuf -->
-    #       sitelink title
-    #     </a>                     <!-- stop_populating_textbuf, pop to sitelink title -->
-    #   </h3>                      <!-- hand back to sitelink_* -->
-    #
-    #   <!-- still within the scope of sitelink_* -->
-    #   <div class="st">  <!-- annotate as 'sitelink_abstract', start_populating_textbuf -->
-    #     abstract text
-    #   </div>            <!-- stop_populating_textbuf, pop to sitelink abstract -->
-    #
-    # - Sometimes Google autocorrects a query. Whenever this happens
-    #   there will be a block whose English version reads "Showing
-    #   results for ... <newline> Search instead for ...", and the HTML
-    #   looks like
-    #
-    #   <span class="spell">Showing results for</span>
-    #   <a class="spell" href="/search?q=google..."><b><i>google</i></b></a>
-    #   <br>
-    #   <span class="spell_orig"></span>
-    #
-    #   We collect the text inside a.spell as the suggested spelling
-    #   (self.suggested_spelling).
-    #
-    #   Note that:
-    #
-    #   1. When npfr=1 (exact), there could still be an
-    #      a.spell, in a block that reads (English version) "Did you mean:
-    #      ...". Therefore, we only consider the query autocorrected when a
-    #      meaningful .spell_orig is also present (self.autocorrected).
-    #
-    #   2. A few garbage display:none, empty tags related to spell
-    #      appear to be always present: span#srfm.spell, a#srfl.spell,
-    #      span#sifm.spell_orig, a#sifl.spell_orig. We need to exclude
-    #      the ids srfm, srfl, sifm and sifl from our consideration.
-    #
-    # - Sometimes Google omits similar (more like duplicate) result
-    #   entries. Whenever this happens there will be a notice in p#ofr. The way
-    #   to unfilter is to simply add '&filter=0' to the query string.
-    #
-    #
-    # Google News
-    #
-    # - Google News results differ from Google Search results in the
-    #   following ways:
-    #
-    #   For each result, the title in the same format, but there's a
-    #   metadata field in a <div> tag with class "slp", and the abstract
-    #   isn't as deeply embedded: it's in a <div> tag on the same level
-    #   with class "st".
-    #
-    #   <!-- within the scope of result_* -->
-    #   <h3 class="r"></h3>  <!-- as before -->
-    #   <div class="slp">    <!-- annotate as 'news_metadata', start_populating_textbuf -->
-    #     ...
-    #     <span>source</span>
-    #     <span>-</span>     <!-- transform to ', ' -->
-    #     <span>publishing time</span>
-    #   </div>               <!-- stop_populating_textbuf, pop to self.metadata -->
-    #   <div class="st">     <!-- annotate as 'news_abstract', start_populating_textbuf -->
-    #     abstract text again with <em> markup on keywords
-    #   </div>               <!-- stop_populating_textbuf, pop to self.abstract -->
-    #
-    #
-    # Ignore List
-    #
-    # - As good as our result criteria might be, sometimes results of
-    #   dubious value (usually from Google's value-add features) slip
-    #   through. The "People also ask" feature is a good example of this
-    #   type (a sample query is "VPN"; see screenshot
-    #   https://i.imgur.com/yfcsoQz.png). In these cases, we may want to
-    #   skip enclosing containers entirely. The ignore list feature is
-    #   designed for this purpose.
-    #
-    #   The current ignore list is available in self.IGNORE_LIST. Each
-    #   entry (called a "selector") is a dict of attribute-value
-    #   pairs. Each attribute is matched verbatim to a tag's attribute,
-    #   except the "class" attribute, where we test for inclusion
-    #   instead (e.g. "c b a" matches "a b", just like it matches the
-    #   CSS selector ".a.b"). There's also a special "attribute" -- tag,
-    #   the meaning of which is obvious. A tag has to match all given
-    #   attributes to be considered a match for the selector.
-    #
-    #   When a match is found, the tag is annotated as SCOPE_ignored,
-    #   where SCOPE is the current handler scope (e.g., root, result,
-    #   title, etc.), and the scope is switched to 'ignore'. All
-    #   descendants of the tag are ignored. When the corresponding end
-    #   tag is finally reach, the former scope is restored.
-    #
-    #
-    # User Agent disabled (differences)
-    #
-    #   1. For Google News results, <div class="g"> is followed by <table> tag
-    #       <div class="g">
-    #           <table>
-    #
-    #   2. File mime type follows <div class="g">
-    #       <div class="g"><span style="float:left"><span class="mime">[PDF]</span>&nbsp;</span>
-    #
-    #   3. News metadata (source and time) comes within a single tag
-    #       <div class="slp"><span class="f">Reuters - 3 hours ago</span>
-    #
-    #   4. URLs are wrapped
-    #       <a href="/url?q=http://...&sa=...">
-    #
-    #   5. URLs are quoted
-    #       'https://vk.com/doc206446660_429188746%3Fhash%3D6097a8b0a41185cb90%26dl%3D03c63c1be5c02e8620'
-    #
-    #   6. Google Services links are returned as regular results,
-    #      start with '/search?q=' but no following 'http' or 'https'
-    #       <div class="g">
-    #           <div>
-    #               <h3 class="r"><a href="/search?q=india&...&sa=...">News for <b>india</b></a></h3>
-    #
-    #   7. YouTube specific results are returned within <table class="ts">
-    #       e.g. search - '3 hours youtube'
-    #
-    #       <span class="st">
-    #           <span class="f"><span class="nobr">10 Jun 2014</span> - <span class="nobr">179 min</span> -
-    #               <span class="nobr">Uploaded by Meditation Relax Music</span>
-    #           </span>
-    #           <br><b>3 HOURS Best Relaxing Music</b> &#39;Romantic <b>Piano</b>&quot; Background <b>Music</b> for Stress ... 3:03 <b>...</b>
-    #       </span>
-    #
-    #   8. There's no a.spell_orig when the query is autocorrected; the
-    #      <a> tag (linking to the exact search) is wrapped in the
-    #      span.spell_orig.
-
-    def __init__(self, news=False):
-        html.parser.HTMLParser.__init__(self)
-
+    def __init__(self, html, *, news=False):
         self.news = news
-
         self.autocorrected = False
-        self.suggested_spelling = None
+        self.showing_results_for = None
         self.filtered = False
         self.results = []
+        self.parse(html)
 
-        self.index = 0
-        self.textbuf = ''
-        self.tag_annotations = {}
+    def parse(self, html):
+        tree = parse_html(html)
 
-        self.set_handlers_to('root')
+        if debugger:
+            printerr('\x1b[1mInspect the DOM through the \x1b[4mtree\x1b[24m variable.\x1b[0m')
+            printerr('')
+            try:
+                import IPython
+                IPython.embed()
+            except ImportError:
+                import pdb
+                pdb.set_trace()
 
-    # Ignore list
-    IGNORE_LIST = [
-        # "People also ask"
-        # Sample query: VPN
-        # Screenshot: https://i.imgur.com/yfcsoQz.png
-        {
-            'tag': 'div',
-            'class': 'related-question-pair'
-        },
-        # We omit Google's "smart card" results (term coined by me) by
-        # guarding against the 'g-blk' class (sample response: https://git.io/voJgB)
-        {
-            'tag': 'div',
-            'class': 'g-blk'
-        },
-        # We also guard against "smart-card" results with `--noua` option
-        {
-            'tag': 'div',
-            'class': 'hp-xpdbox'
-        }
-    ]
-
-    # Tag handlers
-
-    @annotate_tag
-    def root_start(self, tag, attrs):
-        if tag == 'div' and 'g' in self.classes(attrs):
-            # Initialize result field registers
-            self.title = ''
-            self.url = ''
-            self.abstract = ''
-            self.metadata = ''  # Only used for Google News
-            self.sitelinks = []
-
-            # Guard against sitelinks, which also have titles and
-            # abstracts.  In the case of news, guard against "card
-            # sections" (secondary results to the same event).
-            self.title_registered = False
-            self.abstract_registered = False
-            self.metadata_registered = False  # Only used for Google News
-
-            self.set_handlers_to('result')
-            return 'result'
-
-        # Autocorrect
-        if tag == 'span' and 'spell_orig' in self.classes(attrs) and attrs.get('id') != 'sifm':
-            self.autocorrected = True
-            return
-        if tag == 'a' and 'spell' in self.classes(attrs) and attrs.get('id') != 'srfl':
-            self.start_populating_textbuf()
-            return 'spell'
-
-        # Omitted results
-        if tag == 'p' and attrs.get('id') == 'ofr':
-            self.filtered = True
-
-    @retrieve_tag_annotation
-    def root_end(self, tag, annotation):
-        if annotation == 'spell':
-            self.stop_populating_textbuf()
-            self.suggested_spelling = self.pop_textbuf()
-
-    @annotate_tag
-    def result_start(self, tag, attrs):
-        if not ua and tag == 'span' and 'mime' in self.classes(attrs):
-            self.start_populating_textbuf()
-            return 'title_filetype'
-
-        if not self.title_registered and tag == 'h3' and 'r' in self.classes(attrs):
-            self.set_handlers_to('title')
-            return 'title'
-
-        if not self.abstract_registered and tag == 'div' and 's' in self.classes(attrs):
-            self.set_handlers_to('abstract')
-            return 'abstract'
-
-        if not ua and not self.abstract_registered \
-                and tag == 'span' and 'st' in self.classes(attrs):
-            self.start_populating_textbuf(lambda text: text + ' ')
-            return 'abstract_gservices'
-
-        if not self.sitelinks and tag == 'table':
-            if ua or (not self.news and 'ts' not in self.classes(attrs)):
-                self.set_handlers_to('sitelink_table')
-                return 'sitelink_table'
-
-        if self.news:
-            if not self.metadata_registered and tag == 'div' and 'slp' in self.classes(attrs):
-                # Change metadata field separator from '-' to ', ' for better appearance
-                if ua:
-                    self.start_populating_textbuf(lambda text: ', ' if text == '-' else text)
+        index = 0
+        for div_g in tree.select_all('div.g'):
+            if div_g.select('.hp-xpdbox'):
+                # Skip smart cards.
+                continue
+            try:
+                h3 = div_g.select('h3.r')
+                a = h3.select('a')
+                title = a.text
+                mime = div_g.select('.mime')
+                if mime:
+                    title = mime.text + ' ' + title
+                url = self.unwrap_link(a.attr('href'))
+                abstract = div_g.select('.st').text.replace('\n', '')
+                if self.news:
+                    metadata = div_g.select('.slp').text
+                    metadata = metadata.replace('\u200e', '').replace(' - ', ', ')
                 else:
-                    self.start_populating_textbuf(lambda text:
-                                                  text.replace(' -', ',', 1) if ' - ' in text else text)
-                return 'news_metadata'
+                    metadata = None
+            except (AttributeError, ValueError):
+                continue
+            sitelinks = []
+            for td in div_g.select_all('td'):
+                try:
+                    a = td.select('a')
+                    sl_title = a.text
+                    sl_url = self.unwrap_link(a.attr('href'))
+                    sl_abstract = td.select('div.s.st').text
+                    sitelinks.append(Sitelink(sl_title, sl_url, sl_abstract))
+                except (AttributeError, ValueError):
+                    continue
+            index += 1
+            self.results.append(Result(index, title, url, abstract,
+                                       metadata=metadata, sitelinks=sitelinks))
 
-            if not self.abstract_registered and tag == 'div' and 'st' in self.classes(attrs):
-                self.start_populating_textbuf()
-                return 'news_abstract'
+        # Showing results for ...
+        # Search instead for ...
+        spell_orig = tree.select("span.spell_orig")
+        if spell_orig:
+            self.autocorrected = True
+            self.showing_results_for = next(
+                filter(lambda el: el.tag == "a", spell_orig.previous_siblings()), None
+            ).text
 
-    @retrieve_tag_annotation
-    def result_end(self, tag, annotation):
-        if annotation == 'result':
-            if self.url:
-                self.index += 1
-                result = Result(self.index, self.title, self.url, self.abstract,
-                                metadata=self.metadata if self.metadata else None,
-                                sitelinks=self.sitelinks)
-                self.results.append(result)
-            self.set_handlers_to('root')
-        elif annotation == 'news_metadata':
-            self.stop_populating_textbuf()
-            self.metadata = self.pop_textbuf()
-            self.metadata_registered = True
-        elif annotation == 'news_abstract':
-            self.stop_populating_textbuf()
-            self.abstract = self.pop_textbuf()
-            self.abstract_registered = True
-        elif annotation == 'abstract_gservices':
-            self.stop_populating_textbuf()
-            self.abstract = self.pop_textbuf().replace('  ', ' ')
-            self.abstract_registered = True
+        # No results found for ...
+        # Results for ...:
+        alt_query_infobox = tree.select('#topstuff')
+        if alt_query_infobox:
+            bolds = alt_query_infobox.select_all('div b')
+            if len(bolds) == 2:
+                self.showing_results_for = bolds[1].text
 
-    @annotate_tag
-    def title_start(self, tag, attrs):
-        if ua and tag == 'span':
-            # Print a space after the filetype indicator
-            self.start_populating_textbuf(lambda text: text + ' ')
-            return 'title_filetype'
-        if tag == 'a' and 'href' in attrs:
-            # Skip 'News for', 'Images for' search links
-            if attrs['href'].startswith('/search'):
-                return
+        # In order to show you the most relevant results, we have
+        # omitted some entries very similar to the N already displayed.
+        # ...
+        self.filtered = tree.select('p#ofr') is not None
 
-            # Skip card results
-            if not ua and "fl" in self.classes(attrs):
-                return
-
-            self.url = attrs['href']
-            try:
-                start = self.url.index('?q=') + len('?q=')
-                end = self.url.index('&sa=', start)
-                self.url = urllib.parse.unquote_plus(self.url[start:end])
-            except ValueError:
-                pass
-            self.start_populating_textbuf()
-            return 'title_link'
-
-    @retrieve_tag_annotation
-    def title_end(self, tag, annotation):
-        if annotation == 'title_filetype':
-            self.stop_populating_textbuf()
-        elif annotation == 'title_link':
-            self.stop_populating_textbuf()
-            self.title = self.pop_textbuf()
-            self.title_registered = True
-        elif annotation == 'title':
-            self.set_handlers_to('result')
-
-    @annotate_tag
-    def abstract_start(self, tag, attrs):
-        if (not self.metadata_registered and
-                tag == 'div' and 'slp' in self.classes(attrs)):
-            self.start_populating_textbuf()
-            return 'result_metadata'
-        if tag == 'span' and 'st' in self.classes(attrs):
-            self.start_populating_textbuf()
-            return 'abstract_text'
-
-    @retrieve_tag_annotation
-    def abstract_end(self, tag, annotation):
-        if annotation == 'result_metadata':
-            self.stop_populating_textbuf()
-            self.metadata = self.pop_textbuf().strip().replace('\u200e', '')
-            self.metadata_registered = True
-        elif annotation == 'abstract_text':
-            self.stop_populating_textbuf()
-            self.abstract = self.pop_textbuf()
-            self.abstract_registered = True
-        elif annotation == 'abstract':
-            self.set_handlers_to('result')
-
-    @annotate_tag
-    def sitelink_table_start(self, tag, attrs):
-        if tag == 'td':
-            # Initialize a new sitelink
-            self.current_sitelink = Sitelink('', '', '')
-            self.set_handlers_to('sitelink')
-            return 'sitelink'
-
-    @retrieve_tag_annotation
-    def sitelink_table_end(self, tag, annotation):
-        if annotation == 'sitelink_table':
-            self.set_handlers_to('result')
-
-    @annotate_tag
-    def sitelink_start(self, tag, attrs):
-        if tag == 'h3' and 'r' in self.classes(attrs):
-            self.set_handlers_to('sitelink_title')
-            return 'sitelink_title'
-        if tag == 'div' and 'st' in self.classes(attrs):
-            self.start_populating_textbuf()
-            return 'sitelink_abstract'
-
-    @retrieve_tag_annotation
-    def sitelink_end(self, tag, annotation):
-        if annotation == 'sitelink_abstract':
-            self.stop_populating_textbuf()
-            self.current_sitelink.abstract = self.pop_textbuf()
-        elif annotation == 'sitelink':
-            if self.current_sitelink.url:
-                self.sitelinks.append(self.current_sitelink)
-            self.set_handlers_to('sitelink_table')
-
-    @annotate_tag
-    def sitelink_title_start(self, tag, attrs):
-        if tag == 'a' and 'href' in attrs:
-            self.current_sitelink.url = attrs['href']
-            try:
-                start = self.current_sitelink.url.index('?q=') + len('?q=')
-                end = self.current_sitelink.url.index('&sa=', start)
-                self.current_sitelink.url = urllib.parse.unquote_plus(self.current_sitelink.url[start:end])
-            except ValueError:
-                pass
-            self.start_populating_textbuf()
-            return 'sitelink_title_link'
-
-    @retrieve_tag_annotation
-    def sitelink_title_end(self, tag, annotation):
-        if annotation == 'sitelink_title_link':
-            self.stop_populating_textbuf()
-            self.current_sitelink.title = self.pop_textbuf()
-        elif annotation == 'sitelink_title':
-            self.set_handlers_to('sitelink')
-
-    # Generic methods
-
-    # Set handle_starttag to SCOPE_start, and handle_endtag to SCOPE_end.
-    def set_handlers_to(self, scope):
-        self.handle_starttag = getattr(self, scope + '_start')
-        self.handle_endtag = getattr(self, scope + '_end')
-
-    def insert_annotation(self, tag, annotation):
-        if tag not in self.tag_annotations:
-            self.tag_annotations[tag] = []
-        self.tag_annotations[tag].append(annotation)
-
-    @annotate_tag
-    def ignore_start(self, tag, attrs):
-        pass
-
-    @retrieve_tag_annotation
-    def ignore_end(self, tag, annotation):
-        if annotation and annotation.endswith('_ignored'):
-            # Strip '-ignore' suffix from annotation to obtain the outer
-            # context name.
-            context = annotation[:-8]
-            self.set_handlers_to(context)
-
-    def start_populating_textbuf(self, data_transformer=None):
-        if data_transformer is None:
-            # Record data verbatim
-            self.handle_data = self.record_data
-        else:
-            def record_transformed_data(data):
-                self.textbuf += data_transformer(data)
-
-            self.handle_data = record_transformed_data
-
-        self.handle_entityref = self.record_entityref
-        self.handle_charref = self.record_charref
-
-    def pop_textbuf(self):
-        text = self.textbuf
-        self.textbuf = ''
-        return text
-
-    def stop_populating_textbuf(self):
-        self.handle_data = lambda data: None
-        self.handle_entityref = lambda ref: None
-        self.handle_charref = lambda ref: None
-
-    def record_data(self, data):
-        self.textbuf += data
-
-    def record_entityref(self, ref):
-        try:
-            self.textbuf += chr(html.entities.name2codepoint[ref])
-        except KeyError:
-            # Entity name not found; most likely rather sloppy HTML
-            # where a literal ampersand is not escaped; For instance,
-            # the HTML response returned by
-            #
-            #     googler -c au -l ko expected
-            #
-            # contains the following tag
-            #
-            #     <p class="_e4b"><a href="...">expected market return s&p 500</a></p>
-            #
-            # where &p is interpreted by HTMLParser as an entity (this
-            # behaviour seems to be specific to Python 2.7).
-            self.textbuf += '&' + ref
-
-    def record_charref(self, ref):
-        if ref.startswith('x'):
-            char = chr(int(ref[1:], 16))
-        else:
-            char = chr(int(ref))
-        self.textbuf += char
-
+    # Unwraps /url?q=http://...&sa=...
+    # May raise ValueError.
     @staticmethod
-    def classes(attrs):
-        """Get tag's classes from its attribute dict."""
-        return attrs.get('class', '').split()
+    def unwrap_link(link):
+        qs = urllib.parse.urlparse(link).query
+        try:
+            url = urllib.parse.parse_qs(qs)['q'][0]
+        except KeyError:
+            raise ValueError(link)
+        else:
+            if "://" in url:
+                return url
+            else:
+                # Google's internal services link, e.g.,
+                # /search?q=google&..., which cannot be unwrapped into
+                # an actual URL.
+                raise ValueError(link)
 
 
 class Sitelink(object):
@@ -1605,7 +2184,7 @@ class Result(object):
 
         self._urltable = {index: url}
         subindex = 'a'
-        for sitelink in sitelinks:
+        for sitelink in self.sitelinks:
             fullindex = index + subindex
             sitelink.index = fullindex
             self._urltable[fullindex] = sitelink.url
@@ -1652,11 +2231,11 @@ class Result(object):
         if columns > indent + 1:
             # Try to fill to columns
             fillwidth = columns - indent - 1
-            for line in textwrap.wrap(abstract.replace('\n', ''), width=fillwidth):
+            for line in textwrap.wrap(abstract, width=fillwidth):
                 print('%s%s' % (' ' * indent, line))
             print('')
         else:
-            print('%s\n' % abstract.replace('\n', ' '))
+            print('%s\n' % abstract)
         if colors:
             print(colors.reset, end='')
 
@@ -1777,7 +2356,8 @@ class GooglerCmd(object):
         atexit.register(self._conn.close)
 
         self.results = []
-        self._autocorrected_to = None
+        self._autocorrected = None
+        self._showing_results_for = None
         self._results_filtered = False
         self._urltable = {}
 
@@ -1820,11 +2400,11 @@ class GooglerCmd(object):
                 fp.write(page)
             logger.debug("Response body written to '%s'.", tmpfile)
 
-        parser = GoogleParser(news=self._google_url.news)
-        parser.feed(page)
+        parser = GoogleParser(page, news=self._google_url.news)
 
         self.results = parser.results
-        self._autocorrected_to = parser.suggested_spelling if parser.autocorrected else None
+        self._autocorrected = parser.autocorrected
+        self._showing_results_for = parser.showing_results_for
         self._results_filtered = parser.filtered
         self._urltable = {}
         for r in self.results:
@@ -1882,26 +2462,28 @@ class GooglerCmd(object):
         """
         self.fetch()
         colors = self.colors
-        if self._autocorrected_to:
+        if self._showing_results_for:
             if colors:
-                # Underline the keywords
-                autocorrected_to = '\x1b[4m' + self._autocorrected_to + '\x1b[24m'
+                # Underline the query
+                actual_query = '\x1b[4m' + self._showing_results_for + '\x1b[24m'
             else:
-                autocorrected_to = self._autocorrected_to
-            autocorrect_info = ('Showing results for %s; enter "x" for an exact search.' %
-                                autocorrected_to)
+                actual_query = self._showing_results_for
+            if self._autocorrected:
+                info = 'Showing results for %s; enter "x" for an exact search.' % actual_query
+            else:
+                info = 'No results found; showing results for %s.' % actual_query
             printerr('')
             if colors:
-                printerr(colors.prompt + autocorrect_info + colors.reset)
+                printerr(colors.prompt + info + colors.reset)
             else:
-                printerr('** ' + autocorrect_info)
+                printerr('** ' + info)
         self.display_results(prelude=prelude, json_output=json_output)
         if self._results_filtered:
-            unfilter_info = 'Enter "unfilter" to show similar results Google omitted.'
+            info = 'Enter "unfilter" to show similar results Google omitted.'
             if colors:
-                printerr(colors.prompt + unfilter_info + colors.reset)
+                printerr(colors.prompt + info + colors.reset)
             else:
-                printerr('** ' + unfilter_info)
+                printerr('** ' + info)
             printerr('')
 
     def read_next_command(self):
@@ -2509,6 +3091,8 @@ def parse_args(args=None, namespace=None):
                help='when used with --upgrade, upgrade to latest git master')
     addarg('-v', '--version', action='version', version=_VERSION_)
     addarg('-d', '--debug', action='store_true', help='enable debugging')
+    # Hidden option for interacting with DOM in an IPython/pdb shell
+    addarg('-D', '--debugger', action='store_true', help=argparse.SUPPRESS)
     addarg('--complete', help=argparse.SUPPRESS)
 
     return argparser.parse_args(args, namespace)
@@ -2525,6 +3109,10 @@ def main():
             logger.setLevel(logging.DEBUG)
             logger.debug('googler version %s', _VERSION_)
             logger.debug('Python version %s', python_version())
+
+        if opts.debugger:
+            global debugger
+            debugger = True
 
         # Handle query completer
         if opts.complete is not None:
