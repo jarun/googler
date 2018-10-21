@@ -40,6 +40,7 @@ from subprocess import Popen, PIPE, DEVNULL
 import sys
 import textwrap
 import urllib.parse
+import uuid
 import webbrowser
 
 # Python optional dependency compatibility layer
@@ -1479,9 +1480,12 @@ class GoogleUrl(object):
         self._start = 0
         self._keywords = []
         self._sites = None
+
         self._query_dict = {
             'ie': 'UTF-8',
             'oe': 'UTF-8',
+            'gbv': '1',  # control the presence of javascript on the page, 1=no js, 2=js
+            'sei': base64.encodebytes(uuid.uuid1().bytes).decode("ascii").rstrip('=\n').replace('/', '_'),
         }
         self.update(opts, **kwargs)
 
