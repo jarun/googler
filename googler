@@ -2013,7 +2013,7 @@ class GoogleConnection(object):
         self._resp = self._conn.getresponse()
         if self.cookie == '':
             complete_cookie = self._resp.getheader('Set-Cookie')
-            # Cookie won't be available is already blocked
+            # Cookie won't be available if already blocked
             if complete_cookie is not None:
                 self.cookie = complete_cookie[:complete_cookie.find(';')]
                 logger.debug('Cookie: %s' % self.cookie)
