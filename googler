@@ -1484,7 +1484,7 @@ class GoogleUrl(object):
         self._query_dict = {
             'ie': 'UTF-8',
             'oe': 'UTF-8',
-            'gbv': '1',  # control the presence of javascript on the page, 1=no js, 2=js
+            #'gbv': '1',  # control the presence of javascript on the page, 1=no js, 2=js
             'sei': base64.encodebytes(uuid.uuid1().bytes).decode("ascii").rstrip('=\n').replace('/', '_'),
         }
         self.update(opts, **kwargs)
@@ -2004,7 +2004,9 @@ class GoogleConnection(object):
         """
         logger.debug('Fetching URL %s', url)
         self._conn.request('GET', url, None, {
+            'Accept': 'text/html',
             'Accept-Encoding': 'gzip',
+            'Accept-Language': 'en;q=1.0',
             'User-Agent': USER_AGENT if ua else '',
             'Cookie': self.cookie,
             'Connection': 'keep-alive',
