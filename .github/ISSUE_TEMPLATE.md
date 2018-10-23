@@ -1,6 +1,12 @@
 #### Bug reports
 
-Before opening an issue, please try to reproduce on [the latest development version](https://github.com/jarun/googler#installing-from-this-repository) first. The bug you noticed might have already been fixed.
+Before opening an issue, please
+
+💥💥TRY TO REPRODUCE ON [THE LATEST DEVELOPMENT VERSION][master] FIRST💥💥
+
+The bug you noticed might have already been fixed.
+
+[master]: https://github.com/jarun/googler#downloading-a-single-file
 
 If the issue can be reproduced on master, then please make sure you provide the following:
 - Output of `googler -d`;
