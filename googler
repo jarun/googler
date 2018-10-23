@@ -2006,7 +2006,6 @@ class GoogleConnection(object):
         self._conn.request('GET', url, None, {
             'Accept': 'text/html',
             'Accept-Encoding': 'gzip',
-            'Accept-Language': 'en;q=1.0',
             'User-Agent': USER_AGENT if ua else '',
             'Cookie': self.cookie,
             'Connection': 'keep-alive',
