@@ -81,7 +81,7 @@
 
 `googler` requires Python 3.4 or later. Only the latest patch release of each minor version is supported.
 
-To copy url to clipboard at the omniprompt, `googler` looks for `xsel` or `xclip` or `termux-clipboard-set` (in the same order) on Linux, `pbcopy` (default installed) on OS X and `clip` (default installed) on Windows. It also supports GNU Screen and tmux copy-paste buffers in the absence of X11.
+To copy url to clipboard at the omniprompt, `googler` looks for `xsel` or `xclip` or `termux-clipboard-set` (in the same order) on Linux, `pbcopy` (default installed) on macOS and `clip` (default installed) on Windows. It also supports GNU Screen and tmux copy-paste buffers in the absence of X11.
 
 #### From a package manager
 
@@ -411,7 +411,7 @@ To show the domain names in search results instead of the expanded URL (and use 
 
 3. Google News service is not available if the language is `dk` (Denmark), `fi` (Finland) or `is` (Iceland). Use `-l en`. Please refer to #187 for more information.
 
-4. Some users have reported problems with a colored omniprompt (refer to issue [#203](https://github.com/jarun/googler/issues/203)) with iTerm2 on OS X. To force a plain omniprompt:
+4. Some users have reported problems with a colored omniprompt (refer to issue [#203](https://github.com/jarun/googler/issues/203)) with iTerm2 on macOS. To force a plain omniprompt:
 
        export DISABLE_PROMPT_COLOR=1
 
