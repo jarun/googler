@@ -85,7 +85,7 @@ To copy url to clipboard at the omniprompt, `googler` looks for `xsel` or `xclip
 
 #### From a package manager
 
-- [AUR](https://aur.archlinux.org/packages/googler/) (`yaourt -S googler`)
+- [AUR](https://aur.archlinux.org/packages/googler/) (`yay -S googler`)
 - [Debian](https://packages.debian.org/search?keywords=googler&searchon=names) (`apt-get install googler`)
 - [Fedora](https://apps.fedoraproject.org/packages/googler) (`dnf install googler`)
 - [FreeBSD](https://www.freshports.org/www/googler/) (`pkg install googler`)
