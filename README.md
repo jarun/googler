@@ -54,6 +54,7 @@
     - [Domain-only URL](#domain-only-url)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
+- [Fun stuff](#fun-stuff)
 - [Notes](#notes)
 - [Contributions](#contributions)
 - [Developers](#developers)
@@ -415,6 +416,13 @@ To show the domain names in search results instead of the expanded URL (and use 
 4. Some users have reported problems with a colored omniprompt (refer to issue [#203](https://github.com/jarun/googler/issues/203)) with iTerm2 on macOS. To force a plain omniprompt:
 
        export DISABLE_PROMPT_COLOR=1
+
+### Fun stuff
+
+Possibilities are infinite with `googler`:
+
+- [Terminal Reading Mode or Reader View](https://github.com/jarun/googler/wiki/Terminal-Reading-Mode-or-Reader-View)
+- [Stream YouTube videos on desktop](https://github.com/jarun/googler/wiki/Stream-YouTube-videos-on-desktop)
 
 ### Notes
 
