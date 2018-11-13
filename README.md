@@ -54,7 +54,7 @@
     - [Domain-only URL](#domain-only-url)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
-- [Fun stuff](#fun-stuff)
+- [Curiosity nails it](#curiosity-nails-it)
 - [Notes](#notes)
 - [Contributions](#contributions)
 - [Developers](#developers)
@@ -417,10 +417,11 @@ To show the domain names in search results instead of the expanded URL (and use 
 
        export DISABLE_PROMPT_COLOR=1
 
-### Fun stuff
+### Curiosity nails it
 
 Possibilities are infinite with `googler`:
 
+- [googler on the iPad](https://github.com/jarun/googler/wiki/googler-on-the-iPad)
 - [Terminal Reading Mode or Reader View](https://github.com/jarun/googler/wiki/Terminal-Reading-Mode-or-Reader-View)
 - [Stream YouTube videos on desktop](https://github.com/jarun/googler/wiki/Stream-YouTube-videos-on-desktop)
 
