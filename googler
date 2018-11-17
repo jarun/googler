@@ -49,14 +49,19 @@ try:
 except ImportError:
     pass
 
-
-# Basic setup
+try:
+    import cjkwrap
+    dwrap = cjkwrap
+except ImportError:
+    dwrap = textwrap
 
 try:
     import setproctitle
     setproctitle.setproctitle('googler')
 except Exception:
     pass
+
+# Basic setup
 
 logging.basicConfig(format='[%(levelname)s] %(message)s')
 logger = logging.getLogger()
@@ -2199,30 +2204,28 @@ class Result(object):
             self._urltable[fullindex] = sitelink.url
             subindex = chr(ord(subindex) + 1)
 
-    def _print_title_and_url(self, index, title, url, indent=0):
+    def _print_title_and_url(self, index, title, url, indent=3, pre=0):
         colors = self.colors
 
         if not self.urlexpand:
-            segments = urllib.parse.urlparse(url)
-            url = '  [' + segments.netloc + ']'
+            url = '[' + urllib.parse.urlparse(url).netloc + ']'
 
-        # Pad index and url with `indent` number of spaces
-        index = ' ' * indent + str(index)
-        url = ' ' * indent + url
         if colors:
-            print(colors.index + index + colors.reset, end='')
-            if self.urlexpand:
-                print(' ' + colors.title + title + colors.reset)
-                print(colors.url + url + colors.reset)
+            # Adjust index to print result index clearly
+            print(" %s%s%-*s%s" % (' ' * pre, colors.index, indent, index + '.', colors.reset), end='')
+            if not self.urlexpand:
+                print(' ' + colors.title + title + colors.reset + ' ' + colors.url + url + colors.reset)
             else:
-                print(' ' + colors.title + title + colors.reset + colors.url + url + colors.reset)
+                print(' ' + colors.title + title + colors.reset)
+                print(' ' * (indent + 2 + pre) + colors.url + url + colors.reset)
         else:
             if self.urlexpand:
-                print(' %s %s\n%s' % (index, title, url))
+                print(' %s%-*s %s' % (' ' * pre, indent, index + '.', title))
+                print(' %s%s' % (' ' * (indent + 1 + pre), url))
             else:
-                print(' %s %s%s' % (index, title, url))
+                print(' %s%-*s %s %s' % (' ' * pre, indent, index + '.', title, url))
 
-    def _print_metadata_and_abstract(self, abstract, metadata=None, indent=0):
+    def _print_metadata_and_abstract(self, abstract, metadata=None, indent=5, pre=0):
         colors = self.colors
         try:
             columns, _ = os.get_terminal_size()
@@ -2231,20 +2234,20 @@ class Result(object):
 
         if metadata:
             if colors:
-                print(colors.metadata + metadata + colors.reset)
+                print(' ' * (indent + pre) + colors.metadata + metadata + colors.reset)
             else:
-                print(metadata)
+                print(' ' * (indent + pre) + metadata)
 
         if colors:
             print(colors.abstract, end='')
-        if columns > indent + 1:
+        if columns > indent + 1 + pre:
             # Try to fill to columns
             fillwidth = columns - indent - 1
-            for line in textwrap.wrap(abstract, width=fillwidth):
-                print('%s%s' % (' ' * indent, line))
+            for line in dwrap.wrap(abstract.replace('\n', ''), width=fillwidth):
+                print('%s%s' % (' ' * (indent + pre), line))
             print('')
         else:
-            print('%s\n' % abstract)
+            print('%s%s\n' % (' ' * pre, abstract.replace('\n', ' ')))
         if colors:
             print(colors.reset, end='')
 
@@ -2254,8 +2257,8 @@ class Result(object):
         self._print_metadata_and_abstract(self.abstract, metadata=self.metadata)
 
         for sitelink in self.sitelinks:
-            self._print_title_and_url(sitelink.index, sitelink.title, sitelink.url, indent=4)
-            self._print_metadata_and_abstract(sitelink.abstract, indent=4)
+            self._print_title_and_url(sitelink.index, sitelink.title, sitelink.url, pre=4)
+            self._print_metadata_and_abstract(sitelink.abstract, pre=4)
 
     def jsonizable_object(self):
         """Return a JSON-serializable dict representing the result entry."""
