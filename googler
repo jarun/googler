@@ -58,7 +58,7 @@ except ImportError:
 try:
     import setproctitle
     setproctitle.setproctitle('googler')
-except Exception:
+except (ImportError, Exception):
     pass
 
 # Basic setup
