@@ -2355,6 +2355,7 @@ class GooglerCmd(object):
 
     # Class variables
     colors = None
+    re_url_index = re.compile(r"\d+(a-z)?")
 
     def __init__(self, opts):
         super().__init__()
@@ -2672,7 +2673,7 @@ class GooglerCmd(object):
                 elif cmd == 'u':
                     Result.urlexpand = not Result.urlexpand
                     printerr('url expansion toggled.')
-                elif cmd.startswith('c ') and cmd[2:].isdigit():
+                elif cmd.startswith('c ') and self.re_url_index.match(cmd[2:]):
                     try:
                         # try copying the url to clipboard using native utilities
                         copier_params = []
