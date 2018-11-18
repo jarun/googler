@@ -39,6 +39,7 @@ import ssl
 from subprocess import Popen, PIPE, DEVNULL
 import sys
 import textwrap
+import unicodedata
 import urllib.parse
 import uuid
 import webbrowser
@@ -48,12 +49,6 @@ try:
     import readline
 except ImportError:
     pass
-
-try:
-    import cjkwrap
-    dwrap = cjkwrap
-except ImportError:
-    dwrap = textwrap
 
 try:
     import setproctitle
@@ -113,6 +108,50 @@ API_REPO_BASE = 'https://api.github.com/repos/jarun/googler'
 RAW_DOWNLOAD_REPO_BASE = 'https://raw.githubusercontent.com/jarun/googler'
 
 debugger = False
+
+
+# Monkeypatch textwrap for CJK wide characters.
+
+def monkeypatch_textwrap_for_cjk():
+    try:
+        if textwrap.wrap.patched:
+            return
+    except AttributeError:
+        pass
+    psl_textwrap_wrap = textwrap.wrap
+
+    def textwrap_wrap(text, width=70, **kwargs):
+        if width <= 2:
+            width = 2
+        # We first add a U+0000 after each East Asian Fullwidth or East
+        # Asian Wide character, then fill to width - 1 (so that if a NUL
+        # character ends up on a new line, we still have one last column
+        # to spare for the preceding wide character). Finally we strip
+        # all the NUL characters.
+        #
+        # East Asian Width: https://www.unicode.org/reports/tr11/
+        return [
+            line.replace('\0', '')
+            for line in psl_textwrap_wrap(
+                ''.join(
+                    ch + '\0' if unicodedata.east_asian_width(ch) in ('F', 'W') else ch
+                    for ch in unicodedata.normalize('NFC', text)
+                ),
+                width=width - 1,
+                **kwargs
+            )
+        ]
+
+    def textwrap_fill(text, width=70, **kwargs):
+        return '\n'.join(textwrap_wrap(text, width=width, **kwargs))
+
+    textwrap.wrap = textwrap_wrap
+    textwrap.fill = textwrap_fill
+    textwrap.wrap.patched = True
+    textwrap.fill.patched = True
+
+
+monkeypatch_textwrap_for_cjk()
 
 
 ### begin dim (DOM implementation with CSS support) ###
@@ -2243,7 +2282,7 @@ class Result(object):
         if columns > indent + 1 + pre:
             # Try to fill to columns
             fillwidth = columns - indent - 1
-            for line in dwrap.wrap(abstract.replace('\n', ''), width=fillwidth):
+            for line in textwrap.wrap(abstract.replace('\n', ''), width=fillwidth):
                 print('%s%s' % (' ' * (indent + pre), line))
             print('')
         else:
