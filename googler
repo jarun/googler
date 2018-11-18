@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# TODO: showing results for... in --noprompt mode
-
 import argparse
 import atexit
 import base64
@@ -2486,6 +2484,29 @@ class GooglerCmd(object):
                     r.print()
 
     @require_keywords
+    def showing_results_for_alert(self, interactive=True):
+        colors = self.colors
+        if self._showing_results_for:
+            if colors:
+                # Underline the query
+                actual_query = '\x1b[4m' + self._showing_results_for + '\x1b[24m'
+            else:
+                actual_query = self._showing_results_for
+            if self._autocorrected:
+                if interactive:
+                    info = 'Showing results for %s; enter "x" for an exact search.' % actual_query
+                else:
+                    info = 'Showing results for %s; use -x, --exact for an exact search.' % actual_query
+            else:
+                info = 'No results found; showing results for %s.' % actual_query
+            if interactive:
+                printerr('')
+            if colors:
+                printerr(colors.prompt + info + colors.reset)
+            else:
+                printerr('** ' + info)
+
+    @require_keywords
     def fetch_and_display(self, prelude='\n', json_output=False, interactive=True):
         """Fetch a page and display results.
 
@@ -2513,24 +2534,10 @@ class GooglerCmd(object):
 
         """
         self.fetch()
-        colors = self.colors
-        if self._showing_results_for:
-            if colors:
-                # Underline the query
-                actual_query = '\x1b[4m' + self._showing_results_for + '\x1b[24m'
-            else:
-                actual_query = self._showing_results_for
-            if self._autocorrected:
-                info = 'Showing results for %s; enter "x" for an exact search.' % actual_query
-            else:
-                info = 'No results found; showing results for %s.' % actual_query
-            printerr('')
-            if colors:
-                printerr(colors.prompt + info + colors.reset)
-            else:
-                printerr('** ' + info)
+        self.showing_results_for_alert()
         self.display_results(prelude=prelude, json_output=json_output)
         if self._results_filtered:
+            colors = self.colors
             info = 'Enter "unfilter" to show similar results Google omitted.'
             if colors:
                 printerr(colors.prompt + info + colors.reset)
@@ -3220,7 +3227,8 @@ def main():
                 else:
                     print('No results.', file=sys.stderr)
             else:
-                repl.display_results(prelude='', json_output=opts.json)
+                repl.showing_results_for_alert(interactive=False)
+                repl.display_results(json_output=opts.json)
             sys.exit(0)
         else:
             # Interactive mode
