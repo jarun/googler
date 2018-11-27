@@ -2744,9 +2744,9 @@ class GooglerCmd(object):
                                 copier_params = ['tmux', 'set-buffer']
                                 copier_mode = 'cmdline_arg'
                             elif os.getenv('STY'):  # check for GNU screen
-                                # Try to use GNU screen's exchange-file as fallback.
-                                copier_params = ['screen', '-X', 'readbuf']
-                                copier_mode = 'ext_file'
+                                # Try to use GNU screen's paste buffer as fallback.
+                                copier_params = ['screen', '-X', 'readbuf', '-e', 'utf8']
+                                copier_mode = 'screen_specific'
 
                         if not copier_params:
                             printerr('failed to locate suitable clipboard utility')
@@ -2758,11 +2758,19 @@ class GooglerCmd(object):
                             elif copier_mode == 'cmdline_arg':
                                 Popen(copier_params + [content], stdin=DEVNULL,
                                       stdout=DEVNULL, stderr=DEVNULL).communicate()
+                            elif copier_mode == 'screen_specific':
+                                import tempfile
+                                tmpfd, tmppath = tempfile.mkstemp()
+                                try:
+                                    with os.fdopen(tmpfd, 'wb') as fp:
+                                        fp.write(content)
+                                    copier_params.append(tmppath)
+                                    Popen(copier_params, stdin=DEVNULL,
+                                          stdout=DEVNULL, stderr=DEVNULL).communicate()
+                                finally:
+                                    os.unlink(tmppath)
                             else:
-                                with open('/tmp/screen-exchange', 'wb') as f:
-                                    f.write(content)
-                                Popen(copier_params, stdin=DEVNULL,
-                                      stdout=DEVNULL, stderr=DEVNULL).communicate()
+                                raise ValueError('unknown copier mode %s' % repr(copier_mode))
                     except Exception:
                         raise NoKeywordsException
                 else:
