@@ -2671,6 +2671,57 @@ class GooglerCmd(object):
         self._google_url.set_queries(filter=0)
         self.fetch_and_display()
 
+    def copy_url(self, idx):
+        try:
+            try:
+                content = self._urltable[idx].encode('utf-8')
+            except Exception:
+                printerr('Invalid index.')
+                return
+
+            # try copying the url to clipboard using native utilities
+            copier_params = []
+            if sys.platform.startswith(('linux', 'freebsd', 'openbsd')):
+                if shutil.which('xsel') is not None:
+                    copier_params = ['xsel', '-b', '-i']
+                elif shutil.which('xclip') is not None:
+                    copier_params = ['xclip', '-selection', 'clipboard']
+                elif shutil.which('termux-clipboard-set') is not None:
+                    copier_params = ['termux-clipboard-set']
+            elif sys.platform == 'darwin':
+                copier_params = ['pbcopy']
+            elif sys.platform == 'win32':
+                copier_params = ['clip']
+
+            if copier_params:
+                Popen(copier_params, stdin=PIPE, stdout=DEVNULL, stderr=DEVNULL).communicate(content)
+                return
+
+            # If native clipboard utilities are absent, try to use terminal multiplexers
+            # tmux
+            if os.getenv('TMUX_PANE'):
+                copier_params = ['tmux', 'set-buffer']
+                Popen(copier_params + [content], stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL).communicate()
+                return
+
+            # GNU Screen paste buffer
+            if os.getenv('STY'):
+                import tempfile
+                copier_params = ['screen', '-X', 'readbuf', '-e', 'utf8']
+                tmpfd, tmppath = tempfile.mkstemp()
+                try:
+                    with os.fdopen(tmpfd, 'wb') as fp:
+                        fp.write(content)
+                    copier_params.append(tmppath)
+                    Popen(copier_params, stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL).communicate()
+                finally:
+                    os.unlink(tmppath)
+                return
+
+            printerr('failed to locate suitable clipboard utility')
+        except Exception:
+            raise NoKeywordsException
+
     def cmdloop(self):
         """Run REPL."""
         if self.keywords:
@@ -2720,59 +2771,7 @@ class GooglerCmd(object):
                     Result.urlexpand = not Result.urlexpand
                     printerr('url expansion toggled.')
                 elif cmd.startswith('c ') and self.re_url_index.match(cmd[2:]):
-                    try:
-                        # try copying the url to clipboard using native utilities
-                        copier_params = []
-                        copier_mode = 'stdin'
-                        if sys.platform.startswith(('linux', 'freebsd', 'openbsd')):
-                            if shutil.which('xsel') is not None:
-                                copier_params = ['xsel', '-b', '-i']
-                            elif shutil.which('xclip') is not None:
-                                copier_params = ['xclip', '-selection', 'clipboard']
-                            elif shutil.which('termux-clipboard-set') is not None:
-                                copier_params = ['termux-clipboard-set']
-                        elif sys.platform == 'darwin':
-                            copier_params = ['pbcopy']
-                        elif sys.platform == 'win32':
-                            copier_params = ['clip']
-
-                        # If native clipboard utilities are absent, try to use terminal
-                        # multiplexers, tmux/GNU screen, as fallback.
-                        if not copier_params:
-                            if os.getenv('TMUX_PANE'):  # check for tmux
-                                # Try to use tmux buffer as fallback. Use case suggested by #230.
-                                copier_params = ['tmux', 'set-buffer']
-                                copier_mode = 'cmdline_arg'
-                            elif os.getenv('STY'):  # check for GNU screen
-                                # Try to use GNU screen's paste buffer as fallback.
-                                copier_params = ['screen', '-X', 'readbuf', '-e', 'utf8']
-                                copier_mode = 'screen_specific'
-
-                        if not copier_params:
-                            printerr('failed to locate suitable clipboard utility')
-                        else:
-                            content = self._urltable[cmd[2:]].encode('utf-8')
-                            if copier_mode == 'stdin':
-                                Popen(copier_params, stdin=PIPE,
-                                      stdout=DEVNULL, stderr=DEVNULL).communicate(content)
-                            elif copier_mode == 'cmdline_arg':
-                                Popen(copier_params + [content], stdin=DEVNULL,
-                                      stdout=DEVNULL, stderr=DEVNULL).communicate()
-                            elif copier_mode == 'screen_specific':
-                                import tempfile
-                                tmpfd, tmppath = tempfile.mkstemp()
-                                try:
-                                    with os.fdopen(tmpfd, 'wb') as fp:
-                                        fp.write(content)
-                                    copier_params.append(tmppath)
-                                    Popen(copier_params, stdin=DEVNULL,
-                                          stdout=DEVNULL, stderr=DEVNULL).communicate()
-                                finally:
-                                    os.unlink(tmppath)
-                            else:
-                                raise ValueError('unknown copier mode %s' % repr(copier_mode))
-                    except Exception:
-                        raise NoKeywordsException
+                    self.copy_url(cmd[2:])
                 else:
                     self.do_google(cmd)
             except NoKeywordsException:
