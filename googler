@@ -2675,7 +2675,7 @@ class GooglerCmd(object):
         try:
             try:
                 content = self._urltable[idx].encode('utf-8')
-            except Exception:
+            except KeyError:
                 printerr('Invalid index.')
                 return
 
