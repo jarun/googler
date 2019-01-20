@@ -417,6 +417,7 @@ To show the domain names in search results instead of the expanded URL (and use 
 Possibilities are infinite with `googler`:
 
 - [googler on the iPad](https://github.com/jarun/googler/wiki/googler-on-the-iPad)
+- [Directly print content of results to terminal](https://github.com/jarun/googler/wiki/Directly-print-content-of-results-to-terminal)
 - [Terminal Reading Mode or Reader View](https://github.com/jarun/googler/wiki/Terminal-Reading-Mode-or-Reader-View)
 - [Stream YouTube videos on desktop](https://github.com/jarun/googler/wiki/Stream-YouTube-videos-on-desktop)
 - [Search error on StackOverflow from terminal](https://github.com/jarun/googler/wiki/Search-error-on-StackOverflow-from-terminal)
