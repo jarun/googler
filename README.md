@@ -11,6 +11,7 @@
 </p>
 
 <p align="center">
+<a href="https://repology.org/metapackage/googler"><img src="https://repology.org/badge/tiny-repos/googler.svg" alt="Availability"></a>
 <a href="https://github.com/jarun/googler/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPLv3-yellow.svg?maxAge=2592000" alt="License" /></a>
 <a href="https://travis-ci.org/jarun/googler"><img src="https://travis-ci.org/jarun/googler.svg?branch=master" alt="Build Status" /></a>
 </p>
@@ -28,7 +29,7 @@
 *Love smart and efficient utilities? Explore [my repositories](https://github.com/jarun?tab=repositories). Buy me a cup of coffee if they help you.*
 
 <p align="center">
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q"><img src="https://img.shields.io/badge/PayPal-donate-green.svg" alt="Donate via PayPal!" /></a>
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RMLTQ76JSXJ4Q"><img src="https://img.shields.io/badge/PayPal-donate-1eb0fc.svg" alt="Donate via PayPal!" /></a>
 </p>
 
 ### Table of contents
@@ -92,7 +93,7 @@ To copy url to clipboard at the omniprompt, `googler` looks for `xsel` or `xclip
 - [macOS/Homebrew](http://formulae.brew.sh/formula/googler) (`brew install googler`)
 - [NixOS](https://github.com/NixOS/nixpkgs/tree/master/pkgs/applications/misc/googler) (`nix-env -i googler`)
 - [openSUSE](https://software.opensuse.org/search?q=googler) (`zypper in googler`)
-- [Raspbian Testing](https://archive.raspbian.org/raspbian/pool/main/g/googler/) (`apt-get install nnn`)
+- [Raspbian Testing](https://archive.raspbian.org/raspbian/pool/main/g/googler/) (`apt-get install googler`)
 - [Slackware](http://slackbuilds.org/repository/14.2/network/googler/) (`slackpkg install googler`)
 - [Snap Store](https://snapcraft.io/googler) (`snap install googler`)
 - [Ubuntu](https://packages.ubuntu.com/search?keywords=googler&searchon=names) (`apt-get install googler`)
