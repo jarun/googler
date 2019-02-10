@@ -2769,7 +2769,7 @@ class GooglerCmd(object):
                     printerr('Index out of bound. To search for the number, use g.')
                 elif cmd == 'u':
                     Result.urlexpand = not Result.urlexpand
-                    printerr('url expansion toggled.')
+                    self.display_results()
                 elif cmd.startswith('c ') and self.re_url_index.match(cmd[2:]):
                     self.copy_url(cmd[2:])
                 else:
