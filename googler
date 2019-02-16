@@ -1424,7 +1424,7 @@ def check_stdout_encoding():
 
 # Classes
 
-class TLS1_2Connection(HTTPSConnection):
+class HardenedHTTPSConnection(HTTPSConnection):
     """Overrides HTTPSConnection.connect to specify TLS version
 
     NOTE: TLS 1.2 is supported from Python 3.4
@@ -1455,8 +1455,12 @@ class TLS1_2Connection(HTTPSConnection):
             if hasattr(ssl, 'PROTOCOL_TLS'):
                 # Since Python 3.5.3
                 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-                ssl_context.options |= (ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 |
-                                        ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1)
+                if hasattr(ssl_context, "minimum_version"):
+                    # Python 3.7 with OpenSSL 1.1.0g or later
+                    ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
+                else:
+                    ssl_context.options |= (ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 |
+                                            ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1)
             elif hasattr(ssl, 'PROTOCOL_TLSv1_2'):
                 # Since Python 3.4
                 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
@@ -1910,7 +1914,7 @@ class GoogleConnection(object):
             proxy_user_passwd, proxy_host_port = parse_proxy_spec(proxy)
 
             logger.debug('Connecting to proxy server %s', proxy_host_port)
-            self._conn = TLS1_2Connection(proxy_host_port, timeout=timeout)
+            self._conn = HardenedHTTPSConnection(proxy_host_port, timeout=timeout)
 
             logger.debug('Tunnelling to host %s' % host_display)
             connect_headers = {}
@@ -1927,7 +1931,7 @@ class GoogleConnection(object):
                 raise GoogleConnectionError(msg)
         else:
             logger.debug('Connecting to new host %s', host_display)
-            self._conn = TLS1_2Connection(host, port=port, timeout=timeout)
+            self._conn = HardenedHTTPSConnection(host, port=port, timeout=timeout)
             try:
                 self._conn.connect(self._notweak)
             except Exception as e:
