@@ -18,6 +18,8 @@
   alias @asciinema='googler -w asciinema.org'
 # Ask Ubuntu
   alias @askubuntu='googler -w askubuntu.com'
+# Arch Forums
+  alias @abbs='googler -w bbs.archlinux.org'
 # Arch User Repository
   alias @aur='googler -w aur.archlinux.org'
 # Arch Wiki
