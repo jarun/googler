@@ -26,6 +26,14 @@
 
 `googler` isn't affiliated to Google in any way.
 
+More fun stuff you can try with `googler`:
+
+- [googler on the iPad](https://github.com/jarun/googler/wiki/googler-on-the-iPad)
+- [Directly print content of results to terminal](https://github.com/jarun/googler/wiki/Directly-print-content-of-results-to-terminal)
+- [Terminal Reading Mode or Reader View](https://github.com/jarun/googler/wiki/Terminal-Reading-Mode-or-Reader-View)
+- [Stream YouTube videos on desktop](https://github.com/jarun/googler/wiki/Stream-YouTube-videos-on-desktop)
+- [Search error on StackOverflow from terminal](https://github.com/jarun/googler/wiki/Search-error-on-StackOverflow-from-terminal)
+
 *Love smart and efficient utilities? Explore [my repositories](https://github.com/jarun?tab=repositories). Buy me a cup of coffee if they help you.*
 
 <p align="center">
@@ -53,7 +61,6 @@
     - [Domain-only URL](#domain-only-url)
 - [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
-- [Curiosity nails it](#curiosity-nails-it)
 - [Notes](#notes)
 - [Contributions](#contributions)
 - [Developers](#developers)
@@ -412,16 +419,6 @@ To show the domain names in search results instead of the expanded URL (and use 
 4. Some users have reported problems with a colored omniprompt (refer to issue [#203](https://github.com/jarun/googler/issues/203)) with iTerm2 on macOS. To force a plain omniprompt:
 
        export DISABLE_PROMPT_COLOR=1
-
-### Curiosity nails it
-
-Possibilities are infinite with `googler`:
-
-- [googler on the iPad](https://github.com/jarun/googler/wiki/googler-on-the-iPad)
-- [Directly print content of results to terminal](https://github.com/jarun/googler/wiki/Directly-print-content-of-results-to-terminal)
-- [Terminal Reading Mode or Reader View](https://github.com/jarun/googler/wiki/Terminal-Reading-Mode-or-Reader-View)
-- [Stream YouTube videos on desktop](https://github.com/jarun/googler/wiki/Stream-YouTube-videos-on-desktop)
-- [Search error on StackOverflow from terminal](https://github.com/jarun/googler/wiki/Search-error-on-StackOverflow-from-terminal)
 
 ### Notes
 
