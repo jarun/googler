@@ -2112,10 +2112,10 @@ class GoogleParser(object):
                     title = mime.text + ' ' + title
                 url = self.unwrap_link(a.attr('href'))
                 abstract = div_g.select('.st').text.replace('\n', '')
-                if self.news:
+                try:
                     metadata = div_g.select('.slp').text
-                    metadata = metadata.replace('\u200e', '').replace(' - ', ', ')
-                else:
+                    metadata = metadata.replace('\u200e', '').replace(' - ', ', ').strip()
+                except AttributeError:
                     metadata = None
             except (AttributeError, ValueError):
                 continue
