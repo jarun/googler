@@ -145,7 +145,7 @@ To remove `googler` and associated docs, run
 
 To install the latest stable version, run
 
-    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.7.1/googler && sudo chmod +x /usr/local/bin/googler
+    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.8/googler && sudo chmod +x /usr/local/bin/googler
 
 You could then let googler upgrade itself by running
 
@@ -205,7 +205,7 @@ optional arguments:
   --show-browser-logs   do not suppress browser output (stdout and stderr)
   --np, --noprompt      search and exit, do not prompt
   -u, --upgrade         perform in-place self-upgrade
-  --include-git         when used with --upgrade, upgrade to latest git master
+  --include-git         when used with --upgrade, get latest git master
   -v, --version         show program's version number and exit
   -d, --debug           enable debugging
 

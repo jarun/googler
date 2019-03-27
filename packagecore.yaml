@@ -12,6 +12,7 @@ packages:
       - make
     deps:
       - python
+    container: "archlinux/base"
   centos7.0:
     builddeps:
       - make
@@ -79,16 +80,21 @@ packages:
       - make
     deps:
       - python3
-  opensuse42.1:
+  fedora29:
     builddeps:
       - make
     deps:
       - python3
-  opensuse42.2:
-    builddeps:
-      - make
-    deps:
-      - python3
+#  opensuse42.1:
+#    builddeps:
+#      - make
+#    deps:
+#      - python3
+#  opensuse42.2:
+#    builddeps:
+#      - make
+#    deps:
+#      - python3
   opensuse42.3:
     builddeps:
       - make

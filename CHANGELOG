@@ -1,3 +1,16 @@
+googler 3.8
+2019-03-27
+
+What's in?
+- A complete parser rewrite
+- Visual redesign of the output format
+- Text-wrapping for CJK wide characters
+- Refresh current page on URL expansion toggle
+- Available on Raspbian testing and Chocolatey
+- Several important fixes
+
+-------------------------------------------------------------------------------
+
 googler 3.7.1
 2018-10-10
 

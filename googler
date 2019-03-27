@@ -73,7 +73,7 @@ except ValueError:
 
 # Constants
 
-_VERSION_ = '3.7.1'
+_VERSION_ = '3.8'
 
 COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'a': '30', 'b': '31', 'c': '32', 'd': '33',
@@ -3158,7 +3158,7 @@ def parse_args(args=None, namespace=None):
         addarg('-u', '--upgrade', action='store_true',
                help='perform in-place self-upgrade')
         addarg('--include-git', action='store_true',
-               help='when used with --upgrade, upgrade to latest git master')
+               help='when used with --upgrade, get latest git master')
     addarg('-v', '--version', action='version', version=_VERSION_)
     addarg('-d', '--debug', action='store_true', help='enable debugging')
     # Hidden option for interacting with DOM in an IPython/pdb shell
