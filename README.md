@@ -13,7 +13,7 @@
 <p align="center">
 <a href="https://repology.org/metapackage/googler"><img src="https://repology.org/badge/tiny-repos/googler.svg" alt="Availability"></a>
 <a href="https://github.com/jarun/googler/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPLv3-yellow.svg?maxAge=2592000" alt="License" /></a>
-<a href="https://travis-ci.org/jarun/googler"><img src="https://travis-ci.org/jarun/googler.svg?branch=master" alt="Build Status" /></a>
+<a href="https://circleci.com/gh/jarun/workflows/googler"><img src="https://img.shields.io/circleci/project/github/jarun/googler.svg" alt="Build Status" /></a>
 </p>
 
 <p align="center">
