@@ -85,16 +85,6 @@ packages:
       - make
     deps:
       - python3
-  opensuse42.1:
-    builddeps:
-      - make
-    deps:
-      - python3
-  opensuse42.2:
-    builddeps:
-      - make
-    deps:
-      - python3
   opensuse42.3:
     builddeps:
       - make
