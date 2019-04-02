@@ -1,0 +1,78 @@
+version: 2
+
+test-template: &test-template
+  working_directory: ~/googler
+  environment:
+    CI_FORCE_TEST: 1
+  steps:
+    - run: apt update && apt install -y --no-install-recommends git wamerican
+    - checkout
+    - run: ./tests/ci-test-wrapper
+
+jobs:
+  py34:
+    docker:
+      - image: python:3.4-slim
+    <<: *test-template
+
+  py35:
+    docker:
+      - image: python:3.5-slim
+    <<: *test-template
+
+  py36:
+    docker:
+      - image: python:3.6-slim
+    <<: *test-template
+
+  py37:
+    docker:
+      - image: python:3.7-slim
+    <<: *test-template
+
+  package-and-publish:
+    machine: true
+    working_directory: ~/googler
+    steps:
+      - checkout
+      - run:
+          name: "package with packagecore"
+          command: |
+            # Use latest installed python3 from pyenv
+            export PYENV_VERSION="$(pyenv versions | grep -Po '\b3\.\d+\.\d+' | tail -1)"
+            pip install packagecore
+            packagecore -o ./dist/ ${CIRCLE_TAG#v}
+      - run:
+          name: "publish to GitHub"
+          command: |
+            go get github.com/tcnksm/ghr
+            ghr -t ${GITHUB_API_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -replace ${CIRCLE_TAG} ./dist/
+
+workflows:
+  version: 2
+
+  test:
+    jobs: &all-tests
+      - py34
+      - py35
+      - py36
+      - py37
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs: *all-tests
+
+  publish-github-release:
+    jobs:
+      - package-and-publish:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
