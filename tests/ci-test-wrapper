@@ -3,7 +3,7 @@
 set -e
 
 declare here repo_root test_script
-here="$(perl -e 'use File::Basename; use Cwd "abs_path"; print dirname(abs_path(@ARGV[0]));' -- "$0")"
+here="$(python3 -c 'import pathlib, sys; print(pathlib.Path(sys.argv[2]).parent.resolve())' -- "$0")"
 repo_root="$here/.."
 test_script="$here/test"
 export GIT_DIR="$here/../.git"
