@@ -7,22 +7,12 @@ commands:
   install:
     - make PREFIX="/usr" install DESTDIR="${BP_DESTDIR}"
 packages:
-  centos7.0:
+  archlinux:
     builddeps:
       - make
     deps:
       - python
-    commands:
-      pre:
-        - yum install epel-release
-  centos7.1:
-    builddeps:
-      - make
-    deps:
-      - python
-    commands:
-      pre:
-        - yum install epel-release
+    container: "archlinux/base"
   centos7.2:
     builddeps:
       - make
