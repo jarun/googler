@@ -30,6 +30,7 @@ from http.client import HTTPSConnection
 import locale
 import logging
 import os
+import platform
 import shutil
 import signal
 import socket
@@ -3112,6 +3113,17 @@ def parse_args(args=None, namespace=None):
 
     colorstr_env = os.getenv('GOOGLER_COLORS')
 
+    use_colors = True
+    if sys.platform == 'win32':
+        use_colors = (platform.release() == '10' or platform.version() >= '10.0.14393')
+        if use_colors:
+            try:
+                from ctypes import windll
+                kernel32 = windll.kernel32
+                kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), kernel32.GetConsoleMode()|7)
+            except Exception:
+                use_colors = False
+
     argparser = GooglerArgumentParser(description='Google from the command-line.')
     addarg = argparser.add_argument
     addarg('-s', '--start', type=argparser.nonnegative_int, default=0,
@@ -3126,7 +3138,7 @@ def parse_args(args=None, namespace=None):
     addarg('-l', '--lang', metavar='LANG', help='display in language LANG')
     addarg('-x', '--exact', action='store_true',
            help='disable automatic spelling correction')
-    addarg('-C', '--nocolor', dest='colorize', action='store_false',
+    addarg('-C', '--nocolor', dest='colorize', default=use_colors, action='store_false',
            help='disable color output')
     addarg('--colors', dest='colorstr', type=argparser.is_colorstr,
            default=colorstr_env if colorstr_env else 'GKlgxy', metavar='COLORS',
