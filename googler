@@ -1988,7 +1988,17 @@ class GoogleConnection(object):
             if resp.status in {301, 302, 303, 307, 308}:
                 redirection_url = resp.getheader('location', '')
                 if 'sorry/IndexRedirect?' in redirection_url or 'sorry/index?' in redirection_url:
-                    raise GoogleConnectionError('Connection blocked due to unusual activity.')
+                    msg = textwrap.dedent("""\
+                    Connection blocked due to unusual activity.
+                    THIS IS NOT A BUG, please do NOT report it as a bug unless you have specific
+                    information that may lead to the development of a workaround.
+                    You IP address is temporarily or permanently blocked by Google and requires
+                    reCAPTCHA-solving to use the service, which googler is not capable of.
+                    Possible causes include issuing too many queries in a short time frame, or
+                    operating from a shared / low reputation IP with a history of abuse.
+                    Please do NOT use googler for automated scraping.""")
+                    msg = " ".join(msg.splitlines())
+                    raise GoogleConnectionError(msg)
                 self._redirect(redirection_url)
                 resp = self._resp
                 redirect_counter += 1
