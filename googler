@@ -3126,8 +3126,13 @@ def parse_args(args=None, namespace=None):
     addarg('-l', '--lang', metavar='LANG', help='display in language LANG')
     addarg('-x', '--exact', action='store_true',
            help='disable automatic spelling correction')
-    addarg('-C', '--nocolor', dest='colorize', action='store_false',
-           help='disable color output')
+    addarg('--colorize', nargs='?', choices=['auto', 'always', 'never'],
+           const='always', default='auto',
+           help="""whether to colorize output; defaults to 'auto', which enables
+           color when stdout is a tty device; using --colorize without an argument
+           is equivalent to --colorize=always""")
+    addarg('-C', '--nocolor', action='store_true',
+           help='equivalent to --colorize=never')
     addarg('--colors', dest='colorstr', type=argparser.is_colorstr,
            default=colorstr_env if colorstr_env else 'GKlgxy', metavar='COLORS',
            help='set output colors (see man page for details)')
@@ -3165,7 +3170,11 @@ def parse_args(args=None, namespace=None):
     addarg('-D', '--debugger', action='store_true', help=argparse.SUPPRESS)
     addarg('--complete', help=argparse.SUPPRESS)
 
-    return argparser.parse_args(args, namespace)
+    parsed = argparser.parse_args(args, namespace)
+    if parsed.nocolor:
+        parsed.colorize = 'never'
+
+    return parsed
 
 
 def main():
@@ -3203,7 +3212,16 @@ def main():
                 pass
 
         # Set colors
-        if opts.colorize:
+        if opts.colorize == 'always':
+            colorize = True
+        elif opts.colorize == 'auto':
+            colorize = sys.stdout.isatty()
+        elif opts.colorize == 'never':
+            colorize = False
+        else:
+            raise ValueError("invalid --colorize value '%s'" % opts.colorize)
+
+        if colorize:
             colors = Colors(*[COLORMAP[c] for c in opts.colorstr], reset=COLORMAP['x'])
         else:
             colors = None
