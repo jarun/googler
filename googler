@@ -30,6 +30,7 @@ from http.client import HTTPSConnection
 import locale
 import logging
 import os
+import platform
 import shutil
 import signal
 import socket
@@ -3228,6 +3229,29 @@ def main():
         Result.colors = colors
         Result.urlexpand = True if os.getenv('DISABLE_URL_EXPANSION') is None else False
         GooglerCmd.colors = colors
+
+        # Try to enable ANSI color support in cmd or PowerShell on Windows 10
+        if sys.platform == 'win32' and sys.stdout.isatty() and colorize:
+            # VT100 control sequences are supported on Windows 10 Anniversary Update and later.
+            # https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
+            # https://docs.microsoft.com/en-us/windows/console/setconsolemode
+            if platform.release() == '10':
+                STD_OUTPUT_HANDLE = -11
+                ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
+                try:
+                    from ctypes import windll, wintypes, byref
+                    kernel32 = windll.kernel32
+                    stdout_handle = kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+                    old_mode = wintypes.DWORD()
+                    if not kernel32.GetConsoleMode(stdout_handle, byref(old_mode)):
+                        raise RuntimeError('GetConsoleMode failed')
+                    new_mode = old_mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING
+                    if not kernel32.SetConsoleMode(stdout_handle, new_mode):
+                        raise RuntimeError('SetConsoleMode failed')
+                    # Note: No need to restore at exit. SetConsoleMode seems to
+                    # be limited to the calling process.
+                except Exception:
+                    pass
 
         if opts.url_handler is not None:
             open_url.url_handler = opts.url_handler
