@@ -2,7 +2,12 @@
 
 set -e
 
-declare quiet exitcode
+trap 'exit 130' INT
+
+declare here googler quiet ci exitcode
+
+here="$(python3 -c 'import pathlib, sys; print(pathlib.Path(sys.argv[2]).parent.resolve())' -- "$0")"
+googler=$here/../googler
 
 quiet=0
 ci=0
@@ -17,7 +22,7 @@ while [[ $1 == -* ]]; do
             cat <<'EOF'
 Usage: test [options]
 
-Run automated tests of googler(1). googler(1) is expected on $PATH.
+Run automated tests of googler(1).
 
 Requires shuf(1) from coreutils and /usr/share/dict/words.
 
@@ -105,12 +110,12 @@ test_googler () {
 
     declare -g quiet
     if (( quiet )); then
-        googler --noprompt -d "$@" &>/dev/null || report_error --rerun "$@"
+        $googler --noprompt -d "$@" &>/dev/null || report_error --rerun "$@"
     else
         printf '\033[34m==> googler ' >&2
         printf '%q ' "$@" >&2
         printf '\033[0m\n' >&2
-        googler --noprompt -d "$@" || report_error "$@"
+        $googler --noprompt -d "$@" || report_error "$@"
         echo
     fi
 }
