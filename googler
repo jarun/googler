@@ -3247,17 +3247,19 @@ def main():
             # https://docs.microsoft.com/en-us/windows/console/setconsolemode
             if platform.release() == '10':
                 STD_OUTPUT_HANDLE = -11
+                STD_ERROR_HANDLE = -12
                 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
                 try:
                     from ctypes import windll, wintypes, byref
                     kernel32 = windll.kernel32
-                    stdout_handle = kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
-                    old_mode = wintypes.DWORD()
-                    if not kernel32.GetConsoleMode(stdout_handle, byref(old_mode)):
-                        raise RuntimeError('GetConsoleMode failed')
-                    new_mode = old_mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING
-                    if not kernel32.SetConsoleMode(stdout_handle, new_mode):
-                        raise RuntimeError('SetConsoleMode failed')
+                    for nhandle in (STD_OUTPUT_HANDLE, STD_ERROR_HANDLE):
+                        handle = kernel32.GetStdHandle(nhandle)
+                        old_mode = wintypes.DWORD()
+                        if not kernel32.GetConsoleMode(handle, byref(old_mode)):
+                            raise RuntimeError('GetConsoleMode failed')
+                        new_mode = old_mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING
+                        if not kernel32.SetConsoleMode(handle, new_mode):
+                            raise RuntimeError('SetConsoleMode failed')
                     # Note: No need to restore at exit. SetConsoleMode seems to
                     # be limited to the calling process.
                 except Exception:
