@@ -3,11 +3,12 @@ version: 2
 test-template: &test-template
   working_directory: ~/googler
   environment:
-    CI_FORCE_TEST: 1
+    NUM_TEST_ITERATIONS: 30
+    SLEEP_DURATION: 3
   steps:
     - run: apt update && apt install -y --no-install-recommends git wamerican
     - checkout
-    - run: ./tests/ci-test-wrapper
+    - run: ./tests/test --ci
 
 jobs:
   py34:
