@@ -88,7 +88,7 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'x': '0', 'X': '1', 'y': '7', 'Y': '7;1',
 }.items()}
 
-USER_AGENT = ('googler/' + _VERSION_)
+USER_AGENT = 'googler/%s (like MSIE)' % _VERSION_
 ua = True  # User Agent is enabled by default
 
 text_browsers = ['elinks', 'links', 'lynx', 'w3m', 'www-browser']
