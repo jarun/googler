@@ -89,7 +89,6 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
 }.items()}
 
 USER_AGENT = 'googler/%s (like MSIE)' % _VERSION_
-ua = True  # User Agent is enabled by default
 
 text_browsers = ['elinks', 'links', 'lynx', 'w3m', 'www-browser']
 
@@ -2067,7 +2066,7 @@ class GoogleConnection(object):
         self._conn.request('GET', url, None, {
             'Accept': 'text/html',
             'Accept-Encoding': 'gzip',
-            'User-Agent': USER_AGENT if ua else '',
+            'User-Agent': USER_AGENT,
             'Cookie': self.cookie,
             'Connection': 'keep-alive',
             'DNT': '1',
@@ -3183,7 +3182,7 @@ def parse_args(args=None, namespace=None):
     addarg('-p', '--proxy', default=https_proxy_from_environment(),
            help="""tunnel traffic through an HTTP proxy;
            PROXY is of the form [http://][user:password@]proxyhost[:port]""")
-    addarg('--noua', action='store_true', help='disable user agent')
+    addarg('--noua', action='store_true', help='legacy option (no effect)')
     addarg('--notweak', action='store_true',
            help='disable TCP optimizations and forced TLS 1.2')
     addarg('--json', action='store_true',
@@ -3214,8 +3213,6 @@ def parse_args(args=None, namespace=None):
 
 
 def main():
-    global ua
-
     try:
         opts = parse_args()
 
@@ -3280,8 +3277,7 @@ def main():
                 open_url.suppress_browser_output = True
 
         if opts.noua:
-            logger.debug('User Agent is disabled')
-            ua = False
+            logger.warning('--noua option has been deprecated and has no effect (see #284)')
 
         repl = GooglerCmd(opts)
 
