@@ -18,6 +18,7 @@ _googler () {
         -c --tld
         -l --lang
         -x --exact
+        --colorize
         -C --nocolor
         --colors
         -j --first --lucky
@@ -25,7 +26,6 @@ _googler () {
         -w --site
         --unfilter
         -p --proxy
-        --noua
         --notweak
         --json
         --url-handler
@@ -41,6 +41,7 @@ _googler () {
         -n --count
         -c --tld
         -l --lang
+        --colorize
         --colors
         -t --time
         -w --site
