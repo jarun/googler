@@ -2121,7 +2121,12 @@ class GoogleParser(object):
                 if mime:
                     title = mime.text + ' ' + title
                 url = self.unwrap_link(a.attr('href'))
-                abstract = div_g.select('.st').text.replace('\n', '')
+                matched_keywords = []
+                abstract = ''
+                for childnode in div_g.select('.st').children:
+                    if childnode.tag == 'b' and childnode.text != '...':
+                            matched_keywords.append({'phrase': childnode.text, 'offset': len(abstract)})
+                    abstract = abstract + childnode.text.replace('\n', '')
                 try:
                     metadata = div_g.select('.slp').text
                     metadata = metadata.replace('\u200e', '').replace(' - ', ', ').strip()
@@ -2141,7 +2146,7 @@ class GoogleParser(object):
                     continue
             index += 1
             self.results.append(Result(index, title, url, abstract,
-                                       metadata=metadata, sitelinks=sitelinks))
+                                       metadata=metadata, sitelinks=sitelinks, matches=matched_keywords))
 
         # Showing results for ...
         # Search instead for ...
@@ -2221,6 +2226,7 @@ class Result(object):
     abstract : str
     metadata : str or None
     sitelinks : list
+    matches : list
 
     Class Variables
     ---------------
@@ -2238,7 +2244,7 @@ class Result(object):
     colors = None
     urlexpand = True
 
-    def __init__(self, index, title, url, abstract, metadata=None, sitelinks=None):
+    def __init__(self, index, title, url, abstract, metadata=None, sitelinks=None, matches=None):
         index = str(index)
         self.index = index
         self.title = title
@@ -2246,6 +2252,7 @@ class Result(object):
         self.abstract = abstract
         self.metadata = metadata
         self.sitelinks = [] if sitelinks is None else sitelinks
+        self.matches = [] if matches is None else matches
 
         self._urltable = {index: url}
         subindex = 'a'
@@ -2276,7 +2283,7 @@ class Result(object):
             else:
                 print(' %s%-*s %s %s' % (' ' * pre, indent, index + '.', title, url))
 
-    def _print_metadata_and_abstract(self, abstract, metadata=None, indent=5, pre=0):
+    def _print_metadata_and_abstract(self, abstract, metadata=None, matches=None, indent=5, pre=0):
         colors = self.colors
         try:
             columns, _ = os.get_terminal_size()
@@ -2290,6 +2297,15 @@ class Result(object):
                 print(' ' * (indent + pre) + metadata)
 
         if colors:
+            # Start from the last match, as inserting the bold characters changes the offsets.
+            for match in reversed(matches or []):
+                abstract = (
+                    abstract[: match['offset']]
+                    + '\033[1m'
+                    + match['phrase']
+                    + '\033[0m'
+                    + abstract[match['offset'] + len(match['phrase']) :]
+                )
             print(colors.abstract, end='')
         if columns > indent + 1 + pre:
             # Try to fill to columns
@@ -2305,7 +2321,7 @@ class Result(object):
     def print(self):
         """Print the result entry."""
         self._print_title_and_url(self.index, self.title, self.url)
-        self._print_metadata_and_abstract(self.abstract, metadata=self.metadata)
+        self._print_metadata_and_abstract(self.abstract, metadata=self.metadata, matches=self.matches)
 
         for sitelink in self.sitelinks:
             self._print_title_and_url(sitelink.index, sitelink.title, sitelink.url, pre=4)
@@ -2322,6 +2338,8 @@ class Result(object):
             obj['metadata'] = self.metadata
         if self.sitelinks:
             obj['sitelinks'] = [sitelink.__dict__ for sitelink in self.sitelinks]
+        if self.matches:
+            obj['matches'] = self.matches
         return obj
 
     def urltable(self):
