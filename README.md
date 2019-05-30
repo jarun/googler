@@ -144,7 +144,7 @@ To remove `googler` and associated docs, run
 
 To install the latest stable version, run
 
-    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.8/googler && sudo chmod +x /usr/local/bin/googler
+    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v3.9/googler && sudo chmod +x /usr/local/bin/googler
 
 You could then let googler upgrade itself by running
 
@@ -167,10 +167,11 @@ Search keyword and option completion scripts for Bash, Fish and Zsh can be found
 #### Cmdline options
 
 ```
-usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x] [-C]
-               [--colors COLORS] [-j] [-t dN] [-w SITE] [--unfilter]
-               [-p PROXY] [--noua] [--notweak] [--json] [--url-handler UTIL]
-               [--show-browser-logs] [--np] [-u] [--include-git] [-v] [-d]
+usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x]
+               [--colorize [{auto,always,never}]] [-C] [--colors COLORS] [-j]
+               [-t dN] [-w SITE] [--unfilter] [-p PROXY] [--noua] [--notweak]
+               [--json] [--url-handler UTIL] [--show-browser-logs] [--np] [-u]
+               [--include-git] [-v] [-d]
                [KEYWORD [KEYWORD ...]]
 
 Google from the command-line.
@@ -187,7 +188,12 @@ optional arguments:
                         e.g., 'in' for India
   -l LANG, --lang LANG  display in language LANG
   -x, --exact           disable automatic spelling correction
-  -C, --nocolor         disable color output
+  --colorize [{auto,always,never}]
+                        whether to colorize output; defaults to 'auto', which
+                        enables color when stdout is a tty device; using
+                        --colorize without an argument is equivalent to
+                        --colorize=always
+  -C, --nocolor         equivalent to --colorize=never
   --colors COLORS       set output colors (see man page for details)
   -j, --first, --lucky  open the first result in web browser and exit
   -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
@@ -197,7 +203,7 @@ optional arguments:
   -p PROXY, --proxy PROXY
                         tunnel traffic through an HTTP proxy; PROXY is of the
                         form [http://][user:password@]proxyhost[:port]
-  --noua                disable user agent
+  --noua                legacy option (no effect)
   --notweak             disable TCP optimizations and forced TLS 1.2
   --json                output in JSON format; implies --noprompt
   --url-handler UTIL    custom script or cli utility to open results

@@ -1,3 +1,16 @@
+googler 3.9
+2019-05-30
+
+What's in?
+- fix issue - `googler` showing "No results."
+- show matched keywords in bold in result abstracts
+- option `--colorize` for more control on colors
+- better support for colors on Windows
+- switch to CircleCI from Travis
+- option `--noua` is deprecated (noop) and will be removed in future
+
+-------------------------------------------------------------------------------
+
 googler 3.8
 2019-03-27
 
