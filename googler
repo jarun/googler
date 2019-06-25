@@ -2125,7 +2125,7 @@ class GoogleParser(object):
                 abstract = ''
                 for childnode in div_g.select('.st').children:
                     if childnode.tag == 'b' and childnode.text != '...':
-                            matched_keywords.append({'phrase': childnode.text, 'offset': len(abstract)})
+                        matched_keywords.append({'phrase': childnode.text, 'offset': len(abstract)})
                     abstract = abstract + childnode.text.replace('\n', '')
                 try:
                     metadata = div_g.select('.slp').text
@@ -2264,7 +2264,7 @@ class Result(object):
             self._urltable[fullindex] = sitelink.url
             subindex = chr(ord(subindex) + 1)
 
-    def _print_title_and_url(self, index, title, url, indent=3, pre=0):
+    def _print_title_and_url(self, index, title, url, indent=0):
         colors = self.colors
 
         if not self.urlexpand:
@@ -2272,20 +2272,20 @@ class Result(object):
 
         if colors:
             # Adjust index to print result index clearly
-            print(" %s%s%-*s%s" % (' ' * pre, colors.index, indent, index + '.', colors.reset), end='')
+            print(" %s%s%-3s%s" % (' ' * indent, colors.index, index + '.', colors.reset), end='')
             if not self.urlexpand:
                 print(' ' + colors.title + title + colors.reset + ' ' + colors.url + url + colors.reset)
             else:
                 print(' ' + colors.title + title + colors.reset)
-                print(' ' * (indent + 2 + pre) + colors.url + url + colors.reset)
+                print(' ' * (indent + 5) + colors.url + url + colors.reset)
         else:
             if self.urlexpand:
-                print(' %s%-*s %s' % (' ' * pre, indent, index + '.', title))
-                print(' %s%s' % (' ' * (indent + 1 + pre), url))
+                print(' %s%-3s %s' % (' ' * indent, index + '.', title))
+                print(' %s%s' % (' ' * (indent + 4), url))
             else:
-                print(' %s%-*s %s %s' % (' ' * pre, indent, index + '.', title, url))
+                print(' %s%-3s %s %s' % (' ' * indent, index + '.', title, url))
 
-    def _print_metadata_and_abstract(self, abstract, metadata=None, matches=None, indent=5, pre=0):
+    def _print_metadata_and_abstract(self, abstract, metadata=None, matches=None, indent=0):
         colors = self.colors
         try:
             columns, _ = os.get_terminal_size()
@@ -2294,9 +2294,9 @@ class Result(object):
 
         if metadata:
             if colors:
-                print(' ' * (indent + pre) + colors.metadata + metadata + colors.reset)
+                print(' ' * (indent + 5) + colors.metadata + metadata + colors.reset)
             else:
-                print(' ' * (indent + pre) + metadata)
+                print(' ' * (indent + 5) + metadata)
 
         if colors and not self.nohl:
             # Start from the last match, as inserting the bold characters changes the offsets.
@@ -2309,14 +2309,14 @@ class Result(object):
                     + abstract[match['offset'] + len(match['phrase']) :]
                 )
             print(colors.abstract, end='')
-        if columns > indent + 1 + pre:
+        if columns > indent + 6:
             # Try to fill to columns
-            fillwidth = columns - indent - 1
+            fillwidth = columns - (indent + 6)
             for line in textwrap.wrap(abstract.replace('\n', ''), width=fillwidth):
-                print('%s%s' % (' ' * (indent + pre), line))
+                print('%s%s' % (' ' * (indent + 5), line))
             print('')
         else:
-            print('%s%s\n' % (' ' * pre, abstract.replace('\n', ' ')))
+            print('%s%s\n' % (' ' * (indent + 5), abstract.replace('\n', ' ')))
         if colors:
             print(colors.reset, end='')
 
@@ -2326,8 +2326,8 @@ class Result(object):
         self._print_metadata_and_abstract(self.abstract, metadata=self.metadata, matches=self.matches)
 
         for sitelink in self.sitelinks:
-            self._print_title_and_url(sitelink.index, sitelink.title, sitelink.url, pre=4)
-            self._print_metadata_and_abstract(sitelink.abstract, pre=4)
+            self._print_title_and_url(sitelink.index, sitelink.title, sitelink.url, indent=4)
+            self._print_metadata_and_abstract(sitelink.abstract, indent=4)
 
     def jsonizable_object(self):
         """Return a JSON-serializable dict representing the result entry."""
