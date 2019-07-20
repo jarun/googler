@@ -44,6 +44,7 @@ args=(
     '(--colorize)--colorize[whether to colorize output]:auto/always/never'
     '(-C --nocolor)'{-C,--nocolor}'[disable color output]'
     '(--colors)--colors[set output colors]:six-letter string'
+    '(--nohl)--nohl[do not highlight keyword matches]'
     '(-j --first --lucky)'{-j,--first,--lucky}'[open the first result in a web browser]'
     '(-t --time)'{-t,--time}'[time limit search]:period (h/d/w/m/y + number)'
     '(-w --site)'{-w,--site}'[search a site using Google]:domain'

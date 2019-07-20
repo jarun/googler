@@ -21,6 +21,7 @@ _googler () {
         --colorize
         -C --nocolor
         --colors
+        --nohl
         -j --first --lucky
         -t --time
         -w --site

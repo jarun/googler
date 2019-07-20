@@ -2231,6 +2231,7 @@ class Result(object):
     Class Variables
     ---------------
     colors : str
+    nohl : bool
 
     Methods
     -------
@@ -2242,6 +2243,7 @@ class Result(object):
 
     # Class variables
     colors = None
+    nohl = False
     urlexpand = True
 
     def __init__(self, index, title, url, abstract, metadata=None, sitelinks=None, matches=None):
@@ -2296,7 +2298,7 @@ class Result(object):
             else:
                 print(' ' * (indent + pre) + metadata)
 
-        if colors:
+        if colors and not self.nohl:
             # Start from the last match, as inserting the bold characters changes the offsets.
             for match in reversed(matches or []):
                 abstract = (
@@ -3189,6 +3191,7 @@ def parse_args(args=None, namespace=None):
     addarg('--colors', dest='colorstr', type=argparser.is_colorstr,
            default=colorstr_env if colorstr_env else 'GKlgxy', metavar='COLORS',
            help='set output colors (see man page for details)')
+    addarg('--nohl', action='store_true', help='do not highlight keyword matches in abstract')
     addarg('-j', '--first', '--lucky', dest='lucky', action='store_true',
            help='open the first result in web browser and exit')
     addarg('-t', '--time', dest='duration', type=argparser.is_duration,
@@ -3275,6 +3278,7 @@ def main():
         else:
             colors = None
         Result.colors = colors
+        Result.nohl = opts.nohl
         Result.urlexpand = True if os.getenv('DISABLE_URL_EXPANSION') is None else False
         GooglerCmd.colors = colors
 

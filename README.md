@@ -195,6 +195,7 @@ optional arguments:
                         --colorize=always
   -C, --nocolor         equivalent to --colorize=never
   --colors COLORS       set output colors (see man page for details)
+  --nohl                do not highlight keyword matches in abstract
   -j, --first, --lucky  open the first result in web browser and exit
   -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
                         weeks), m5 (5 months), y5 (5 years)]
