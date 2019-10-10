@@ -455,3 +455,7 @@ Special thanks to [jeremija](https://github.com/jeremija) and [Narrat](https://g
 Logo copyright © 2017 Zhiming Wang.
 
 You may freely redistribute it alongside the code, or use it when describing or linking to this project. You should NOT create modified versions of it, make it the logo or icon of your project (except personal forks and/or forks with the goal of upstreaming), or otherwise use it without written permission.
+
+### LICENSE
+
+This project is licensed under the [GNU General Public License](LICENSE).
