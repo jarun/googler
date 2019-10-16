@@ -11,11 +11,6 @@ test-template: &test-template
     - run: ./tests/test --ci
 
 jobs:
-  py34:
-    docker:
-      - image: python:3.4-slim
-    <<: *test-template
-
   py35:
     docker:
       - image: python:3.5-slim
@@ -29,6 +24,11 @@ jobs:
   py37:
     docker:
       - image: python:3.7-slim
+    <<: *test-template
+
+  py38:
+    docker:
+      - image: python:3.8-slim
     <<: *test-template
 
   package-and-publish:
@@ -54,10 +54,10 @@ workflows:
 
   test:
     jobs: &all-tests
-      - py34
       - py35
       - py36
       - py37
+      - py38
 
   weekly:
     triggers:
