@@ -162,33 +162,19 @@ from collections import OrderedDict
 from enum import Enum
 from html.parser import HTMLParser
 
-try:
-    from typing import (
-        Any,
-        Dict,
-        Generator,
-        Iterable,
-        Iterator,
-        List,
-        Match,
-        Optional,
-        Tuple,
-        Union,
-        cast,
-    )
-except ImportError:  # pragma: no cover
-    # Python 3.4 without external typing module
-
-    class _TypeStub:
-        def __getitem__(self, _):  # type: ignore
-            return None
-
-    Any = None
-    Dict = Generator = Iterable = Iterator = List = Match = _TypeStub()  # type: ignore
-    Optional = Tuple = Union = _TypeStub()  # type: ignore
-
-    def cast(typ, val):  # type: ignore
-        return val
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    Iterable,
+    Iterator,
+    List,
+    Match,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+)
 
 
 SelectorGroupLike = Union[str, "SelectorGroup", "Selector"]
