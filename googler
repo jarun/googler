@@ -2202,11 +2202,14 @@ class GoogleParser(object):
                 matched_keywords = []
                 abstract = ''
                 for childnode in div_g.select('.st').children:
+                    if 'f' in childnode.classes:
+                        # .f is handled as metadata instead.
+                        continue
                     if childnode.tag == 'b' and childnode.text != '...':
                         matched_keywords.append({'phrase': childnode.text, 'offset': len(abstract)})
                     abstract = abstract + childnode.text.replace('\n', '')
                 try:
-                    metadata = div_g.select('.slp').text
+                    metadata = div_g.select('.f').text
                     metadata = metadata.replace('\u200e', '').replace(' - ', ', ').strip()
                 except AttributeError:
                     metadata = None
