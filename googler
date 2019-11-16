@@ -2524,6 +2524,8 @@ class GooglerCmd(object):
 
         self.promptcolor = True if os.getenv('DISABLE_PROMPT_COLOR') is None else False
 
+        self.no_results_instructions_shown = False
+
     @property
     def options(self):
         """Current options."""
@@ -2571,6 +2573,13 @@ class GooglerCmd(object):
         for r in self.results:
             self._urltable.update(r.urltable())
 
+    def warn_no_results(self):
+        printerr('No results.')
+        if not self.no_results_instructions_shown:
+            printerr('If you believe this is a bug, please review '
+                     'https://git.io/googler-no-results before submitting a bug report.')
+            self.no_results_instructions_shown = True
+
     @require_keywords
     def display_results(self, prelude='\n', json_output=False):
         """Display results stored in ``self.results``.
@@ -2588,7 +2597,7 @@ class GooglerCmd(object):
         else:
             # Regular output
             if not self.results:
-                print('No results.', file=sys.stderr)
+                self.warn_no_results()
             else:
                 sys.stderr.write(prelude)
                 for r in self.results:
