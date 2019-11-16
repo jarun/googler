@@ -23,7 +23,6 @@ complete -c googler -s x -l exact             --description 'disable automatic s
 complete -c googler -l colorize    -r         --description 'whether to colorize output (options: auto/always/never)'
 complete -c googler -s C -l nocolor           --description 'disable color output'
 complete -c googler -l colors      -r         --description 'set output colors'
-complete -c googler -l nohl                   --description 'do not highlight keyword matches'
 complete -c googler -s j -l first -l lucky    --description 'open the first result in a web browser'
 complete -c googler -s t -l time   -r         --description 'time limit search (h/d/w/m/y + number)'
 complete -c googler -s w -l site   -r         --description 'search a site using Google'
