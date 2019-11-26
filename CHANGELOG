@@ -1,3 +1,12 @@
+googler 4.0
+2019-11-27
+
+What's in?
+- Switch to modern UA and fix parser to handle new result format
+- Text-wrapping
+
+-------------------------------------------------------------------------------
+
 googler 3.9
 2019-05-30
 

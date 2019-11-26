@@ -42,7 +42,7 @@ jobs:
             # Use latest installed python3 from pyenv
             export PYENV_VERSION="$(pyenv versions | grep -Po '\b3\.\d+\.\d+' | tail -1)"
             pip install packagecore
-            packagecore -o ./dist/ ${CIRCLE_TAG#v}
+            packagecore -c tests/packagecore/packagecore.yaml -o ./dist/ ${CIRCLE_TAG#v}
       - run:
           name: "publish to GitHub"
           command: |
