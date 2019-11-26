@@ -103,7 +103,7 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'x': '0', 'X': '1', 'y': '7', 'Y': '7;1',
 }.items()}
 
-USER_AGENT = 'googler/%s (like MSIE)' % _VERSION_
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
 
 text_browsers = ['elinks', 'links', 'lynx', 'w3m', 'www-browser']
 
@@ -2197,13 +2197,18 @@ class GoogleParser(object):
                 # Skip smart cards.
                 continue
             try:
-                h3 = div_g.select('h3.r')
-                a = h3.select('a')
-                title = a.text
-                mime = div_g.select('.mime')
-                if mime:
-                    title = mime.text + ' ' + title
-                url = self.unwrap_link(a.attr('href'))
+                h3 = div_g.select('div.r h3')
+                if h3:
+                    title = h3.text
+                    url = self.unwrap_link(h3.parent.attr('href'))
+                else:
+                    h3 = div_g.select('h3.r')
+                    a = h3.select('a')
+                    title = a.text
+                    mime = div_g.select('.mime')
+                    if mime:
+                        title = mime.text + ' ' + title
+                    url = self.unwrap_link(a.attr('href'))
                 matched_keywords = []
                 abstract = ''
                 for childnode in div_g.select('.st').children:
@@ -2238,10 +2243,12 @@ class GoogleParser(object):
         # Search instead for ...
         spell_orig = tree.select("span.spell_orig")
         if spell_orig:
-            self.autocorrected = True
-            self.showing_results_for = next(
+            showing_results_for_link = next(
                 filter(lambda el: el.tag == "a", spell_orig.previous_siblings()), None
-            ).text
+            )
+            if showing_results_for_link:
+                self.autocorrected = True
+                self.showing_results_for = showing_results_for_link.text
 
         # No results found for ...
         # Results for ...:
@@ -2257,14 +2264,14 @@ class GoogleParser(object):
         self.filtered = tree.select('p#ofr') is not None
 
     # Unwraps /url?q=http://...&sa=...
-    # May raise ValueError.
+    # TODO: don't unwrap if URL isn't in this form.
     @staticmethod
     def unwrap_link(link):
         qs = urllib.parse.urlparse(link).query
         try:
             url = urllib.parse.parse_qs(qs)['q'][0]
         except KeyError:
-            raise ValueError(link)
+            return link
         else:
             if "://" in url:
                 return url
