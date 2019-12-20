@@ -85,19 +85,19 @@ To copy url to clipboard at the omniprompt, `googler` looks for `xsel` or `xclip
 
 #### From a package manager
 
-- [AUR](https://aur.archlinux.org/packages/googler/) (`yay -S googler`)
-- [Chocolatey](https://chocolatey.org/packages/googler) (`choco install googler`)
-- [Debian](https://packages.debian.org/search?keywords=googler&searchon=names) (`apt-get install googler`)
-- [Fedora](https://apps.fedoraproject.org/packages/googler) (`dnf install googler`)
-- [FreeBSD](https://www.freshports.org/www/googler/) (`pkg install googler`)
-- [macOS/Homebrew](http://formulae.brew.sh/formula/googler) (`brew install googler`)
-- [NixOS](https://github.com/NixOS/nixpkgs/tree/master/pkgs/applications/misc/googler) (`nix-env -i googler`)
-- [openSUSE](https://software.opensuse.org/search?q=googler) (`zypper in googler`)
-- [Raspbian Testing](https://archive.raspbian.org/raspbian/pool/main/g/googler/) (`apt-get install googler`)
-- [Slackware](http://slackbuilds.org/repository/14.2/network/googler/) (`slackpkg install googler`)
-- [Snap Store](https://snapcraft.io/googler) (`snap install googler`)
-- [Ubuntu](https://packages.ubuntu.com/search?keywords=googler&searchon=names) (`apt-get install googler`)
-- [Void Linux](https://github.com/void-linux/void-packages/blob/master/srcpkgs/googler/template) (`xbps-install -S googler`)
+Install `googler` from your package manager. If the version available is dated try an alternative installation method.
+
+<details><summary>Packaging status (expand)</summary>
+<p>
+<br>
+<a href="https://repology.org/metapackage/googler/versions"><img src="https://repology.org/badge/vertical-allrepos/googler.svg" alt="Packaging status"></a>
+</p>
+Unlisted packagers:
+<p>
+<br>
+● <a href="https://snapcraft.io/googler">Snap Store</a> (<code>snap install googler</code>)<br>
+</p>
+</details>
 
 ##### Tips for packagers
 
