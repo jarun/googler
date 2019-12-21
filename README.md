@@ -426,6 +426,11 @@ To show the domain names in search results instead of the expanded URL (and use 
 
 3. You can find a rofi script for `googler` [here](http://hastebin.com/fonowacija.bash). Written by an anonymous user, untested and we don't maintain it.
 
+4. The Albert Launcher python plugins repo
+([awesome-albert-plugins](https://github.com/bergercookie/awesome-albert-plugins))
+includes suggestions-enabled search plugins for a variety of websites using
+googler. Refer to the latter for demos and usage instructions.
+
 ### Contributions
 
 Pull requests are welcome. Please visit [#209](https://github.com/jarun/googler/issues/209) for a list of TODOs.
