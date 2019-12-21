@@ -2,7 +2,7 @@
 
 <p align="center">
 <a href="https://github.com/jarun/googler/releases/latest"><img src="https://img.shields.io/github/release/jarun/googler.svg?maxAge=600" alt="Latest release" /></a>
-<a href="https://repology.org/metapackage/googler"><img src="https://repology.org/badge/tiny-repos/googler.svg" alt="Availability"></a>
+<a href="https://repology.org/project/googler/versions"><img src="https://repology.org/badge/tiny-repos/googler.svg" alt="Availability"></a>
 <a href="https://github.com/jarun/googler/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPLv3-yellow.svg?maxAge=2592000" alt="License" /></a>
 <a href="https://circleci.com/gh/jarun/workflows/googler"><img src="https://img.shields.io/circleci/project/github/jarun/googler.svg" alt="Build Status" /></a>
 <a href="https://repl.it/github/jarun/googler"><img src="https://repl.it/badge/github/jarun/googler?maxAge=2592000" alt="Repl.it" /></a>
@@ -90,7 +90,7 @@ Install `googler` from your package manager. If the version available is dated t
 <details><summary>Packaging status (expand)</summary>
 <p>
 <br>
-<a href="https://repology.org/metapackage/googler/versions"><img src="https://repology.org/badge/vertical-allrepos/googler.svg" alt="Packaging status"></a>
+<a href="https://repology.org/project/googler/versions"><img src="https://repology.org/badge/vertical-allrepos/googler.svg" alt="Packaging status"></a>
 </p>
 Unlisted packagers:
 <p>
