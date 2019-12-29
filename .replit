@@ -1,2 +1,2 @@
 language = "python3"
-run = "./googler"
+run = "python googler"
