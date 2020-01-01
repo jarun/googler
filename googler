@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Copyright © 2008 Henri Hakkinen
-# Copyright © 2015-2019 Arun Prakash Jana <engineerarun@gmail.com>
+# Copyright © 2015-2020 Arun Prakash Jana <engineerarun@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -2940,7 +2940,7 @@ class GooglerArgumentParser(argparse.ArgumentParser):
         file.write(textwrap.dedent("""
         Version %s
         Copyright © 2008 Henri Hakkinen
-        Copyright © 2015-2019 Arun Prakash Jana <engineerarun@gmail.com>
+        Copyright © 2015-2020 Arun Prakash Jana <engineerarun@gmail.com>
         Zhiming Wang <zmwangx@gmail.com>
         License: GPLv3
         Webpage: https://github.com/jarun/googler
