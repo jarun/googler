@@ -17,6 +17,7 @@ complete -c googler -s h -l help              --description 'show help text and 
 complete -c googler -s s -l start  -r         --description 'start at the Nth result'
 complete -c googler -s n -l count  -r         --description 'show specified number of results (default 10)'
 complete -c googler -s N -l news              --description 'show results from news section'
+complete -c googler -s V -l videos            --description 'show results from videos section'
 complete -c googler -s c -l tld    -r         --description 'country-specific search with top-level domain'
 complete -c googler -s l -l lang   -r         --description 'display in specified language'
 complete -c googler -s x -l exact             --description 'disable automatic spelling correction'

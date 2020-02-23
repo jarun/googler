@@ -15,6 +15,7 @@ _googler () {
         -s --start
         -n --count
         -N --news
+        -V --videos
         -c --tld
         -l --lang
         -x --exact

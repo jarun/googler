@@ -1584,6 +1584,8 @@ class GoogleUrl(object):
         Read-write property.
     news : bool
         Read-only property.
+    videos : bool
+        Read-only property.
     url : str
         Read-only property.
 
@@ -1653,6 +1655,11 @@ class GoogleUrl(object):
         """Whether the URL is for Google News."""
         return 'tbm' in self._query_dict and self._query_dict['tbm'] == 'nws'
 
+    @property
+    def videos(self):
+        """Whether the URL is for Google Videos."""
+        return 'tbm' in self._query_dict and self._query_dict['tbm'] == 'vid'
+
     def full(self):
         """Return the full URL.
 
@@ -1702,6 +1709,7 @@ class GoogleUrl(object):
                 keywords: str or list of strs
                 lang: str
                 news: bool
+                videos: bool
                 num: int
                 site: str
                 start: int
@@ -1738,6 +1746,11 @@ class GoogleUrl(object):
         if 'news' in opts:
             if opts['news']:
                 qd['tbm'] = 'nws'
+            else:
+                qd.pop('tbm', None)
+        if 'videos' in opts:
+            if opts['videos']:
+                qd['tbm'] = 'vid'
             else:
                 qd.pop('tbm', None)
         if 'num' in opts:
@@ -2170,8 +2183,9 @@ class GoogleConnection(object):
 
 class GoogleParser(object):
 
-    def __init__(self, html, *, news=False):
+    def __init__(self, html, *, news=False, videos=False):
         self.news = news
+        self.videos = videos
         self.autocorrected = False
         self.showing_results_for = None
         self.filtered = False
@@ -2573,7 +2587,7 @@ class GooglerCmd(object):
                 fp.write(page)
             logger.debug("Response body written to '%s'.", tmpfile)
 
-        parser = GoogleParser(page, news=self._google_url.news)
+        parser = GoogleParser(page, news=self._google_url.news, videos=self._google_url.videos)
 
         self.results = parser.results
         self._autocorrected = parser.autocorrected
@@ -3271,6 +3285,8 @@ def parse_args(args=None, namespace=None):
            default=10, metavar='N', help='show N results (default 10)')
     addarg('-N', '--news', action='store_true',
            help='show results from news section')
+    addarg('-V', '--videos', action='store_true',
+           help='show results from videos section')
     addarg('-c', '--tld', metavar='TLD',
            help="""country-specific search with top-level domain .TLD, e.g., 'in'
            for India""")

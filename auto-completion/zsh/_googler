@@ -38,6 +38,7 @@ args=(
     '(-s --start)'{-s,--start}'[start at the Nth result]:result number'
     '(-n --count)'{-n,--count}'[show specified number of results (default 10)]:count'
     '(-N --news)'{-N,--news}'[show results from news section]'
+    '(-V --videos)'{-V,--videos}'[show results from videos section]'
     '(-c --tld)'{-c,--tld}'[country-specific search with top-level domain]:top level domain without dot'
     '(-l --lang)'{-l,--lang}'[display in specified language]:language code'
     '(-x --exact)'{-x,--exact}'[disable automatic spelling correction]'

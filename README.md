@@ -60,7 +60,7 @@ More fun stuff you can try with `googler`:
 
 ### Features
 
-- Google Search, Google Site Search, Google News
+- Google Search, Google Site Search, Google News, Google Videos
 - Fast and clean (no ads, stray URLs or clutter), custom color
 - Navigate result pages from omniprompt, open URLs in browser
 - Effortless keyword-based site search with googler @t add-on
@@ -160,7 +160,7 @@ Search keyword and option completion scripts for Bash, Fish and Zsh can be found
 #### Cmdline options
 
 ```
-usage: googler [-h] [-s N] [-n N] [-N] [-c TLD] [-l LANG] [-x]
+usage: googler [-h] [-s N] [-n N] [-N] [-V] [-c TLD] [-l LANG] [-x]
                [--colorize [{auto,always,never}]] [-C] [--colors COLORS] [-j]
                [-t dN] [-w SITE] [--unfilter] [-p PROXY] [--noua] [--notweak]
                [--json] [--url-handler UTIL] [--show-browser-logs] [--np] [-u]
@@ -177,6 +177,7 @@ optional arguments:
   -s N, --start N       start at the Nth result
   -n N, --count N       show N results (default 10)
   -N, --news            show results from news section
+  -V, --videos          show results from videos section
   -c TLD, --tld TLD     country-specific search with top-level domain .TLD,
                         e.g., 'in' for India
   -l LANG, --lang LANG  display in language LANG
