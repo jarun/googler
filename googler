@@ -1739,6 +1739,10 @@ class GoogleUrl(object):
                 qd['nfpr'] = 1
             else:
                 qd.pop('nfpr', None)
+        if 'from' in opts or 'to' in opts:
+            cd_min = opts.get('from', '')
+            cd_max = opts.get('to', '')
+            qd['tbs'] = 'cdr:1,cd_min:%s,cd_max:%s' % (cd_min, cd_max)
         if 'keywords' in opts:
             self._keywords = opts['keywords']
         if 'lang' in opts and opts['lang']:
@@ -3009,6 +3013,15 @@ class GooglerArgumentParser(argparse.ArgumentParser):
         return arg
 
     @staticmethod
+    def is_date(arg):
+        """Check if a string is a valid date/month/year accepted by Google."""
+        if re.match(r'^(\d+/){0,2}\d+$', arg):
+            return arg
+        else:
+            raise argparse.ArgumentTypeError('%s is not a valid date/month/year; '
+                                             'use the American date format with slashes')
+
+    @staticmethod
     def is_colorstr(arg):
         """Check if a string is a valid color string."""
         try:
@@ -3308,6 +3321,12 @@ def parse_args(args=None, namespace=None):
     addarg('-t', '--time', dest='duration', type=argparser.is_duration,
            metavar='dN', help='time limit search '
            '[h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5 years)]')
+    addarg('--from', type=argparser.is_date,
+           help="""starting date/month/year of date range; must use American date
+           format with slashes, e.g., 2/24/2020, 2/2020, 2020; can be used in
+           conjuction with --to, and overrides -t, --time""")
+    addarg('--to', type=argparser.is_date,
+           help='ending date/month/year of date range; see --from')
     addarg('-w', '--site', dest='sites', action='append', metavar='SITE',
            help='search a site using Google')
     addarg('--unfilter', action='store_true', help='do not omit similar results')
