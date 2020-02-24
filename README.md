@@ -162,9 +162,9 @@ Search keyword and option completion scripts for Bash, Fish and Zsh can be found
 ```
 usage: googler [-h] [-s N] [-n N] [-N] [-V] [-c TLD] [-l LANG] [-x]
                [--colorize [{auto,always,never}]] [-C] [--colors COLORS] [-j]
-               [-t dN] [-w SITE] [--unfilter] [-p PROXY] [--noua] [--notweak]
-               [--json] [--url-handler UTIL] [--show-browser-logs] [--np] [-u]
-               [--include-git] [-v] [-d]
+               [-t dN] [--from FROM] [--to TO] [-w SITE] [--unfilter]
+               [-p PROXY] [--noua] [--notweak] [--json] [--url-handler UTIL]
+               [--show-browser-logs] [--np] [-u] [--include-git] [-v] [-d]
                [KEYWORD [KEYWORD ...]]
 
 Google from the command-line.
@@ -192,6 +192,11 @@ optional arguments:
   -j, --first, --lucky  open the first result in web browser and exit
   -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
                         weeks), m5 (5 months), y5 (5 years)]
+  --from FROM           starting date/month/year of date range; must use
+                        American date format with slashes, e.g., 2/24/2020,
+                        2/2020, 2020; can be used in conjuction with --to,
+                        and overrides -t, --time
+  --to TO               ending date/month/year of date range; see --from
   -w SITE, --site SITE  search a site using Google
   --unfilter            do not omit similar results
   -p PROXY, --proxy PROXY
