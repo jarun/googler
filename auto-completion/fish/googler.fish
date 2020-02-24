@@ -26,6 +26,8 @@ complete -c googler -s C -l nocolor           --description 'disable color outpu
 complete -c googler -l colors      -r         --description 'set output colors'
 complete -c googler -s j -l first -l lucky    --description 'open the first result in a web browser'
 complete -c googler -s t -l time   -r         --description 'time limit search (h/d/w/m/y + number)'
+complete -c googler -l from        -r         --description 'starting date/month/year of date range'
+complete -c googler -l to          -r         --description 'ending date/month/year of date range'
 complete -c googler -s w -l site   -r         --description 'search a site using Google'
 complete -c googler -l unfilter               --description 'do not omit similar results'
 complete -c googler -s p -l proxy  -r         --description 'proxy in HOST:PORT format'

@@ -24,6 +24,8 @@ _googler () {
         --colors
         -j --first --lucky
         -t --time
+        --from
+        --to
         -w --site
         --unfilter
         -p --proxy
@@ -45,6 +47,8 @@ _googler () {
         --colorize
         --colors
         -t --time
+        --from
+        --to
         -w --site
         -p --proxy
         --url-handler

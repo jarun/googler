@@ -47,6 +47,8 @@ args=(
     '(--colors)--colors[set output colors]:six-letter string'
     '(-j --first --lucky)'{-j,--first,--lucky}'[open the first result in a web browser]'
     '(-t --time)'{-t,--time}'[time limit search]:period (h/d/w/m/y + number)'
+    '(--from)--from[starting date/month/year of date range]:date m/d/yyyy'
+    '(--to)--to[ending date/month/year of date range]:date m/d/yyyy'
     '(-w --site)'{-w,--site}'[search a site using Google]:domain'
     '(--unfilter)--unfilter[do not omit similar results]'
     '(-p --proxy)'{-p,--proxy}'[proxy in HOST:PORT format]:proxy details'
