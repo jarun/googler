@@ -221,6 +221,8 @@
   alias @osalt='googler -w osalt.com'
 # OSDev Wiki
   alias @osdev='googler -w wiki.osdev.org'
+# OSTechNix
+  alias @ostech='googler -w ostechnix.com'
 # OpenWrt
   alias @owrt='googler -w openwrt.org'
 # Oxford Dictionary
