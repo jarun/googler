@@ -1732,16 +1732,16 @@ class GoogleUrl(object):
         opts.update(kwargs)
 
         qd = self._query_dict
-        if 'duration' in opts and opts['duration']:
+        if opts.get('duration'):
             qd['tbs'] = 'qdr:%s' % opts['duration']
         if 'exact' in opts:
             if opts['exact']:
                 qd['nfpr'] = 1
             else:
                 qd.pop('nfpr', None)
-        if 'from' in opts or 'to' in opts:
-            cd_min = opts.get('from', '')
-            cd_max = opts.get('to', '')
+        if opts.get('from') or opts.get('to'):
+            cd_min = opts.get('from') or ''
+            cd_max = opts.get('to') or ''
             qd['tbs'] = 'cdr:1,cd_min:%s,cd_max:%s' % (cd_min, cd_max)
         if 'keywords' in opts:
             self._keywords = opts['keywords']
