@@ -3350,9 +3350,9 @@ def parse_args(args=None, namespace=None):
            help='disable TCP optimizations and forced TLS 1.2')
     addarg('--json', action='store_true',
            help='output in JSON format; implies --noprompt')
-    addarg('--url-handler', metavar='URL_HANDLER',
+    addarg('--url-handler', metavar='UTIL',
            help='custom script or cli utility to open results')
-    addarg('--url-output', metavar='URL_OUTPUT',
+    addarg('--url-output', metavar='FILE',
            help='file to write urls to')
     addarg('--show-browser-logs', action='store_true',
            help='do not suppress browser output (stdout and stderr)')
