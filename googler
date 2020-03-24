@@ -1390,6 +1390,13 @@ def open_url(url):
     in a custom CLI script or utility. A subprocess is spawned with url as
     the parameter in this case instead of the usual webbrowser.open() call.
 
+    The file stream ``open_url.url_output`` can be used to write opened URLs to.
+    The URL and a newline are written to the file, which is then flushed.
+    When the file is a pipe, this makes it easy for a shell to read in the URLs
+    from the named pipe and run commands on them in parallel to googler.
+    It is very difficult (and/or slow) to run bash functions, for example,
+    using ``open_url.url_handler``.  This makes that much simpler.
+
     Whether the browser's output (both stdout and stderr) are suppressed
     depends on the boolean attribute ``open_url.suppress_browser_output``.
     If the attribute is not set upon a call, set it to a default value,
@@ -1408,6 +1415,11 @@ def open_url(url):
     if hasattr(open_url, 'url_handler'):
         p = Popen([open_url.url_handler, url], stdin=PIPE)
         p.communicate()
+        return
+    if hasattr(open_url, 'url_output'):
+        out = open_url.url_output
+        out.write(url + '\n')
+        out.flush()
         return
 
     browser = webbrowser.get()
@@ -3338,8 +3350,10 @@ def parse_args(args=None, namespace=None):
            help='disable TCP optimizations and forced TLS 1.2')
     addarg('--json', action='store_true',
            help='output in JSON format; implies --noprompt')
-    addarg('--url-handler', metavar='UTIL',
+    addarg('--url-handler', metavar='URL_HANDLER',
            help='custom script or cli utility to open results')
+    addarg('--url-output', metavar='URL_OUTPUT',
+           help='file to write urls to')
     addarg('--show-browser-logs', action='store_true',
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
@@ -3417,6 +3431,8 @@ def main():
 
         if opts.url_handler is not None:
             open_url.url_handler = opts.url_handler
+        elif opts.url_output is not None:
+            open_url.url_output = open(opts.url_output, 'w')
         else:
             # Set text browser override to False
             open_url.override_text_browser = False
