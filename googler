@@ -2253,6 +2253,23 @@ class GoogleParser(object):
             self.results.append(Result(index, title, url, abstract,
                                        metadata=metadata, sitelinks=sitelinks, matches=matched_keywords))
 
+        if not self.results:
+            for card in tree.select_all('g-card'):
+                a = card.select('a[href]')
+                if not a:
+                    continue
+                url = self.unwrap_link(a.attr('href'))
+                text_nodes = []
+                for node in a.descendants():
+                    if isinstance(node, TextNode) and node.strip():
+                        text_nodes.append(node.text)
+                if len(text_nodes) != 4:
+                    continue
+                publisher, title, abstract, publishing_time = text_nodes
+                metadata = '%s, %s' % (publisher, publishing_time)
+                index += 1
+                self.results.append(Result(index, title, url, abstract, metadata=metadata))
+
         # Showing results for ...
         # Search instead for ...
         spell_orig = tree.select("span.spell_orig")
