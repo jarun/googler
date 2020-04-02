@@ -1747,16 +1747,12 @@ class GoogleUrl(object):
             self._keywords = opts['keywords']
         if 'lang' in opts and opts['lang']:
             qd['hl'] = opts['lang']
-        if 'news' in opts:
-            if opts['news']:
-                qd['tbm'] = 'nws'
-            else:
-                qd.pop('tbm', None)
-        if 'videos' in opts:
-            if opts['videos']:
-                qd['tbm'] = 'vid'
-            else:
-                qd.pop('tbm', None)
+        if 'news' in opts and opts['news']:
+            qd['tbm'] = 'nws'
+        elif 'videos' in opts and opts['videos']:
+            qd['tbm'] = 'vid'
+        else:
+            qd.pop('tbm', None)
         if 'num' in opts:
             self._num = opts['num']
         if 'sites' in opts:
