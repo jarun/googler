@@ -2234,7 +2234,7 @@ class GoogleParser(object):
                     abstract = abstract + childnode.text.replace('\n', '')
                 try:
                     metadata = div_g.select('.f').text
-                    metadata = metadata.replace('\u200e', '').replace(' - ', ', ').strip()
+                    metadata = metadata.replace('\u200e', '').replace(' - ', ', ').strip().rstrip(',')
                 except AttributeError:
                     metadata = None
             except (AttributeError, ValueError):
