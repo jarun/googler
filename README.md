@@ -10,7 +10,11 @@
 </p>
 
 <p align="center">
-<a href="https://asciinema.org/a/85019"><img src="https://i.imgur.com/EbZof9q.png" alt="Asciicast" width="734"/></a>
+  <a href="https://gitcdn.xyz/repo/zmwangx/8826487bffb35dbeb442045b7e8cbc91/raw/ae7ae19c47e54b9eb58b8e022d4e9bf5f5e05402/google-demo-no-controls.svg">
+    <img src="https://gitcdn.xyz/repo/zmwangx/8826487bffb35dbeb442045b7e8cbc91/raw/ae7ae19c47e54b9eb58b8e022d4e9bf5f5e05402/google-demo-no-controls.svg" alt="screencast">
+  </a>
+  <br>
+  <em>If the SVG animation does not play, please click on the image to open it separately.</em>
 </p>
 
 `googler` is a power tool to Google (Web & News) and Google Site Search from the command-line. It shows the title, URL and abstract for each result, which can be directly opened in a browser from the terminal. Results are fetched in pages (with page navigation). Supports sequential searches in a single `googler` instance.
