@@ -1,3 +1,15 @@
+googler 4.1
+2020-04-30
+
+What's in?
+- search Google Videos
+- options `--from` and `--to` to specify date range for search
+- update parser to handle new layout for Google News results
+- strip trailing comma from metadata
+- add auto-generated packages for new distros, remove obsolete
+
+-------------------------------------------------------------------------------
+
 googler 4.0
 2019-11-27
 

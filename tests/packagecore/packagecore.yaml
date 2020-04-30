@@ -23,6 +23,19 @@ packages:
       - make
     deps:
       - python
+  centos7.7:
+    builddeps:
+      - make
+    deps:
+      - python
+  centos8.0:
+    builddeps:
+      - make
+    deps:
+      - python3
+    commands:
+      precompile:
+        - dnf install python3
   debian8:
     builddeps:
       - make
@@ -38,31 +51,6 @@ packages:
       - make
     deps:
       - python3
-  fedora25:
-    builddeps:
-      - make
-    deps:
-      - python3
-  fedora26:
-    builddeps:
-      - make
-    deps:
-      - python3
-  fedora27:
-    builddeps:
-      - make
-    deps:
-      - python3
-  fedora28:
-    builddeps:
-      - make
-    deps:
-      - python3
-  fedora29:
-    builddeps:
-      - make
-    deps:
-      - python3
   fedora30:
     builddeps:
       - make
@@ -73,12 +61,7 @@ packages:
       - make
     deps:
       - python3
-  opensuse42.3:
-    builddeps:
-      - make
-    deps:
-      - python3
-  opensuse15.0:
+  opensuse15.1:
     builddeps:
       - make
     deps:
@@ -94,6 +77,11 @@ packages:
     deps:
       - python3
   ubuntu18.04:
+    builddeps:
+      - make
+    deps:
+      - python3
+  ubuntu20.04:
     builddeps:
       - make
     deps:
