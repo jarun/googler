@@ -609,7 +609,7 @@ class TextNode(str, Node):
         """
         Two text nodes are equal if and only if they are the same node.
 
-        For string comparision, use :attr:`text`.
+        For string comparison, use :attr:`text`.
         """
         return self is other
 
@@ -617,7 +617,7 @@ class TextNode(str, Node):
         """
         Two text nodes are non-equal if they are not the same node.
 
-        For string comparision, use :attr:`text`.
+        For string comparison, use :attr:`text`.
         """
         return self is not other
 
@@ -3337,7 +3337,7 @@ def parse_args(args=None, namespace=None):
     addarg('--from', type=argparser.is_date,
            help="""starting date/month/year of date range; must use American date
            format with slashes, e.g., 2/24/2020, 2/2020, 2020; can be used in
-           conjuction with --to, and overrides -t, --time""")
+           conjunction with --to, and overrides -t, --time""")
     addarg('--to', type=argparser.is_date,
            help='ending date/month/year of date range; see --from')
     addarg('-w', '--site', dest='sites', action='append', metavar='SITE',

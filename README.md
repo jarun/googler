@@ -194,7 +194,7 @@ optional arguments:
                         weeks), m5 (5 months), y5 (5 years)]
   --from FROM           starting date/month/year of date range; must use
                         American date format with slashes, e.g., 2/24/2020,
-                        2/2020, 2020; can be used in conjuction with --to,
+                        2/2020, 2020; can be used in conjunction with --to,
                         and overrides -t, --time
   --to TO               ending date/month/year of date range; see --from
   -w SITE, --site SITE  search a site using Google
