@@ -1513,12 +1513,12 @@ class HardenedHTTPSConnection(HTTPSConnection):
     NOTE: TLS 1.2 is supported from Python 3.4
     """
 
-    def __init__(self, host, **kwargs):
+    def __init__(self, host, address_family=0, **kwargs):
         HTTPSConnection.__init__(self, host, **kwargs)
+        self.address_family = address_family
 
     def connect(self, notweak=False):
-        sock = socket.create_connection((self.host, self.port),
-                                        self.timeout, self.source_address)
+        sock = self.create_socket_connection()
 
         # Optimizations not available on OS X
         if not notweak and sys.platform.startswith('linux'):
@@ -1553,6 +1553,41 @@ class HardenedHTTPSConnection(HTTPSConnection):
 
         # Fallback
         HTTPSConnection.connect(self)
+
+    # Adapted from socket.create_connection.
+    # https://github.com/python/cpython/blob/bce4ddafdd188cc6deb1584728b67b9e149ca6a4/Lib/socket.py#L771-L813
+    def create_socket_connection(self):
+        err = None
+        for res in socket.getaddrinfo(self.host, self.port, self.address_family, socket.SOCK_STREAM):
+            af, socktype, proto, canonname, sa = res
+            sock = None
+            try:
+                sock = socket.socket(af, socktype, proto)
+                if self.timeout is not None:
+                    sock.settimeout(self.timeout)
+                if self.source_address:
+                    sock.bind(self.source_address)
+                sock.connect(sa)
+                # Break explicitly a reference cycle
+                err = None
+                logger.debug('Opened socket to %s:%d',
+                             sa[0] if af == socket.AF_INET else ('[%s]' % sa[0]),
+                             sa[1])
+                return sock
+
+            except socket.error as _:
+                err = _
+                if sock is not None:
+                    sock.close()
+
+        if err is not None:
+            try:
+                raise err
+            finally:
+                # Break explicitly a reference cycle
+                err = None
+        else:
+            raise socket.error("getaddrinfo returns an empty list")
 
 
 class GoogleUrl(object):
@@ -1966,9 +2001,10 @@ class GoogleConnection(object):
 
     """
 
-    def __init__(self, host, port=None, timeout=45, proxy=None, notweak=False):
+    def __init__(self, host, port=None, address_family=0, timeout=45, proxy=None, notweak=False):
         self._host = None
         self._port = None
+        self._address_family = address_family
         self._proxy = proxy
         self._notweak = notweak
         self._conn = None
@@ -2010,7 +2046,8 @@ class GoogleConnection(object):
             proxy_user_passwd, proxy_host_port = parse_proxy_spec(proxy)
 
             logger.debug('Connecting to proxy server %s', proxy_host_port)
-            self._conn = HardenedHTTPSConnection(proxy_host_port, timeout=timeout)
+            self._conn = HardenedHTTPSConnection(proxy_host_port,
+                                                 address_family=self._address_family, timeout=timeout)
 
             logger.debug('Tunnelling to host %s' % host_display)
             connect_headers = {}
@@ -2027,7 +2064,8 @@ class GoogleConnection(object):
                 raise GoogleConnectionError(msg)
         else:
             logger.debug('Connecting to new host %s', host_display)
-            self._conn = HardenedHTTPSConnection(host, port=port, timeout=timeout)
+            self._conn = HardenedHTTPSConnection(host, port=port,
+                                                 address_family=self._address_family, timeout=timeout)
             try:
                 self._conn.connect(self._notweak)
             except Exception as e:
@@ -2086,6 +2124,8 @@ class GoogleConnection(object):
                 if 'sorry/IndexRedirect?' in redirection_url or 'sorry/index?' in redirection_url:
                     msg = textwrap.dedent("""\
                     Connection blocked due to unusual activity.
+                    If you are connecting over IPv6 (use --debug to view connection details),
+                    the -4, --ipv4 option might help.
                     THIS IS NOT A BUG, please do NOT report it as a bug unless you have specific
                     information that may lead to the development of a workaround.
                     You IP address is temporarily or permanently blocked by Google and requires
@@ -2553,7 +2593,9 @@ class GooglerCmd(object):
 
         self._google_url = GoogleUrl(opts)
         proxy = opts.proxy if hasattr(opts, 'proxy') else None
-        self._conn = GoogleConnection(self._google_url.hostname, proxy=proxy,
+        self._conn = GoogleConnection(self._google_url.hostname,
+                                      address_family=opts.address_family,
+                                      proxy=proxy,
                                       notweak=opts.notweak)
         atexit.register(self._conn.close)
 
@@ -3357,6 +3399,12 @@ def parse_args(args=None, namespace=None):
            help='do not suppress browser output (stdout and stderr)')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
            help='search and exit, do not prompt')
+    addarg('-4', '--ipv4', action='store_const', dest='address_family',
+           const=socket.AF_INET, default=0,
+           help='only connect over IPv4')
+    addarg('-6', '--ipv6', action='store_const', dest='address_family',
+           const=socket.AF_INET6, default=0,
+           help='only connect over IPv6')
     addarg('keywords', nargs='*', metavar='KEYWORD', help='search keywords')
     if ENABLE_SELF_UPGRADE_MECHANISM and not system_is_windows():
         addarg('-u', '--upgrade', action='store_true',
