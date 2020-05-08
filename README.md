@@ -72,7 +72,7 @@ More fun stuff you can try with `googler`:
 - Open the first result directly in browser (as in *I'm Feeling Lucky*)
 - Non-stop searches: fire new searches at omniprompt without exiting
 - HTTPS proxy, User Agent, TLS 1.2 (default) support
-- Comprehensive documentation, man page with handy usage examples
+- Comprehensive documentation, main page with handy usage examples
 - Minimal dependencies
 
 ### Installation
