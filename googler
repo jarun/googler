@@ -2683,7 +2683,7 @@ class GooglerCmd(object):
                 self.warn_no_results()
             else:
                 sys.stderr.write(prelude)
-                for r in self.results:
+                for r in reversed(self.results) if self._opts.reverse else self.results:
                     r.print()
 
     @require_keywords
@@ -3397,6 +3397,8 @@ def parse_args(args=None, namespace=None):
            help='custom script or cli utility to open results')
     addarg('--show-browser-logs', action='store_true',
            help='do not suppress browser output (stdout and stderr)')
+    addarg('-r', '--reverse', action='store_true',
+           help='reverse printing order of results')
     addarg('--np', '--noprompt', dest='noninteractive', action='store_true',
            help='search and exit, do not prompt')
     addarg('-4', '--ipv4', action='store_const', dest='address_family',
