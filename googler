@@ -2269,7 +2269,7 @@ class GoogleParser(object):
                     if 'f' in childnode.classes:
                         # .f is handled as metadata instead.
                         continue
-                    if childnode.tag == 'b' and childnode.text != '...':
+                    if childnode.tag in ['b', 'em'] and childnode.text != '...':
                         matched_keywords.append({'phrase': childnode.text, 'offset': len(abstract)})
                     abstract = abstract + childnode.text.replace('\n', '')
                 try:
