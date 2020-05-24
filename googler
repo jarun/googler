@@ -3388,7 +3388,7 @@ def parse_args(args=None, namespace=None):
     addarg('-p', '--proxy', default=https_proxy_from_environment(),
            help="""tunnel traffic through an HTTP proxy;
            PROXY is of the form [http://][user:password@]proxyhost[:port]""")
-    addarg('--noua', action='store_true', help='legacy option (no effect)')
+    addarg('--noua', action='store_true', help=argparse.SUPPRESS)
     addarg('--notweak', action='store_true',
            help='disable TCP optimizations and forced TLS 1.2')
     addarg('--json', action='store_true',
