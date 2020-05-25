@@ -1,0 +1,32 @@
+name: build and upload artifacts
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build-and-upload-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+      - name: Install PackageCore
+        run: |
+          python -m pip install --upgrade pip
+          pip install packagecore
+      - name: Build artifacts with PackageCore
+        run: |
+          version=${GITHUB_REF##*/v}
+          packagecore -o dist/ "$version"
+      - name: Create draft release with artifacts
+        run: |
+          tag=${GITHUB_REF##*/}
+          asset_options=()
+          for asset in dist/*; do
+            asset_options+=(-a "$asset")
+          done
+          hub release create --draft "${asset_options[@]}" --message "googler $tag" "$tag"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
