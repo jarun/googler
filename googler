@@ -1558,8 +1558,11 @@ class HardenedHTTPSConnection(HTTPSConnection):
     # https://github.com/python/cpython/blob/bce4ddafdd188cc6deb1584728b67b9e149ca6a4/Lib/socket.py#L771-L813
     def create_socket_connection(self):
         err = None
-        for res in socket.getaddrinfo(self.host, self.port, self.address_family, socket.SOCK_STREAM):
-            af, socktype, proto, canonname, sa = res
+        results = socket.getaddrinfo(self.host, self.port, self.address_family, socket.SOCK_STREAM)
+        # Prefer IPv4 if address family isn't explicitly specified.
+        if self.address_family == 0:
+            results = sorted(results, key=lambda res: 1 if res[0] == socket.AF_INET else 2)
+        for af, socktype, proto, canonname, sa in results:
             sock = None
             try:
                 sock = socket.socket(af, socktype, proto)
@@ -1570,6 +1573,7 @@ class HardenedHTTPSConnection(HTTPSConnection):
                 sock.connect(sa)
                 # Break explicitly a reference cycle
                 err = None
+                self.address_family = af
                 logger.debug('Opened socket to %s:%d',
                              sa[0] if af == socket.AF_INET else ('[%s]' % sa[0]),
                              sa[1])
@@ -2122,10 +2126,13 @@ class GoogleConnection(object):
             if resp.status in {301, 302, 303, 307, 308}:
                 redirection_url = resp.getheader('location', '')
                 if 'sorry/IndexRedirect?' in redirection_url or 'sorry/index?' in redirection_url:
-                    msg = textwrap.dedent("""\
-                    Connection blocked due to unusual activity.
-                    If you are connecting over IPv6 (use --debug to view connection details),
-                    the -4, --ipv4 option might help.
+                    msg = "Connection blocked due to unusual activity.\n"
+                    if self._conn.address_family == socket.AF_INET6:
+                        msg += textwrap.dedent("""\
+                        You are connecting over IPv6 which is likely the problem. Try to make
+                        sure the machine has a working IPv4 network interface configured.
+                        See also the -4, --ipv4 option of googler.\n""")
+                    msg += textwrap.dedent("""\
                     THIS IS NOT A BUG, please do NOT report it as a bug unless you have specific
                     information that may lead to the development of a workaround.
                     You IP address is temporarily or permanently blocked by Google and requires
@@ -3401,7 +3408,8 @@ def parse_args(args=None, namespace=None):
            help='search and exit, do not prompt')
     addarg('-4', '--ipv4', action='store_const', dest='address_family',
            const=socket.AF_INET, default=0,
-           help='only connect over IPv4')
+           help="""only connect over IPv4
+           (by default, IPv4 is preferred but IPv6 is used as a fallback)""")
     addarg('-6', '--ipv6', action='store_const', dest='address_family',
            const=socket.AF_INET6, default=0,
            help='only connect over IPv6')
