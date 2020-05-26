@@ -79,8 +79,8 @@ def test_site_search():
     def be_from_wikipedia(result):
         return result["url"].startswith("https://en.wikipedia.org")
 
-    gr = GR(["site:en.wikipedia.org google"])
-    gr.all_should(be_from_wikipedia)
+    GR(["--site=en.wikipedia.org", "google"]).all_should(be_from_wikipedia)
+    GR(["site:en.wikipedia.org google"]).all_should(be_from_wikipedia)
 
 
 @pytest.mark.parametrize("tld", ["in", "de"])
