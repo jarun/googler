@@ -19,6 +19,98 @@
 
 `googler` isn't affiliated to Google in any way.
 
+Here are some usage examples:
+
+1. Google **hello world**:
+
+        $ googler hello world
+
+2. Fetch **15 results** updated within the last **14 months**, starting from the **3<sup>rd</sup> result** for the keywords **jungle book** in **site** imdb.com:
+
+        $ googler -n 15 -s 3 -t m14 -w imdb.com jungle book
+
+    Or instead of the last 14 months, look for results specifically between Apr 4, 2016 and Dec 31, 2016:
+
+        $ googler -n 15 -s 3 --from 04/04/2016 --to 12/31/2016 -w imdb.com jungle book
+
+3. Read recent **news** on gadgets:
+
+        $ googler -N gadgets
+
+4. Fetch results on IPL cricket from **Google India** server in **English**:
+
+        $ googler -c in -l en IPL cricket
+
+5. Search for **videos** on PyCon 2020:
+
+        $ googler -V PyCon 2020
+
+6. Search **quoted text**:
+
+        $ googler it\'s a \"beautiful world\" in spring
+
+7. Search for a **specific file type**:
+
+        $ googler instrumental filetype:mp3
+
+8. Disable **automatic spelling correction**, e.g. fetch results for `googler` instead of `google`:
+
+        $ googler -x googler
+
+9. **I'm feeling lucky** search:
+
+        $ googler -j leather jackets
+
+10. **Website specific** search:
+
+        $ googler -w amazon.com -w ebay.com digital camera
+
+    Site specific search continues at omniprompt.
+
+11. Positional arguments are joined (with delimiting whitespace) to form the final query, so you can be creative with your aliases. For instance, always **exclude** seoarticlefactory.com from search results:
+
+        $ alias googler='googler " -site:seoarticlefactory.com"'
+        $ googler '<hugely popular keyword filled with SEO garbage>'
+
+12. Alias to find **definitions of words**:
+
+        alias define='googler -n 2 define'
+
+13. Look up `n`, `p`, `o`, `O`, `q`, `g keywords` or a result index at the **omniprompt**: as the omniprompt recognizes these keys or index strings as commands, you need to prefix them with `g`, e.g.,
+
+        g n
+        g g keywords
+        g 1
+
+14. Input and output **redirection**:
+
+        $ googler -C hello world < input > output
+    Note that `-C` is required to avoid printing control characters (for colored output).
+
+15. **Pipe** output:
+
+        $ googler -C hello world | tee output
+
+16. Use a **custom color scheme**, e.g., a warm color scheme designed for Solarized Dark ([screenshot](https://i.imgur.com/6L8VlfS.png)):
+
+        $ googler --colors bjdxxy google
+        $ GOOGLER_COLORS=bjdxxy googler google
+
+17. Tunnel traffic through an **HTTPS proxy**, e.g., a local Privoxy instance listening on port 8118:
+
+        $ googler --proxy localhost:8118 google
+
+    By default the environment variable `https_proxy` is used, if defined.
+
+18. Quote multiple search keywords to auto-complete (using completion script):
+
+        $ googler 'hello w<TAB>
+
+19. More **help**:
+
+        $ googler -h
+        $ man googler
+
 More fun stuff you can try with `googler`:
 
 - [googler on the iPad](https://github.com/jarun/googler/wiki/googler-on-the-iPad)
@@ -52,7 +144,6 @@ More fun stuff you can try with `googler`:
     - [Text-based browser integration](#text-based-browser-integration)
     - [Colors](#colors)
     - [Domain-only URL](#domain-only-url)
-- [Examples](#examples)
 - [Troubleshooting](#troubleshooting)
 - [Notes](#notes)
 - [Contributions](#contributions)
@@ -334,83 +425,6 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 #### Domain-only URL
 
 To show the domain names in search results instead of the expanded URL (and use lesser space), set the environment variable `DISABLE_URL_EXPANSION`.
-
-### Examples
-
-1. Google **hello world**:
-
-       $ googler hello world
-
-2. Fetch **15 results** updated within the last **14 months**, starting from the **3<sup>rd</sup> result** for the keywords **jungle book** in **site** imdb.com:
-
-       $ googler -n 15 -s 3 -t m14 -w imdb.com jungle book
-
-3. Read recent **news** on gadgets:
-
-       $ googler -N gadgets
-
-4. Fetch results on IPL cricket from **Google India** server in **English**:
-
-       $ googler -c in -l en IPL cricket
-
-5. Search **quoted text**:
-
-       $ googler it\'s a \"beautiful world\" in spring
-
-6. Search for a **specific file type**:
-
-       $ googler instrumental filetype:mp3
-
-7. Disable **automatic spelling correction**, e.g. fetch results for `googler` instead of `google`:
-
-       $ googler -x googler
-
-8. **I'm feeling lucky** search:
-
-       $ googler -j leather jackets
-
-9. **Website specific** search:
-
-       $ googler -w amazon.com -w ebay.com digital camera
-    Site specific search continues at omniprompt.
-
-10. Alias to find **definitions of words**:
-
-        alias define='googler -n 2 define'
-
-11. Look up `n`, `p`, `o`, `O`, `q`, `g keywords` or a result index at the **omniprompt**: as the omniprompt recognizes these keys or index strings as commands, you need to prefix them with `g`, e.g.,
-
-        g n
-        g g keywords
-        g 1
-
-12. Input and output **redirection**:
-
-        $ googler -C hello world < input > output
-    Note that `-C` is required to avoid printing control characters (for colored output).
-
-13. **Pipe** output:
-
-        $ googler -C hello world | tee output
-
-14. Use a **custom color scheme**, e.g., a warm color scheme designed for Solarized Dark ([screenshot](https://i.imgur.com/6L8VlfS.png)):
-
-        $ googler --colors bjdxxy google
-        $ GOOGLER_COLORS=bjdxxy googler google
-
-15. Tunnel traffic through an **HTTPS proxy**, e.g., a local Privoxy instance listening on port 8118:
-
-        $ googler --proxy localhost:8118 google
-    By default the environment variable `https_proxy` is used, if defined.
-
-16. Quote multiple search keywords to auto-complete (using completion script):
-
-        $ googler 'hello w<TAB>
-
-17. More **help**:
-
-        $ googler -h
-        $ man googler
 
 ### Troubleshooting
 
