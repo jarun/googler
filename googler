@@ -1437,7 +1437,8 @@ def open_url(url):
         if open_url.suppress_browser_output:
             os.close(fd)
             os.dup2(_stderr, 2)
-            os.dup2(_stdout, 1)
+            if "microsoft" not in platform.uname()[3].lower():
+                os.dup2(_stdout, 1)
 
     if open_url.override_text_browser:
         open_url.suppress_browser_output = browser_output
