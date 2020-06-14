@@ -1425,7 +1425,9 @@ def open_url(url):
         _stderr = os.dup(2)
         os.close(2)
         _stdout = os.dup(1)
-        os.close(1)
+        # Patch for GUI browsers on WSL
+        if "microsoft" not in platform.uname()[3].lower():
+            os.close(1)
         fd = os.open(os.devnull, os.O_RDWR)
         os.dup2(fd, 2)
         os.dup2(fd, 1)
