@@ -2898,6 +2898,8 @@ class GooglerCmd(object):
                     copier_params = ['xsel', '-b', '-i']
                 elif shutil.which('xclip') is not None:
                     copier_params = ['xclip', '-selection', 'clipboard']
+                elif shutil.which('wl-copy') is not None:
+                    copier_params = ['wl-copy']
                 elif shutil.which('termux-clipboard-set') is not None:
                     copier_params = ['termux-clipboard-set']
             elif sys.platform == 'darwin':
