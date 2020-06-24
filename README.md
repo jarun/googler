@@ -116,7 +116,7 @@ More fun stuff you can try with `googler`:
 - [googler on the iPad](https://github.com/jarun/googler/wiki/googler-on-the-iPad)
 - [Print content of results to terminal or listen to it](https://github.com/jarun/googler/wiki/Print-content-of-results-to-terminal-or-listen-to-it)
 - [Terminal Reading Mode or Reader View](https://github.com/jarun/googler/wiki/Terminal-Reading-Mode-or-Reader-View)
-- [Stream YouTube videos on desktop](https://github.com/jarun/googler/wiki/Stream-YouTube-videos-on-desktop)
+- [Stream YouTube videos on desktop](https://github.com/jarun/googler/wiki/Search-and-stream-videos-from-the-terminal)
 - [Search error on StackOverflow from terminal](https://github.com/jarun/googler/wiki/Search-error-on-StackOverflow-from-terminal)
 
 *Love smart and efficient utilities? Explore [my repositories](https://github.com/jarun?tab=repositories). Buy me a cup of coffee if they help you.*
