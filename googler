@@ -2254,6 +2254,9 @@ class GoogleParser(object):
                 import pdb
                 pdb.set_trace()
 
+        # cw is short for collapse_whitespace.
+        cw = lambda s: re.sub(r'[ \t\n\r]+', ' ', s) if s is not None else s
+
         index = 0
         for div_g in tree.select_all('div.g'):
             if div_g.select('.hp-xpdbox'):
@@ -2278,9 +2281,10 @@ class GoogleParser(object):
                     if 'f' in childnode.classes:
                         # .f is handled as metadata instead.
                         continue
-                    if childnode.tag in ['b', 'em'] and childnode.text != '...':
-                        matched_keywords.append({'phrase': childnode.text, 'offset': len(abstract)})
-                    abstract = abstract + childnode.text.replace('\n', '')
+                    childnode_text = cw(childnode.text)
+                    if childnode.tag in ['b', 'em'] and childnode_text != '...':
+                        matched_keywords.append({'phrase': childnode_text, 'offset': len(abstract)})
+                    abstract = abstract + childnode_text
                 try:
                     metadata = div_g.select('.f').text
                     metadata = metadata.replace('\u200e', '').replace(' - ', ', ').strip().rstrip(',')
@@ -2295,12 +2299,16 @@ class GoogleParser(object):
                     sl_title = a.text
                     sl_url = self.unwrap_link(a.attr('href'))
                     sl_abstract = td.select('div.s.st').text
-                    sitelinks.append(Sitelink(sl_title, sl_url, sl_abstract))
+                    sitelinks.append(Sitelink(cw(sl_title), sl_url, cw(sl_abstract)))
                 except (AttributeError, ValueError):
                     continue
             index += 1
-            self.results.append(Result(index, title, url, abstract,
-                                       metadata=metadata, sitelinks=sitelinks, matches=matched_keywords))
+            # cw cannot be applied to abstract here since it may screw
+            # up offsets of matches. Instead, each relevant node's text
+            # is whitespace-collapsed before being appended to abstract.
+            # We then hope for the best.
+            self.results.append(Result(index, cw(title), url, abstract,
+                                       metadata=cw(metadata), sitelinks=sitelinks, matches=matched_keywords))
 
         if not self.results:
             for card in tree.select_all('g-card'):
@@ -2317,7 +2325,7 @@ class GoogleParser(object):
                 publisher, title, abstract, publishing_time = text_nodes
                 metadata = '%s, %s' % (publisher, publishing_time)
                 index += 1
-                self.results.append(Result(index, title, url, abstract, metadata=metadata))
+                self.results.append(Result(index, cw(title), url, cw(abstract), metadata=cw(metadata)))
 
         # Showing results for ...
         # Search instead for ...
@@ -2526,6 +2534,10 @@ class Result(object):
 
         """
         return self._urltable
+
+    @staticmethod
+    def collapse_whitespace(s):
+        return re.sub(r'[ \t\n\r]+', ' ', s)
 
 
 class GooglerCmdException(Exception):
