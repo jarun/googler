@@ -3118,6 +3118,29 @@ def system_is_windows():
     return sys.platform in {'win32', 'cygwin'}
 
 
+def get_latest_ref(include_git=False):
+    """Helper for download_latest_googler."""
+    import urllib.request
+
+    if include_git:
+        # Get SHA of latest commit on master
+        request = urllib.request.Request('%s/commits/master' % API_REPO_BASE,
+                                         headers={'Accept': 'application/vnd.github.v3.sha'})
+        response = urllib.request.urlopen(request)
+        if response.status != 200:
+            raise http.client.HTTPException(response.reason)
+        return response.read().decode('utf-8')
+    else:
+        # Get name of latest tag
+        request = urllib.request.Request('%s/releases?per_page=1' % API_REPO_BASE,
+                                         headers={'Accept': 'application/vnd.github.v3+json'})
+        response = urllib.request.urlopen(request)
+        if response.status != 200:
+            raise http.client.HTTPException(response.reason)
+        import json
+        return json.loads(response.read().decode('utf-8'))[0]['tag_name']
+
+
 def download_latest_googler(include_git=False):
     """Download latest googler to a temp file.
 
@@ -3138,27 +3161,8 @@ def download_latest_googler(include_git=False):
          file.
 
     """
-    import urllib.request
-
-    if include_git:
-        # Get SHA of latest commit on master
-        request = urllib.request.Request('%s/commits/master' % API_REPO_BASE,
-                                         headers={'Accept': 'application/vnd.github.v3.sha'})
-        response = urllib.request.urlopen(request)
-        if response.status != 200:
-            raise http.client.HTTPException(response.reason)
-        git_ref = response.read().decode('utf-8')
-    else:
-        # Get name of latest tag
-        request = urllib.request.Request('%s/releases?per_page=1' % API_REPO_BASE,
-                                         headers={'Accept': 'application/vnd.github.v3+json'})
-        response = urllib.request.urlopen(request)
-        if response.status != 200:
-            raise http.client.HTTPException(response.reason)
-        import json
-        git_ref = json.loads(response.read().decode('utf-8'))[0]['tag_name']
-
     # Download googler to a tempfile
+    git_ref = get_latest_ref(include_git=include_git)
     googler_download_url = '%s/%s/googler' % (RAW_DOWNLOAD_REPO_BASE, git_ref)
     printerr('Downloading %s' % googler_download_url)
     request = urllib.request.Request(googler_download_url,
@@ -3236,6 +3240,53 @@ def self_upgrade(include_git=False):
         printerr('Upgraded to %s.' % git_ref)
     else:
         printerr('Already up to date.')
+
+
+def check_new_version():
+    try:
+        from distutils.version import StrictVersion as Version
+    except ImportError:
+        # distutils not available (thanks distros), use a concise poor
+        # man's version parser.
+        class Version(tuple):
+            def __new__(cls, version_str):
+                def parseint(s):
+                    try:
+                        return int(s)
+                    except ValueError:
+                        return 0
+                return tuple.__new__(cls, [parseint(s) for s in version_str.split('.')])
+
+    import pathlib
+    import tempfile
+    import time
+    cache = pathlib.Path(tempfile.gettempdir()) / 'googler-latest-version'
+    latest_version_str = None
+    # Try to load latest version string from cached location, if it
+    # exists and is fresh enough.
+    try:
+        if cache.is_file() and time.time() - cache.stat().st_mtime < 86400:
+            latest_version_str = cache.read_text().strip()
+    except OSError:
+        pass
+    if not latest_version_str:
+        try:
+            latest_version_str = get_latest_ref().lstrip('v')
+            cache.write_text(latest_version_str)
+        except Exception:
+            pass
+    if not latest_version_str:
+        return
+    # Try to fetch latest version string from GitHub.
+    try:
+        current_version = Version(_VERSION_)
+        latest_version = Version(latest_version_str)
+    except ValueError:
+        return
+    if latest_version > current_version:
+        print('\x1b[33;1mThe latest release of googler is v%s, please upgrade.\x1b[0m'
+              % latest_version_str,
+              file=sys.stderr)
 
 
 # Miscellaneous functions
@@ -3457,6 +3508,7 @@ def main():
             logger.setLevel(logging.DEBUG)
             logger.debug('googler version %s', _VERSION_)
             logger.debug('Python version %s', python_version())
+            check_new_version()
 
         if opts.debugger:
             global debugger
