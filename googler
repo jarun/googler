@@ -2512,22 +2512,24 @@ class Result(object):
             else:
                 print(' ' * (indent + 5) + metadata)
 
-        fillwidth = (columns - (indent + 6)) if columns > indent + 6 else len(abstract)
-        wrapped_abstract = TrackedTextwrap(abstract, fillwidth)
-        if colors:
-            # Highlight matches.
-            for match in matches or []:
-                offset = match['offset']
-                span = len(match['phrase'])
-                wrapped_abstract.insert_zero_width_sequence('\x1b[1m', offset)
-                wrapped_abstract.insert_zero_width_sequence('\x1b[0m', offset + span)
+        if abstract:
+            fillwidth = (columns - (indent + 6)) if columns > indent + 6 else len(abstract)
+            wrapped_abstract = TrackedTextwrap(abstract, fillwidth)
+            if colors:
+                # Highlight matches.
+                for match in matches or []:
+                    offset = match['offset']
+                    span = len(match['phrase'])
+                    wrapped_abstract.insert_zero_width_sequence('\x1b[1m', offset)
+                    wrapped_abstract.insert_zero_width_sequence('\x1b[0m', offset + span)
 
-        if colors:
-            print(colors.abstract, end='')
-        for line in wrapped_abstract.lines:
-            print('%s%s' % (' ' * (indent + 5), line))
-        if colors:
-            print(colors.reset, end='')
+            if colors:
+                print(colors.abstract, end='')
+            for line in wrapped_abstract.lines:
+                print('%s%s' % (' ' * (indent + 5), line))
+            if colors:
+                print(colors.reset, end='')
+
         print('')
 
     def print(self):
