@@ -144,6 +144,7 @@ More fun stuff you can try with `googler`:
     - [Text-based browser integration](#text-based-browser-integration)
     - [Colors](#colors)
     - [Domain-only URL](#domain-only-url)
+    - [Windows Subsystem for Linux (WSL)](#windows-subsystem-for-linux-wsl)
 - [Troubleshooting](#troubleshooting)
 - [Notes](#notes)
 - [Contributions](#contributions)
@@ -425,6 +426,12 @@ Please consult the manual of your terminal emulator as well as the [Wikipedia ar
 #### Domain-only URL
 
 To show the domain names in search results instead of the expanded URL (and use lesser space), set the environment variable `DISABLE_URL_EXPANSION`.
+
+#### Windows Subsystem for Linux (WSL)
+
+On WSL, GUI browsers on the Windows side cannot be detected by default. You need to explicitly set the `BROWSER` environment variable to the path of a Windows executable. For instance, you can put the following in your shell's rc:
+
+    $ export BROWSER='/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 
 ### Troubleshooting
 
