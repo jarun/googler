@@ -2305,16 +2305,20 @@ class GoogleParser(object):
                     sl_title = a.text
                     sl_url = self.unwrap_link(a.attr('href'))
                     sl_abstract = td.select('div.s.st, div.s .st').text
-                    sitelinks.append(Sitelink(cw(sl_title), sl_url, cw(sl_abstract)))
+                    sitelink = Sitelink(cw(sl_title), sl_url, cw(sl_abstract))
+                    if sitelink not in sitelinks:
+                        sitelinks.append(sitelink)
                 except (AttributeError, ValueError):
                     continue
-            index += 1
             # cw cannot be applied to abstract here since it may screw
             # up offsets of matches. Instead, each relevant node's text
             # is whitespace-collapsed before being appended to abstract.
             # We then hope for the best.
-            self.results.append(Result(index, cw(title), url, abstract,
-                                       metadata=cw(metadata), sitelinks=sitelinks, matches=matched_keywords))
+            result = Result(index + 1, cw(title), url, abstract,
+                            metadata=cw(metadata), sitelinks=sitelinks, matches=matched_keywords)
+            if result not in self.results:
+                self.results.append(result)
+                index += 1
 
         if not self.results:
             for card in tree.select_all('g-card'):
@@ -2385,6 +2389,16 @@ class Sitelink(object):
         self.abstract = abstract
         self.index = ''
 
+    def __eq__(self, other):
+        return (
+            self.title == other.title and
+            self.url == other.url and
+            self.abstract == other.abstract
+        )
+
+    def __hash__(self):
+        return hash((self.title, self.url, self.abstract))
+
 
 Colors = collections.namedtuple('Colors', 'index, title, url, metadata, abstract, prompt, reset')
 
@@ -2448,6 +2462,21 @@ class Result(object):
             sitelink.index = fullindex
             self._urltable[fullindex] = sitelink.url
             subindex = chr(ord(subindex) + 1)
+
+    def __eq__(self, other):
+        return (
+            self.title == other.title and
+            self.url == other.url and
+            self.abstract == other.abstract and
+            self.metadata == other.metadata and
+            self.sitelinks == other.sitelinks and
+            self.matches == other.matches
+        )
+
+    def __hash__(self):
+        sitelinks_hashable = tuple(sitelinks) if sitelinks is not None else None
+        matches_hashable = tuple(matches) if matches is not None else None
+        return hash(self.title, self.url, self.abstract, self.metadata, self.sitelinks, self.matches)
 
     def _print_title_and_url(self, index, title, url, indent=0):
         colors = self.colors
