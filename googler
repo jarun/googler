@@ -1663,6 +1663,12 @@ class GoogleUrl(object):
             #'gbv': '1',  # control the presence of javascript on the page, 1=no js, 2=js
             'sei': base64.encodebytes(uuid.uuid1().bytes).decode("ascii").rstrip('=\n').replace('/', '_'),
         }
+
+        # In preloaded HTML parsing mode, set keywords to something so
+        # that we are not tripped up by require_keywords.
+        if opts.html_file and not opts.keywords:
+            opts.keywords = ['<debug>']
+
         self.update(opts, **kwargs)
 
     def __str__(self):
@@ -2613,12 +2619,19 @@ class GooglerCmd(object):
         self._opts = opts
 
         self._google_url = GoogleUrl(opts)
-        proxy = opts.proxy if hasattr(opts, 'proxy') else None
-        self._conn = GoogleConnection(self._google_url.hostname,
-                                      address_family=opts.address_family,
-                                      proxy=proxy,
-                                      notweak=opts.notweak)
-        atexit.register(self._conn.close)
+
+        if opts.html_file:
+            # Preloaded HTML parsing mode, do not initialize connection.
+            self._preload_from_file = opts.html_file
+            self._conn = None
+        else:
+            self._preload_from_file = None
+            proxy = opts.proxy if hasattr(opts, 'proxy') else None
+            self._conn = GoogleConnection(self._google_url.hostname,
+                                        address_family=opts.address_family,
+                                        proxy=proxy,
+                                        notweak=opts.notweak)
+            atexit.register(self._conn.close)
 
         self.results = []
         self._autocorrected = None
@@ -2657,15 +2670,18 @@ class GooglerCmd(object):
         """
         # This method also sets self._results_filtered and
         # self._urltable.
-        page = self._conn.fetch_page(self._google_url.relative())
-
-        if logger.isEnabledFor(logging.DEBUG):
-            import tempfile
-            fd, tmpfile = tempfile.mkstemp(prefix='googler-response-', suffix='.html')
-            os.close(fd)
-            with open(tmpfile, 'w', encoding='utf-8') as fp:
-                fp.write(page)
-            logger.debug("Response body written to '%s'.", tmpfile)
+        if self._preload_from_file:
+            with open(self._preload_from_file, encoding='utf-8') as fp:
+                page = fp.read()
+        else:
+            page = self._conn.fetch_page(self._google_url.relative())
+            if logger.isEnabledFor(logging.DEBUG):
+                import tempfile
+                fd, tmpfile = tempfile.mkstemp(prefix='googler-response-', suffix='.html')
+                os.close(fd)
+                with open(tmpfile, 'w', encoding='utf-8') as fp:
+                    fp.write(page)
+                logger.debug("Response body written to '%s'.", tmpfile)
 
         parser = GoogleParser(page, news=self._google_url.news, videos=self._google_url.videos)
 
@@ -3490,6 +3506,8 @@ def parse_args(args=None, namespace=None):
     addarg('-d', '--debug', action='store_true', help='enable debugging')
     # Hidden option for interacting with DOM in an IPython/pdb shell
     addarg('-D', '--debugger', action='store_true', help=argparse.SUPPRESS)
+    # Hidden option for parsing dumped HTML
+    addarg('--parse', dest='html_file', help=argparse.SUPPRESS)
     addarg('--complete', help=argparse.SUPPRESS)
 
     parsed = argparser.parse_args(args, namespace)
@@ -3570,8 +3588,8 @@ def main():
 
         repl = GooglerCmd(opts)
 
-        if opts.json or opts.lucky or opts.noninteractive:
-            # Non-interactive mode
+        # Non-interactive mode
+        if opts.json or opts.lucky or opts.noninteractive or opts.html_file:
             repl.fetch()
             if opts.lucky:
                 if repl.results:
@@ -3582,9 +3600,9 @@ def main():
                 repl.showing_results_for_alert(interactive=False)
                 repl.display_results(json_output=opts.json)
             sys.exit(0)
-        else:
-            # Interactive mode
-            repl.cmdloop()
+
+        # Interactive mode
+        repl.cmdloop()
     except Exception as e:
         # With debugging on, let the exception through for a traceback;
         # otherwise, only print the exception error message.
