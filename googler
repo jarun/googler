@@ -2304,7 +2304,7 @@ class GoogleParser(object):
                     a = td.select('a')
                     sl_title = a.text
                     sl_url = self.unwrap_link(a.attr('href'))
-                    sl_abstract = td.select('div.s.st').text
+                    sl_abstract = td.select('div.s.st, div.s .st').text
                     sitelinks.append(Sitelink(cw(sl_title), sl_url, cw(sl_abstract)))
                 except (AttributeError, ValueError):
                     continue
