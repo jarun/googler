@@ -3508,6 +3508,7 @@ def main():
             logger.setLevel(logging.DEBUG)
             logger.debug('googler version %s', _VERSION_)
             logger.debug('Python version %s', python_version())
+            logger.debug('Platform: %s', platform.platform())
             check_new_version()
 
         if opts.debugger:
