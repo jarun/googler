@@ -12,7 +12,6 @@ packages:
       - make
     deps:
       - python
-    container: "archlinux/base"
   centos7.5:
     builddeps:
       - make
@@ -36,11 +35,6 @@ packages:
     commands:
       precompile:
         - dnf install python3
-  debian8:
-    builddeps:
-      - make
-    deps:
-      - python3
   debian9:
     builddeps:
       - make
@@ -51,12 +45,12 @@ packages:
       - make
     deps:
       - python3
-  fedora30:
+  fedora31:
     builddeps:
       - make
     deps:
       - python3
-  fedora31:
+  fedora32:
     builddeps:
       - make
     deps:
@@ -66,7 +60,12 @@ packages:
       - make
     deps:
       - python3
-  ubuntu14.04:
+  opensuse15.2:
+    builddeps:
+      - make
+    deps:
+      - python3
+  opensuse.tumbleweed:
     builddeps:
       - make
     deps:

@@ -89,7 +89,7 @@ except ValueError:
 
 # Constants
 
-_VERSION_ = '4.1'
+_VERSION_ = '4.2'
 
 COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'a': '30', 'b': '31', 'c': '32', 'd': '33',

@@ -229,7 +229,7 @@ To remove `googler` and associated docs, run
 
 To install the latest stable version, run
 
-    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v4.1/googler && sudo chmod +x /usr/local/bin/googler
+    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v4.2/googler && sudo chmod +x /usr/local/bin/googler
 
 You could then let googler upgrade itself by running
 
@@ -252,11 +252,10 @@ Search keyword and option completion scripts for Bash, Fish and Zsh can be found
 #### Cmdline options
 
 ```
-usage: googler [-h] [-s N] [-n N] [-N] [-V] [-c TLD] [-l LANG] [-x]
-               [--colorize [{auto,always,never}]] [-C] [--colors COLORS] [-j]
-               [-t dN] [--from FROM] [--to TO] [-w SITE] [--unfilter]
-               [-p PROXY] [--noua] [--notweak] [--json] [--url-handler UTIL]
-               [--show-browser-logs] [--np] [-u] [--include-git] [-v] [-d]
+usage: googler [-h] [-s N] [-n N] [-N] [-V] [-c TLD] [-l LANG] [-x] [--colorize [{auto,always,never}]]
+               [-C] [--colors COLORS] [-j] [-t dN] [--from FROM] [--to TO] [-w SITE] [--unfilter]
+               [-p PROXY] [--notweak] [--json] [--url-handler UTIL] [--show-browser-logs] [--np] [-4]
+               [-6] [-u] [--include-git] [-v] [-d]
                [KEYWORD [KEYWORD ...]]
 
 Google from the command-line.
@@ -270,36 +269,35 @@ optional arguments:
   -n N, --count N       show N results (default 10)
   -N, --news            show results from news section
   -V, --videos          show results from videos section
-  -c TLD, --tld TLD     country-specific search with top-level domain .TLD,
-                        e.g., 'in' for India
+  -c TLD, --tld TLD     country-specific search with top-level domain .TLD, e.g., 'in' for India
   -l LANG, --lang LANG  display in language LANG
   -x, --exact           disable automatic spelling correction
   --colorize [{auto,always,never}]
-                        whether to colorize output; defaults to 'auto', which
-                        enables color when stdout is a tty device; using
-                        --colorize without an argument is equivalent to
+                        whether to colorize output; defaults to 'auto', which enables color when stdout
+                        is a tty device; using --colorize without an argument is equivalent to
                         --colorize=always
   -C, --nocolor         equivalent to --colorize=never
   --colors COLORS       set output colors (see man page for details)
   -j, --first, --lucky  open the first result in web browser and exit
-  -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5
-                        weeks), m5 (5 months), y5 (5 years)]
-  --from FROM           starting date/month/year of date range; must use
-                        American date format with slashes, e.g., 2/24/2020,
-                        2/2020, 2020; can be used in conjunction with --to,
+  -t dN, --time dN      time limit search [h5 (5 hrs), d5 (5 days), w5 (5 weeks), m5 (5 months), y5 (5
+                        years)]
+  --from FROM           starting date/month/year of date range; must use American date format with
+                        slashes, e.g., 2/24/2020, 2/2020, 2020; can be used in conjunction with --to,
                         and overrides -t, --time
   --to TO               ending date/month/year of date range; see --from
   -w SITE, --site SITE  search a site using Google
   --unfilter            do not omit similar results
   -p PROXY, --proxy PROXY
-                        tunnel traffic through an HTTP proxy; PROXY is of the
-                        form [http://][user:password@]proxyhost[:port]
-  --noua                legacy option (no effect)
+                        tunnel traffic through an HTTP proxy; PROXY is of the form
+                        [http://][user:password@]proxyhost[:port]
   --notweak             disable TCP optimizations and forced TLS 1.2
   --json                output in JSON format; implies --noprompt
   --url-handler UTIL    custom script or cli utility to open results
   --show-browser-logs   do not suppress browser output (stdout and stderr)
   --np, --noprompt      search and exit, do not prompt
+  -4, --ipv4            only connect over IPv4 (by default, IPv4 is preferred but IPv6 is used as a
+                        fallback)
+  -6, --ipv6            only connect over IPv6
   -u, --upgrade         perform in-place self-upgrade
   --include-git         when used with --upgrade, get latest git master
   -v, --version         show program's version number and exit

@@ -1,3 +1,19 @@
+googler 4.2
+2020-07-28
+
+- support GUI platform browsers on WSL
+- support Wayland native copier `wl-copy`
+- program options `--ipv4`, `--ipv6`; ipv4 preferred by default
+- deduplicate results
+- fix sitelinks parsing
+- combine consecutive whitespaces
+- fix extraction of matched keywords
+- fix match highlighting
+- no additional blank line for empty abstracts
+- undocumented debug option `--parse` to parse dumped HTML
+
+-------------------------------------------------------------------------------
+
 googler 4.1
 2020-04-30
 
