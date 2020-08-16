@@ -1661,7 +1661,7 @@ class GoogleUrl(object):
             'ie': 'UTF-8',
             'oe': 'UTF-8',
             #'gbv': '1',  # control the presence of javascript on the page, 1=no js, 2=js
-            'sei': base64.encodebytes(uuid.uuid1().bytes).decode("ascii").rstrip('=\n').replace('/', '_'),
+            'sei': base64.encodebytes(uuid.uuid4().bytes).decode("ascii").rstrip('=\n').replace('/', '_'),
         }
 
         # In preloaded HTML parsing mode, set keywords to something so
