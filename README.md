@@ -104,7 +104,7 @@ Here are some usage examples:
 
 18. Quote multiple search keywords to auto-complete (using completion script):
 
-        $ googler 'hello w<TAB>
+        $ googler 'hello w<TAB>'
 
 19. More **help**:
 
