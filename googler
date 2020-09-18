@@ -1656,6 +1656,7 @@ class GoogleUrl(object):
         self._start = 0
         self._keywords = []
         self._sites = None
+        self._exclude = None
 
         self._query_dict = {
             'ie': 'UTF-8',
@@ -1806,6 +1807,8 @@ class GoogleUrl(object):
             self._num = opts['num']
         if 'sites' in opts:
             self._sites = opts['sites']
+        if 'exclude' in opts:
+            self._exclude = opts['exclude']
         if 'start' in opts:
             self._start = opts['start']
         if 'tld' in opts:
@@ -1971,6 +1974,7 @@ class GoogleUrl(object):
         q = ''
         keywords = self._keywords
         sites = self._sites
+        exclude = self._exclude
         if keywords:
             if isinstance(keywords, list):
                 q += '+'.join(urllib.parse.quote_plus(kw) for kw in keywords)
@@ -1978,8 +1982,9 @@ class GoogleUrl(object):
                 q += urllib.parse.quote_plus(keywords)
         if sites:
             q += '+OR'.join('+site:' + urllib.parse.quote_plus(site) for site in sites)
+        if exclude:
+            q += ''.join('+-site:' + urllib.parse.quote_plus(e) for e in exclude)
         qd['q'] = q
-
         return '&'.join('%s=%s' % (k, qd[k]) for k in sorted(qd.keys()))
 
 
@@ -3510,6 +3515,8 @@ def parse_args(args=None, namespace=None):
            help='ending date/month/year of date range; see --from')
     addarg('-w', '--site', dest='sites', action='append', metavar='SITE',
            help='search a site using Google')
+    addarg('-e', '--exclude', dest='exclude', action='append', metavar='EXCLUDE',
+           help='exclude sites')
     addarg('--unfilter', action='store_true', help='do not omit similar results')
     addarg('-p', '--proxy', default=https_proxy_from_environment(),
            help="""tunnel traffic through an HTTP proxy;
