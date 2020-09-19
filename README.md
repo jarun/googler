@@ -286,6 +286,8 @@ optional arguments:
                         and overrides -t, --time
   --to TO               ending date/month/year of date range; see --from
   -w SITE, --site SITE  search a site using Google
+  -e EXCLUDE, --exclude EXCLUDE
+			exclude site from results
   --unfilter            do not omit similar results
   -p PROXY, --proxy PROXY
                         tunnel traffic through an HTTP proxy; PROXY is of the form

@@ -3516,7 +3516,7 @@ def parse_args(args=None, namespace=None):
     addarg('-w', '--site', dest='sites', action='append', metavar='SITE',
            help='search a site using Google')
     addarg('-e', '--exclude', dest='exclude', action='append', metavar='EXCLUDE',
-           help='exclude sites')
+           help='exclude site from results')
     addarg('--unfilter', action='store_true', help='do not omit similar results')
     addarg('-p', '--proxy', default=https_proxy_from_environment(),
            help="""tunnel traffic through an HTTP proxy;
