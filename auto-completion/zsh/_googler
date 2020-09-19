@@ -50,6 +50,7 @@ args=(
     '(--from)--from[starting date/month/year of date range]:date m/d/yyyy'
     '(--to)--to[ending date/month/year of date range]:date m/d/yyyy'
     '(-w --site)'{-w,--site}'[search a site using Google]:domain'
+    '(-e --exclude)'{-e,--exclude}'[exclude site from results]:domain'
     '(--unfilter)--unfilter[do not omit similar results]'
     '(-p --proxy)'{-p,--proxy}'[proxy in HOST:PORT format]:proxy details'
     '(--notweak)--notweak[disable TCP optimizations, forced TLS 1.2]'

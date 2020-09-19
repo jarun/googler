@@ -27,6 +27,7 @@ _googler () {
         --from
         --to
         -w --site
+        -e --exclude
         --unfilter
         -p --proxy
         --notweak
@@ -50,6 +51,7 @@ _googler () {
         --from
         --to
         -w --site
+        -e --exclude
         -p --proxy
         --url-handler
     )
