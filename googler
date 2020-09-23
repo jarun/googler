@@ -3610,6 +3610,13 @@ def main():
         Result.urlexpand = True if os.getenv('DISABLE_URL_EXPANSION') is None else False
         GooglerCmd.colors = colors
 
+ 
+        frmStdin = None
+        if len(opts.keywords) < 1:
+            frmStdin =  [sys.stdin.read()]
+            opts.keywords += frmStdin
+
+
         # Try to enable ANSI color support in cmd or PowerShell on Windows 10
         if sys.platform == 'win32' and sys.stdout.isatty() and colorize:
             set_win_console_mode()
