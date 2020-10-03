@@ -2312,14 +2312,23 @@ class GoogleParser(object):
                 url = self.unwrap_link(a.attr('href'))
                 matched_keywords = []
                 abstract = ''
-                for childnode in abstract_node.children:
-                    if 'f' in childnode.classes:
+                # BFS descendant nodes. Necessary to locate matches (b,
+                # em) while skipping metadata (.f).
+                abstract_nodes = collections.deque([abstract_node])
+                while abstract_nodes:
+                    node = abstract_nodes.popleft()
+                    if 'f' in node.classes:
                         # .f is handled as metadata instead.
                         continue
-                    childnode_text = cw(childnode.text)
-                    if childnode.tag in ['b', 'em'] and childnode_text != '...':
-                        matched_keywords.append({'phrase': childnode_text, 'offset': len(abstract)})
-                    abstract = abstract + childnode_text
+                    if node.tag in ['b', 'em']:
+                        matched_keywords.append({'phrase': node.text, 'offset': len(abstract)})
+                        abstract += node.text
+                        continue
+                    if not node.children:
+                        abstract += node.text
+                        continue
+                    for child in node.children:
+                        abstract_nodes.append(child)
                 try:
                     # Sometimes there are multiple metadata fields
                     # associated with a single entry, e.g. "Released",
