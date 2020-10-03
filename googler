@@ -2276,21 +2276,43 @@ class GoogleParser(object):
                 # Skip smart cards.
                 continue
             try:
-                h3 = div_g.select('div.r h3')
-                if h3:
-                    title = h3.text
-                    url = self.unwrap_link(h3.parent.attr('href'))
+                if div_g.select('.st'):
+                    # Old class structure, stopped working some time in
+                    # September 2020, but kept just in case.
+                    h3 = div_g.select('div.r h3')
+                    if h3:
+                        title = h3.text
+                        a = h3.parent
+                    else:
+                        h3 = div_g.select('h3.r')
+                        a = h3.select('a')
+                        title = a.text
+                        mime = div_g.select('.mime')
+                        if mime:
+                            title = mime.text + ' ' + title
+                    abstract_node = div_g.select('.st')
+                    metadata_node = div_g.select('.f')
                 else:
-                    h3 = div_g.select('h3.r')
-                    a = h3.select('a')
-                    title = a.text
-                    mime = div_g.select('.mime')
-                    if mime:
-                        title = mime.text + ' ' + title
-                    url = self.unwrap_link(a.attr('href'))
+                    # Current structure as of October 2020.
+                    # Note that a filetype tag (e.g. PDF) is now pretty
+                    # damn hard to parse with confidence (that it'll
+                    # survive the slighest further change), so we don't.
+                    title_node, details_node, *_ = div_g.select_all('div.rc > div')
+                    if 'yuRUbf' not in title_node.classes:
+                        logger.debug('unexpected title node class(es): expected %r, got %r',
+                                     'yuRUbf', ' '.join(title_node.classes))
+                    if 'IsZvec' not in details_node.classes:
+                        logger.debug('unexpected details node class(es): expected %r, got %r',
+                                     'IsZvec', ' '.join(details_node.classes))
+                    a = title_node.select('a')
+                    h3 = a.select('h3')
+                    title = h3.text
+                    abstract_node = details_node.select('span')
+                    metadata_node = details_node.select('.f, span ~ div')
+                url = self.unwrap_link(a.attr('href'))
                 matched_keywords = []
                 abstract = ''
-                for childnode in div_g.select('.st').children:
+                for childnode in abstract_node.children:
                     if 'f' in childnode.classes:
                         # .f is handled as metadata instead.
                         continue
@@ -2299,7 +2321,16 @@ class GoogleParser(object):
                         matched_keywords.append({'phrase': childnode_text, 'offset': len(abstract)})
                     abstract = abstract + childnode_text
                 try:
-                    metadata = div_g.select('.f').text
+                    # Sometimes there are multiple metadata fields
+                    # associated with a single entry, e.g. "Released",
+                    # "Producer(s)", "Genre", etc. for a song (sample
+                    # query: "never gonna give you up"). These need to
+                    # be delimited when displayed.
+                    metadata_fields = metadata_node.select_all('div > div[data-ved]')
+                    if metadata_fields:
+                        metadata = ' | '.join(field.text for field in metadata_fields)
+                    else:
+                        metadata = metadata_node.text
                     metadata = metadata.replace('\u200e', '').replace(' - ', ', ').strip().rstrip(',')
                 except AttributeError:
                     metadata = None
