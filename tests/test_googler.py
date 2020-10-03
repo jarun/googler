@@ -89,17 +89,6 @@ def test_tld_option(tld):
     GR(["--tld", tld, "google"])
 
 
-def test_lang_option():
-    def have_louvre_museum_in_english(result):
-        return "Louvre Museum" in result["title"]
-
-    def have_louvre_museum_in_french(result):
-        return "Musée du Louvre" in result["title"]
-
-    GR(["--lang=en", "louvre"]).some_should(have_louvre_museum_in_english)
-    GR(["--lang=fr", "louvre"]).some_should(have_louvre_museum_in_french)
-
-
 def test_exact_option():
     def have_gogole_in_title_or_abstract(result):
         return (
