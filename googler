@@ -2512,9 +2512,9 @@ class Result(object):
         )
 
     def __hash__(self):
-        sitelinks_hashable = tuple(sitelinks) if sitelinks is not None else None
-        matches_hashable = tuple(matches) if matches is not None else None
-        return hash(self.title, self.url, self.abstract, self.metadata, self.sitelinks, self.matches)
+        sitelinks_hashable = tuple(self.sitelinks) if self.sitelinks is not None else None
+        matches_hashable = tuple(self.matches) if self.matches is not None else None
+        return hash(self.title, self.url, self.abstract, self.metadata, sitelinks_hashable, matches_hashable)
 
     def _print_title_and_url(self, index, title, url, indent=0):
         colors = self.colors
