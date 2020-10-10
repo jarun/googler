@@ -2341,7 +2341,13 @@ class GoogleParser(object):
                         metadata = ' | '.join(field.text for field in metadata_fields)
                     else:
                         metadata = metadata_node.text
-                    metadata = metadata.replace('\u200e', '').replace(' - ', ', ').strip().rstrip(',')
+                    metadata = (
+                        metadata
+                        .replace('\u200e', '')
+                        .replace(' - ', ', ')
+                        .replace(' \u2014 ', ', ')
+                        .strip().rstrip(',')
+                    )
                 except AttributeError:
                     metadata = None
             except (AttributeError, ValueError):
