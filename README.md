@@ -171,7 +171,7 @@ More fun stuff you can try with `googler`:
 
 #### Dependencies
 
-`googler` requires Python 3.5 or later. Only the latest patch release of each minor version is supported.
+`googler` requires Python 3.6 or later. Only the latest patch release of each minor version is supported.
 
 To copy url to clipboard at the omniprompt, `googler` looks for `xsel` or `xclip` or `termux-clipboard-set` (in the same order) on Linux, `pbcopy` (default installed) on macOS and `clip` (default installed) on Windows. It also supports GNU Screen and tmux copy-paste buffers in the absence of X11.
 
