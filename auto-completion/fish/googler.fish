@@ -20,6 +20,7 @@ complete -c googler -s N -l news              --description 'show results from n
 complete -c googler -s V -l videos            --description 'show results from videos section'
 complete -c googler -s c -l tld     -r        --description 'country-specific search with top-level domain'
 complete -c googler -s l -l lang    -r        --description 'display in specified language'
+complete -c googler -s g -l geoloc  -r        --description 'specify geolocation code'
 complete -c googler -s x -l exact             --description 'disable automatic spelling correction'
 complete -c googler -l colorize     -r        --description 'whether to colorize output (options: auto/always/never)'
 complete -c googler -s C -l nocolor           --description 'disable color output'

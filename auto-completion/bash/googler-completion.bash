@@ -18,6 +18,7 @@ _googler () {
         -V --videos
         -c --tld
         -l --lang
+        -g --geoloc
         -x --exact
         --colorize
         -C --nocolor
@@ -45,6 +46,7 @@ _googler () {
         -n --count
         -c --tld
         -l --lang
+        -g --geoloc
         --colorize
         --colors
         -t --time

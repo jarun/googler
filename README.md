@@ -229,7 +229,7 @@ To remove `googler` and associated docs, run
 
 To install the latest stable version, run
 
-    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v4.2/googler && sudo chmod +x /usr/local/bin/googler
+    $ sudo curl -o /usr/local/bin/googler https://raw.githubusercontent.com/jarun/googler/v4.3/googler && sudo chmod +x /usr/local/bin/googler
 
 You could then let googler upgrade itself by running
 
@@ -252,10 +252,10 @@ Search keyword and option completion scripts for Bash, Fish and Zsh can be found
 #### Cmdline options
 
 ```
-usage: googler [-h] [-s N] [-n N] [-N] [-V] [-c TLD] [-l LANG] [-x] [--colorize [{auto,always,never}]]
-               [-C] [--colors COLORS] [-j] [-t dN] [--from FROM] [--to TO] [-w SITE] [--unfilter]
-               [-p PROXY] [--notweak] [--json] [--url-handler UTIL] [--show-browser-logs] [--np] [-4]
-               [-6] [-u] [--include-git] [-v] [-d]
+usage: googler [-h] [-s N] [-n N] [-N] [-V] [-c TLD] [-l LANG] [-g CC] [-x]
+               [--colorize [{auto,always,never}]] [-C] [--colors COLORS] [-j] [-t dN] [--from FROM]
+               [--to TO] [-w SITE] [-e SITE] [--unfilter] [-p PROXY] [--notweak] [--json]
+               [--url-handler UTIL] [--show-browser-logs] [--np] [-4] [-6] [-u] [--include-git] [-v] [-d]
                [KEYWORD [KEYWORD ...]]
 
 Google from the command-line.
@@ -271,6 +271,8 @@ optional arguments:
   -V, --videos          show results from videos section
   -c TLD, --tld TLD     country-specific search with top-level domain .TLD, e.g., 'in' for India
   -l LANG, --lang LANG  display in language LANG
+  -g CC, --geoloc CC    country-specific geolocation search with country code CC, e.g. 'in' for India.
+                        Country codes are the same as top-level domains
   -x, --exact           disable automatic spelling correction
   --colorize [{auto,always,never}]
                         whether to colorize output; defaults to 'auto', which enables color when stdout

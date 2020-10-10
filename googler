@@ -89,7 +89,7 @@ except ValueError:
 
 # Constants
 
-_VERSION_ = '4.2'
+_VERSION_ = '4.3'
 _EPOCH_ = '20201001'
 
 COLORMAP = {k: '\x1b[%sm' % v for k, v in {

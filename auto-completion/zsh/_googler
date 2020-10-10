@@ -41,6 +41,7 @@ args=(
     '(-V --videos)'{-V,--videos}'[show results from videos section]'
     '(-c --tld)'{-c,--tld}'[country-specific search with top-level domain]:top level domain without dot'
     '(-l --lang)'{-l,--lang}'[display in specified language]:language code'
+    '(-g --geoloc)'{-g,--geoloc}'[specify geolocation]:code'
     '(-x --exact)'{-x,--exact}'[disable automatic spelling correction]'
     '(--colorize)--colorize[whether to colorize output]:auto/always/never'
     '(-C --nocolor)'{-C,--nocolor}'[disable color output]'

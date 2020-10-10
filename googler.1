@@ -1,4 +1,4 @@
-.TH "GOOGLER" "1" "28 Jul 2020" "Version 4.2" "User Commands"
+.TH "GOOGLER" "1" "10 Oct 2020" "Version 4.3" "User Commands"
 .SH NAME
 googler \- Google from the command-line
 .SH SYNOPSIS
@@ -42,6 +42,9 @@ Country-specific search with top-level domain \fI.TLD\fR, e.g., \fBin\fR for Ind
 .TP
 .BI "-l, --lang=" LANG
 Search for the language \fILANG\fR, e.g., \fBfi\fR for Finnish.
+.TP
+.BI "-g, --geoloc=" CC
+Country-specific geolocation search with country code CC, e.g. 'in' for India. Country codes are the same as top-level domains.
 .TP
 .B "-x, --exact"
 Disable automatic spelling correction. Search exact keywords.

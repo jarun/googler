@@ -1,3 +1,13 @@
+googler 4.3
+2020-10-10
+
+- fix recent break due to server-side changes
+- option `-e`/`--exclude` to exclude site from results
+- option `-g`/`--geoloc` to specify geolocation
+- replace uuid1 with uuid4 in request
+
+-------------------------------------------------------------------------------
+
 googler 4.2
 2020-07-28
 
