@@ -2378,26 +2378,28 @@ class GoogleParser(object):
                         continue
                     for child in node.children:
                         abstract_nodes.append(child)
+                metadata = None
                 try:
                     # Sometimes there are multiple metadata fields
                     # associated with a single entry, e.g. "Released",
                     # "Producer(s)", "Genre", etc. for a song (sample
                     # query: "never gonna give you up"). These need to
                     # be delimited when displayed.
-                    metadata_fields = metadata_node.select_all('div > div[data-ved]')
+                    metadata_fields = metadata_node.select_all('div > div.wFMWsc')
                     if metadata_fields:
                         metadata = ' | '.join(field.text for field in metadata_fields)
-                    else:
+                    elif not metadata_node.select('a') and not metadata_node.select('g-expandable-container'):
                         metadata = metadata_node.text
-                    metadata = (
-                        metadata
-                        .replace('\u200e', '')
-                        .replace(' - ', ', ')
-                        .replace(' \u2014 ', ', ')
-                        .strip().rstrip(',')
-                    )
+                    if metadata:
+                        metadata = (
+                            metadata
+                            .replace('\u200e', '')
+                            .replace(' - ', ', ')
+                            .replace(' \u2014 ', ', ')
+                            .strip().rstrip(',')
+                        )
                 except AttributeError:
-                    metadata = None
+                    pass
             except (AttributeError, ValueError):
                 continue
             sitelinks = []
