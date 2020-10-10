@@ -19,7 +19,7 @@ class GooglerResults:
     def __init__(self, argv):
         self.argv = argv
         json_output = subprocess.check_output(
-            [str(GOOGLER), *PRESET_OPTIONS, "--json", *argv]
+            [str(GOOGLER), *PRESET_OPTIONS, "--debug", "--json", *argv]
         ).decode("utf-8")
         self.results = json.loads(json_output)
         assert self.results, "no results"
