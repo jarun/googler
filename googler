@@ -265,7 +265,6 @@ class TrackedTextwrap:
 
 import html
 import re
-import textwrap
 from collections import OrderedDict
 from enum import Enum
 from html.parser import HTMLParser
@@ -303,6 +302,7 @@ class Node(object):
 
         # Used in DOMBuilder.
         self._partial = False
+        self._namespace = None  # type: Optional[str]
 
     # HTML representation of the node. Meant to be implemented by
     # subclasses.
@@ -537,7 +537,7 @@ class ElementNode(Node):
         s += ">"
         return s
 
-    # https://ipython.org/ipython-doc/3/api/generated/IPython.lib.pretty.html
+    # https://ipython.readthedocs.io/en/stable/api/generated/IPython.lib.pretty.html
     def _repr_pretty_(self, p: Any, cycle: bool) -> None:  # pragma: no cover
         if cycle:
             raise RuntimeError("cycle detected in DOM tree")
@@ -660,7 +660,19 @@ class DOMBuilder(HTMLParser):
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
+        # _stack is the stack for nodes. Each node is pushed to the
+        # stack when its start tag is processed, and remains on the
+        # stack until its parent node is completed (end tag processed),
+        # at which point the node is attached to the parent node as a
+        # child and popped from the stack.
         self._stack = []  # type: List[Node]
+        # _namespace_stack is another stack tracking the parsing
+        # context, which is generally the default namespace (None) but
+        # changes when parsing foreign objects (e.g. 'svg' when parsing
+        # an <svg>). The top element is always the current parsing
+        # context, so popping works differently from _stack: an element
+        # is popped as soon as the corresponding end tag is processed.
+        self._namespace_stack = [None]  # type: List[Optional[str]]
 
     def handle_starttag(
         self, tag: str, attrs: Sequence[Tuple[str, Optional[str]]]
@@ -668,9 +680,16 @@ class DOMBuilder(HTMLParser):
         node = ElementNode(tag, attrs)
         node._partial = True
         self._stack.append(node)
-        # For void elements, immediately invoke the end tag handler (see
-        # handle_startendtag()).
-        if _tag_is_void(tag):
+        namespace = (
+            tag.lower()
+            if _tag_encloses_foreign_namespace(tag)
+            else self._namespace_stack[-1]  # Inherit parent namespace
+        )
+        node._namespace = namespace
+        self._namespace_stack.append(namespace)
+        # For void elements (not in a foreign context), immediately
+        # invoke the end tag handler (see handle_startendtag()).
+        if not namespace and _tag_is_void(tag):
             self.handle_endtag(tag)
 
     def handle_endtag(self, tag: str) -> None:
@@ -690,16 +709,35 @@ class DOMBuilder(HTMLParser):
         parent._partial = False
         for child in children:
             child.parent = parent
+        self._namespace_stack.pop()
 
     # Make parser behavior for explicitly and implicitly void elements
     # (e.g., <hr> vs <hr/>) consistent. The former triggers
     # handle_starttag only, whereas the latter triggers
     # handle_startendtag (which by default triggers both handle_starttag
-    # and handle_endtag). See https://www.bugs.python.org/issue25258.
+    # and handle_endtag). See https://bugs.python.org/issue25258.
+    #
+    # An exception is foreign elements, which aren't considered void
+    # elements but can be explicitly marked as self-closing according to
+    # the HTML spec (e.g. <path/> is valid but <path> is not).
+    # Therefore, both handle_starttag and handle_endtag must be called,
+    # and handle_endtag should not be triggered from within
+    # handle_starttag in that case.
+    #
+    # Note that for simplicity we do not check whether the foreign
+    # element in question is allowed to be self-closing by spec. (The
+    # SVG spec unfortunately doesn't provide a readily available list of
+    # such elements.)
+    #
+    # https://html.spec.whatwg.org/multipage/syntax.html#foreign-elements
     def handle_startendtag(
         self, tag: str, attrs: Sequence[Tuple[str, Optional[str]]]
     ) -> None:
-        self.handle_starttag(tag, attrs)
+        if self._namespace_stack[-1] or _tag_encloses_foreign_namespace(tag):
+            self.handle_starttag(tag, attrs)
+            self.handle_endtag(tag)
+        else:
+            self.handle_starttag(tag, attrs)
 
     def handle_data(self, text: str) -> None:
         if not self._stack:
@@ -1378,6 +1416,16 @@ def _tag_is_void(tag: str) -> bool:
         "track",
         "wbr",
     )
+
+
+def _tag_encloses_foreign_namespace(tag: str) -> bool:
+    """
+    Checks whether the tag encloses a foreign namespace (MathML or SVG).
+
+    https://html.spec.whatwg.org/multipage/syntax.html#foreign-elements
+    """
+    return tag.lower() in ("math", "svg")
+
 
 ### end dim ###
 
