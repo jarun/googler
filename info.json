@@ -2,5 +2,5 @@
     "epoch": "20201001",
     "tracking_issue": 372,
     "fixed_on_master": true,
-    "fixed_in_release": false
+    "fixed_in_release": "v4.3.1"
 }
