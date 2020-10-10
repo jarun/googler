@@ -1556,6 +1556,26 @@ def check_stdout_encoding():
         sys.exit(1)
 
 
+def time_it(description=None):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapped(*args, **kwargs):
+            # Only profile in debug mode.
+            if not logger.isEnabledFor(logging.DEBUG):
+                return func(*args, **kwargs)
+
+            import time
+            mark = time.perf_counter()
+            ret = func(*args, **kwargs)
+            duration = time.perf_counter() - mark
+            logger.debug('%s completed in \x1b[33m%.3fs\x1b[0m', description or func.__name__, duration)
+            return ret
+
+        return wrapped
+
+    return decorator
+
+
 # Classes
 
 class HardenedHTTPSConnection(HTTPSConnection):
@@ -2084,6 +2104,7 @@ class GoogleConnection(object):
         """The host currently connected to."""
         return self._host
 
+    @time_it()
     def new_connection(self, host=None, port=None, timeout=45):
         """Close the current connection (if any) and establish a new one.
 
@@ -2148,6 +2169,7 @@ class GoogleConnection(object):
         """
         self.new_connection(timeout=timeout)
 
+    @time_it()
     def fetch_page(self, url):
         """Fetch a URL.
 
@@ -2303,6 +2325,7 @@ class GoogleParser(object):
         self.results = []
         self.parse(html)
 
+    @time_it()
     def parse(self, html):
         tree = parse_html(html)
 
