@@ -35,6 +35,7 @@ import shutil
 import signal
 import socket
 import ssl
+import subprocess
 from subprocess import Popen, PIPE, DEVNULL
 import sys
 import textwrap
@@ -1455,8 +1456,7 @@ def open_url(url):
 
     # Custom URL handler gets max priority
     if hasattr(open_url, 'url_handler'):
-        p = Popen([open_url.url_handler, url], stdin=PIPE)
-        p.communicate()
+        subprocess.run([open_url.url_handler, url])
         return
 
     browser = webbrowser.get()
