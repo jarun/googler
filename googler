@@ -2369,7 +2369,11 @@ class GoogleParser(object):
                     # Note that a filetype tag (e.g. PDF) is now pretty
                     # damn hard to parse with confidence (that it'll
                     # survive the slighest further change), so we don't.
-                    title_node, details_node, *_ = div_g.select_all('div.rc > div')
+                    
+                    # As of January 15th 2021, the html class is not rc anymore, it's tF2Cxc.
+                    # This approach is not very resilient to changes by Google, but it works for now.
+                    # title_node, details_node, *_ = div_g.select_all('div.rc > div')
+                    title_node, details_node, *_ = div_g.select_all('div.tF2Cxc > div')
                     if 'yuRUbf' not in title_node.classes:
                         logger.debug('unexpected title node class(es): expected %r, got %r',
                                      'yuRUbf', ' '.join(title_node.classes))
