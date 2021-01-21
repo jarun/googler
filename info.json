@@ -1,6 +1,6 @@
 {
-    "epoch": "20201001",
-    "tracking_issue": 372,
+    "epoch": "20210115",
+    "tracking_issue": 392,
     "fixed_on_master": true,
-    "fixed_in_release": "v4.3.1"
+    "fixed_in_release": "v4.3.2"
 }

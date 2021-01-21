@@ -90,8 +90,8 @@ except ValueError:
 
 # Constants
 
-_VERSION_ = '4.3.1'
-_EPOCH_ = '20201001'
+_VERSION_ = '4.3.2'
+_EPOCH_ = '20210115'
 
 COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'a': '30', 'b': '31', 'c': '32', 'd': '33',
@@ -2369,7 +2369,7 @@ class GoogleParser(object):
                     # Note that a filetype tag (e.g. PDF) is now pretty
                     # damn hard to parse with confidence (that it'll
                     # survive the slighest further change), so we don't.
-                    
+
                     # As of January 15th 2021, the html class is not rc anymore, it's tF2Cxc.
                     # This approach is not very resilient to changes by Google, but it works for now.
                     # title_node, details_node, *_ = div_g.select_all('div.rc > div')
