@@ -30,7 +30,7 @@ class GooglerResults:
             assert predicate(result)
 
     def some_should(self, predicate):
-        assert any(map(predicate, self.results))
+        any(list(map(predicate, self.results)))
 
 
 GR = GooglerResults
