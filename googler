@@ -2338,12 +2338,24 @@ class GoogleParser(object):
             except ImportError:
                 import pdb
                 pdb.set_trace()
+        
+        # Google changed their news structure around September 2021
+        # Changing the parser breaks the non-news functionality
+        # So it might be easier to just set these dynamically here.
+        if self.news:
+            div_selector = 'div[data-hveid]'
+            title_selector = 'div'
+            h3_selector = 'div'
+        else:
+            div_selector = 'div.g'
+            title_selector = 'div.tF2Cxc > div'
+            h3_selector = 'h3'
 
         # cw is short for collapse_whitespace.
         cw = lambda s: re.sub(r'[ \t\n\r]+', ' ', s) if s is not None else s
 
         index = 0
-        for div_g in tree.select_all('div.g'):
+        for div_g in tree.select_all(div_selector):
             if div_g.select('.hp-xpdbox'):
                 # Skip smart cards.
                 continue
@@ -2373,7 +2385,7 @@ class GoogleParser(object):
                     # As of January 15th 2021, the html class is not rc anymore, it's tF2Cxc.
                     # This approach is not very resilient to changes by Google, but it works for now.
                     # title_node, details_node, *_ = div_g.select_all('div.rc > div')
-                    title_node, details_node, *_ = div_g.select_all('div.tF2Cxc > div')
+                    title_node, details_node, *_ = div_g.select_all(title_selector)
                     if 'yuRUbf' not in title_node.classes:
                         logger.debug('unexpected title node class(es): expected %r, got %r',
                                      'yuRUbf', ' '.join(title_node.classes))
@@ -2381,7 +2393,7 @@ class GoogleParser(object):
                         logger.debug('unexpected details node class(es): expected %r, got %r',
                                      'IsZvec', ' '.join(details_node.classes))
                     a = title_node.select('a')
-                    h3 = a.select('h3')
+                    h3 = a.select(h3_selector)
                     title = h3.text
                     abstract_node = details_node.select('span')
                     metadata_node = details_node.select('.f, span ~ div')
