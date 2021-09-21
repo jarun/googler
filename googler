@@ -2248,7 +2248,7 @@ class GoogleConnection(object):
         """Redirect to and fetch a new URL.
 
         Like `_raw_get`, the response is stored in ``self._resp``. A new
-        connection is made if redirecting to a different host.
+        connection is made if redirecting to a different host or local proxy is enabled.
 
         Parameters
         ----------
@@ -2265,7 +2265,7 @@ class GoogleConnection(object):
         segments = urllib.parse.urlparse(url)
 
         host = segments.netloc
-        if host != self._host:
+        if host != self._host or self._proxy is not None:
             self.new_connection(host)
 
         relurl = urllib.parse.urlunparse(('', '') + segments[2:])
