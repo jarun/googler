@@ -2338,10 +2338,18 @@ class GoogleParser(object):
             except ImportError:
                 import pdb
                 pdb.set_trace()
-        
+
         # Google changed their news structure around September 2021
         # Changing the parser breaks the non-news functionality
         # So it might be easier to just set these dynamically here.
+
+        # The Title is a dot-separated string in the format:
+        #     - NewsAgency.Title.(Abstract).NewsAge
+        #       (NewsAgency can have dot(s) within)
+        # Abstract has the NewsAgency.
+        # Metadata is same as the actual news Title.
+        # So we set Title as Metadata, append NewsAge to Abstract and
+        # clear Metadata to avoid showing the same Title and Metadata
         if self.news:
             div_selector = 'div[data-hveid]'
             title_selector = 'div'
@@ -2395,6 +2403,11 @@ class GoogleParser(object):
                     a = title_node.select('a')
                     h3 = a.select(h3_selector)
                     title = h3.text
+
+                    if self.news:
+                        newstitle = title.split('.')
+                        #title = newstitle[1]
+
                     abstract_node = details_node.select('span')
                     metadata_node = details_node.select('.f, span ~ div')
                 url = self.unwrap_link(a.attr('href'))
@@ -2417,6 +2430,10 @@ class GoogleParser(object):
                         continue
                     for child in node.children:
                         abstract_nodes.append(child)
+
+                if self.news:
+                    abstract = abstract + " - " + newstitle[-1]
+
                 metadata = None
                 try:
                     # Sometimes there are multiple metadata fields
@@ -2439,6 +2456,11 @@ class GoogleParser(object):
                         )
                 except AttributeError:
                     pass
+
+                if self.news:
+                    title = metadata
+                    metadata = ""
+
             except (AttributeError, ValueError):
                 continue
             sitelinks = []
