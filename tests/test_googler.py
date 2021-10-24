@@ -51,6 +51,7 @@ def test_default_search(query):
     gr.some_should(have_matched_keywords)
 
 
+@pytest.mark.skip(reason="Google News format has changed")
 def test_news_search():
     def have_metadata(result):
         return bool(result.get("metadata"))
