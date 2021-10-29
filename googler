@@ -2849,6 +2849,10 @@ class GooglerCmd(object):
         """Current keywords."""
         return self._google_url.keywords
 
+    def printurl(self):
+        """Current search url."""
+        return self._google_url
+
     @require_keywords
     def fetch(self):
         """Fetch a page and parse for results.
@@ -3542,10 +3546,8 @@ def check_new_version():
 def python_version():
     return '%d.%d.%d' % sys.version_info[:3]
 
-
 def https_proxy_from_environment():
     return os.getenv('https_proxy')
-
 
 def parse_proxy_spec(proxyspec):
     if '://' in proxyspec:
@@ -3746,6 +3748,7 @@ def parse_args(args=None, namespace=None):
     # Hidden option for parsing dumped HTML
     addarg('--parse', dest='html_file', help=argparse.SUPPRESS)
     addarg('--complete', help=argparse.SUPPRESS)
+    addarg('-P', '--printurl', action='store_true', help='print search url and exit')
 
     parsed = argparser.parse_args(args, namespace)
     if parsed.nocolor:
@@ -3824,6 +3827,10 @@ def main():
             logger.warning('--noua option has been deprecated and has no effect (see #284)')
 
         repl = GooglerCmd(opts)
+
+        if opts.printurl:
+            print(repl.printurl())
+            sys.exit(0)
 
         # Non-interactive mode
         if opts.json or opts.lucky or opts.noninteractive or opts.html_file:
