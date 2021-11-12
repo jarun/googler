@@ -1606,7 +1606,12 @@ class HardenedHTTPSConnection(HTTPSConnection):
         elif not notweak:
             # Try to use TLS 1.2
             ssl_context = None
-            if hasattr(ssl, 'PROTOCOL_TLS'):
+            if hasattr(ssl, 'PROTOCOL_TLS_CLIENT'):
+                # Since Python 3.6
+                ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_NONE
+            elif hasattr(ssl, 'PROTOCOL_TLS'):
                 # Since Python 3.5.3
                 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
                 if hasattr(ssl_context, "minimum_version"):
